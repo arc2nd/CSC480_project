@@ -1,0 +1,32 @@
+<html>
+<head>
+{% if title %}
+<title>{{ title }}</title>
+{% else %}
+<title>Welcome to Chore Explore</title>
+{% endif %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!---<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  interesting themes: lux, darkly, cosmo -->
+  <link rel="stylesheet" href="https://bootswatch.com/4/cosmo/bootstrap.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+</head>
+<body>
+<div style="margin-left:50px; margin-right:50px;margin-top:50px;margin-bot:50px;">
+    <h1>{{ title }}</h1>
+    {% block content %}{% endblock %}
+</div>
+
+{% if not footer %}
+    <center>
+    <a href="{{ url_for('index') }}">Index</a> | 
+    <a href="{{ url_for('my_account') }}">My Account</a> | 
+    <a href="{{ url_for('logout') }}">Logout</a>
+    </center>
+{% endif %}
+</body>
+</html>

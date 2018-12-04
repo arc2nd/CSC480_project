@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="jumbotron text-center">
+    <h1>Welcome to Chore Explore</h1>
+
+Let's do chores, yay!!!
+</div>
+
+
+<div style="margin-left:50px; margin-right:50px;">
+    Family Members (replace this static bit with a database user query):
+    <ul>
+    <li><a href="{{ url_for('chores') }}">James Boyer</a>
+    <li><a href="{{ url_for('chores') }}">James McGee</a>
+    <li><a href="{{ url_for('chores') }}">James Parks</a>
+    <li><a href="{{ url_for('chores') }}">Rebecca Plaster</a>
+    </ul>
+
+    <a href="{{ url_for('available') }}">Available Chores</a><br>
+    <a href="{{ url_for('new_chore') }}">New Chore</a><br>
+
+</div>
+{% endblock %}
+
