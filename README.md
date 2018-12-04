@@ -11,5 +11,7 @@ Intro to my Flask webapp process:
     - Windows: `source venv/Scripts/activate`
 5. install requirements:
     - `pip install -r requirements.txt`
+6. run temp server:
+    - `python routes.py`
 
 Point your webbrowser to `localhost:5000`
