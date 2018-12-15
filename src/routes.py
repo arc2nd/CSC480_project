@@ -27,7 +27,16 @@ def logout():
 
 @app.route('/chores', methods=['GET'])
 def chores():
-    return render_template('chores.html')
+    chores_dict = {'Take out trash': 1, 
+                   'Take out recycling': 1, 
+                   'Clean kitty litter': 2, 
+                   'Clean chicken coop': 3, 
+                   'Clean playroom': 1, 
+                   'Wash dishes': 2, 
+                   'Clean your room': 1, 
+                   'Clean bathroom': 3, 
+                   'Vacuum': 1}
+    return render_template('chores.html', data=chores_dict)
 
 
 @app.route('/available', methods=['GET'])

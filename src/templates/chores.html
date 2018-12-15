@@ -2,16 +2,9 @@
 {% block content %}
 
 <ul>
-    <li>Take out trash - $?
-    <li>Take out recycling - $?
-    <li>Clean kitty litter - $?
-    <li>Clean chicken coop - $?
-    <li>Clean playroom - $?
-    <li>Wash dishes - $?
-    <li>Clean your room - $?
-    <li>Clean bathroom - $?
-    <li>Vacuum - $?
-    <li>Water Plants - $?
+{% for c in data %}
+    <li>{{ c }} :: {{ data[c] }}
+{% endfor %}
 </ul>
 
 <p>
