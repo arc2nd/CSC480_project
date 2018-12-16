@@ -45,6 +45,7 @@ def chores():
 
 @app.route('/new_chore_results', methods=['GET', 'POST'])
 def new_chore_results():
+    order_list = ['name', 'desc', 'assigned_to', 'points', 'due']
     res = request.form
     processed_res, missing = Helpers._process_chore_form(res)
     _log(1, missing)
@@ -52,7 +53,7 @@ def new_chore_results():
         return render_template('error.html', data=missing)
     res_str = json.dumps(processed_res, sort_keys=True, indent=4)
     _log(1, res_str)
-    return render_template('new_chore_results.html', data=res)
+    return render_template('new_chore_results.html', order=order_list, data=res)
 
 @app.route('/available', methods=['GET'])
 def available():

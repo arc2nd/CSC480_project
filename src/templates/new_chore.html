@@ -6,6 +6,7 @@ here we will make a new note
 <form name="convert" action="{{ url_for('new_chore_results') }}" method="POST" }}>
     Chore Name: <input name='name' type='text' value=''><br>
     Description: <input name='desc' type='text'><br>
+    Assigned To: <input name='assigned_to', type='text'><br>
     Due: <input name='due' type='text'><br>
     Points: <input name='points' type=number value=0><br>
     <input type="submit" value="Make Chore">
