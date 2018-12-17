@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
 
-Here will be a list of available chores
+<h3>Here will be a list of available chores</h3>
+
+{% for chore in order %}
+    {{ chore|replace('.json', '') }}<br>
+    {% for field in data[chore] %}
+        &nbsp&nbsp&nbsp&nbsp<b>{{ field|replace('_', ' ') }}:</b> {{ data[chore][field] }}  
+    {% endfor %}
+    <br>
+{% endfor %}
 
 {% endblock %}
