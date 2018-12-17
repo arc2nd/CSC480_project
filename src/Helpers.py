@@ -2,6 +2,8 @@
 
 #this is a good spot to put functions that don't really fit other descriptions
 
+from Log import _log
+
 MANDATORY_CHORE_KEYS = ['name']
 OPTIONAL_CHORE_KEYS= ['points', 'desc', 'due']
 POSSIBLE_CHORE_KEYS = MANDATORY_CHORE_KEYS + OPTIONAL_CHORE_KEYS
@@ -14,12 +16,16 @@ MANDATORY_USER_KEYS = ['name', 'email', 'type']
 OPTIONAL_USER_KEYS = ['first', 'middle', 'last', 'dob', 'style']
 POSSIBLE_USER_KEYS = MANDATORY_USER_KEYS + OPTIONAL_USER_KEYS
 
+VERBOSITY = 1
 
 def _convert_form_keys(in_dict):
     """Converts an ImmutableDict to a regular Dict"""
     ret_dict = {}
     for key in in_dict:
-        ret_dict[key] = in_dict[key]
+        if 'submit' not in key.lower():
+            ret_dict[key] = in_dict[key]
+        else:
+            _log(6, VERBOSITY, 'submit', 'chore.log')
     return ret_dict
 
 def _validate_form_keys(in_dict, mandatory_list):
@@ -27,9 +33,9 @@ def _validate_form_keys(in_dict, mandatory_list):
     missing = []
     for key in in_dict:
         if key in mandatory_list:
-            print('key is mandatory: {}'.format(key))
+            _log(6, VERBOSITY, 'key is mandatory: {}'.format(key))
             if not in_dict[key]:
-                print(key)
+                _log(6, VERBOSITY, key)
                 missing.append(key)
     return missing
 

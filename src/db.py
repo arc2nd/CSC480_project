@@ -10,6 +10,8 @@
 import os
 import json
 
+from Log import _log
+
 CONN = os.path.join(os.getcwd(), 'chore_storage')
 
 def _validate_storage_location(conn):
@@ -33,7 +35,7 @@ def _read_from_storage(conn, target):
     ret_val = False
     data_dict = {}
     valid = _validate_storage_location(conn)
-    with open(os.path.join(conn, '{}.json'.format(target)), 'r') as fp:
+    with open(os.path.join(conn, '{}'.format(target)), 'r') as fp:
         data_dict = json.load(fp)
         ret_val = True
     return ret_val, data_dict
