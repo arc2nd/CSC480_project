@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+here we will make a new user 
+
+<form name="convert" action="{{ url_for('new_account_results') }}" method="POST" }}>
+    Account Name: <input name='name' type='text'><br>
+    Email: <input name='email' type='text'><br>
+    Type: <input name='type' type='text'><br>
+    First Name: <input name='first' type='text'><br>
+    Middle Name: <input name='middle', type='text'><br>
+    Last Name: <input name='last' type='text'><br>
+    DoB: <input name='dob' type='text'><br>
+    Style: <input name='points' type='text'><br>
+    <input type="submit" name='submit' value="Make User">
+    <input type="submit" name='cancel' value="cancel">
+</form>
+
+
+{% endblock %}

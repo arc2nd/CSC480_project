@@ -46,6 +46,11 @@ def chores():
     return render_template('chores.html', data=chores_dict)
 
 
+@app.route('/new_chore', methods=['GET'])
+def new_chore():
+    return render_template('new_chore.html')
+
+
 @app.route('/new_chore_results', methods=['GET', 'POST'])
 def new_chore_results():
     res = request.form
@@ -75,14 +80,35 @@ def available():
     return render_template('available.html', order=order_list, data=chores_dict)
 
 
-@app.route('/new_chore', methods=['GET'])
-def new_chore():
-    return render_template('new_chore.html')
-
-
 @app.route('/my_account', methods=['GET'])
 def my_account():
     return render_template('my_account.html')
+
+
+@app.route('/new_account', methods=['GET'])
+def new_account():
+    return render_template('new_account.html')
+
+
+@app.route('/new_account_results', methods=['GET', 'POST'])
+def new_account_results():
+    res = request.form
+    if 'cancel' in res:  # check to see if the cancel button has been pressed
+        return redirect(url_for('index'))
+    return render_template('new_account_results.html')
+
+
+@app.route('/new_reward', methods=['GET'])
+def new_reward():
+    return render_template('new_reward.html')
+
+
+@app.route('/new_reward_results', methods=['GET', 'POST'])
+def new_reward_results():
+    res = request.form
+    if 'cancel' in res:  # check to see if the cancel button has been pressed
+        return redirect(url_for('index'))
+    return render_template('new_reward_results.html')
 
 
 @app.route('/error', methods=['GET'])

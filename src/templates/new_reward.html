@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+here we will make a new reward
+
+<form name="reward" action="{{ url_for('new_reward_results') }}" method="POST" }}>
+    Reward Name: <input name='name' type='text' value=''><br>
+    Description: <input name='desc' type='text'><br>
+    Expires: <input name='expires' type='text'><br>
+    Points: <input name='points' type=number value=0><br>
+    <input type="submit" name='submit' value="Make Reward">
+    <input type="submit" name='cancel' value="cancel">
+</form>
+
+
+{% endblock %}

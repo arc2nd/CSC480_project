@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>The user you just created</h3>
+{% for field in order %}
+    <b>{{ field|replace('_', ' ')|title }}:</b> {{data[field] }}<br>
+{% endfor %}
+
+
+{% endblock %}
