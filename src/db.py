@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+#db.py
 
 # this is probably a good place to put database related functions
 # unless we want a database object
@@ -15,6 +16,9 @@ from Log import _log
 CONN = os.path.join(os.getcwd(), 'chore_storage')
 
 def _validate_storage_location(conn):
+    """make sure the storage location actually exists
+       if not,  make it
+    """
     ret_val = True
     if not os.path.exists(conn):
         os.mkdir(conn)
@@ -23,6 +27,7 @@ def _validate_storage_location(conn):
 
 
 def _write_to_storage(conn, data):
+    """write a data dict to a location/connection"""
     ret_val = False
     valid = _validate_storage_location(conn)
     with open(os.path.join(conn, "{}.json".format(data['name'].replace(' ', '_'))), 'w') as fp:
@@ -32,6 +37,7 @@ def _write_to_storage(conn, data):
 
 
 def _read_from_storage(conn, target):
+    """read a record from the location/connection"""
     ret_val = False
     data_dict = {}
     valid = _validate_storage_location(conn)
@@ -41,6 +47,7 @@ def _read_from_storage(conn, target):
     return ret_val, data_dict
 
 def get_available_chores(conn):
+    """get all chores, will later filter by user"""
     all_chores = []
     if os.path.exists(conn):
         all_chores = os.listdir(conn)
