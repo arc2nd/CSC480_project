@@ -46,6 +46,14 @@ def _read_from_storage(conn, target):
         ret_val = True
     return ret_val, data_dict
 
+def write_chore_to_storage(conn, chore):
+    """write a chore object to a location/connection"""
+    _write_to_storage(conn, chore.data_dict)
+
+def write_reward_to_storage(conn, reward):
+    """write a reward object to a location/connection"""
+    _write_to_storage(conn, reward.data_dict)
+
 def get_available_chores(conn):
     """get all chores, will later filter by user"""
     all_chores = []

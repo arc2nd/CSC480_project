@@ -6,6 +6,7 @@ import json
 from flask import Flask, render_template, Response, redirect, url_for, request, session, flash
 
 import db
+import Chore
 import Helpers
 from Log import _log
 
@@ -53,17 +54,21 @@ def new_chore():
 
 @app.route('/new_chore_results', methods=['GET', 'POST'])
 def new_chore_results():
+    # general processing of the form we've received
     res = request.form
     if 'cancel' in res:  # check to see if the cancel button has been pressed
         return redirect(url_for('index'))
-    _log(6, VERBOSITY, res)
+    _log(1, VERBOSITY, res)
     processed_res, missing = Helpers._process_chore_form(res)  # process the form results and validate
     _log(6, VERBOSITY, missing)
     if len(missing) > 0:
         return render_template('error.html', data=missing)
-    db._write_to_storage(DB_CONN, processed_res)  # write chore to db (currently json storage)
-    res_str = json.dumps(processed_res, sort_keys=True, indent=4)
-    _log(6, VERBOSITY, res_str)
+
+    # build a chore object, populate it, and stick it in the db
+    this_chore = Chore.Chore(processed_res)
+    db.write_chore_to_storage(DB_CONN, this_chore)
+
+    # proceed to the results page
     order_list = ['name', 'desc', 'assigned_to', 'points', 'due']
     return render_template('new_chore_results.html', order=order_list, data=res)
 

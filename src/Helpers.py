@@ -2,6 +2,9 @@
 #Helpers.py
 #this is a good spot to put functions that don't really fit other descriptions
 
+import datetime
+
+import config
 from Log import _log
 
 MANDATORY_CHORE_KEYS = ['name']
@@ -18,15 +21,33 @@ POSSIBLE_USER_KEYS = MANDATORY_USER_KEYS + OPTIONAL_USER_KEYS
 
 VERBOSITY = 1
 
+CHORE_ATTRS = config.CHORE_ATTRS
+
 def _convert_form_keys(in_dict):
-    """Converts an ImmutableDict to a regular Dict"""
+    """Converts an ImmutableDict to a regular Dict
+       and converts type if necessary
+    """
     ret_dict = {}
     for key in in_dict:
         if 'submit' not in key.lower():
-            ret_dict[key] = in_dict[key]
+            val = in_dict[key]
+            if not isinstance(val, CHORE_ATTRS[key]):
+                if isinstance('string', CHORE_ATTRS[key]):
+                    val = '{}'.format(val)
+                if isinstance(0.0, CHORE_ATTRS[key]):
+                    val = float(val)
+                if isinstance(1, CHORE_ATTRS[key]):
+                    val = int(val)
+                if isinstance(datetime.datetime.now(), CHORE_ATTRS[key]):
+                    val = _convert_str_to_dt(val)
+            ret_dict[key] = val
         else:
             _log(6, VERBOSITY, 'submit', 'chore.log')
     return ret_dict
+
+def _convert_str_to_dt(val):
+    """Convert a string (mm/dd/yy) to a datetime object"""
+    return val
 
 def _validate_form_keys(in_dict, mandatory_list):
     """Make sure that the mandatory keys have values"""
