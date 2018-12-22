@@ -63,7 +63,7 @@ class Chore(object):
         """compare now to the due datetime value"""
         ret_val = False
         now = datetime.datetime.now()
-        if 'done' in self.data_dict.keys():
+        if 'due' in self.data_dict.keys():
             if now >= self.data_dict['due']:
                 self.data_dict['expired'] = True
                 self.ret_val = True
