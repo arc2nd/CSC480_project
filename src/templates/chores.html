@@ -3,7 +3,7 @@
 
 <ul>
 {% for c in data %}
-    <li>{{ c }} :: {{ data[c] }}
+    <li><a href="{{ url_for('edit_chore', chore=c) }}">{{ c }}</a> :: {{ data[c] }}
 {% endfor %}
 </ul>
 

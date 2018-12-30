@@ -11,6 +11,8 @@
 import os
 import json
 
+import User
+import Chore
 from Log import _log
 
 CONN = os.path.join(os.getcwd(), 'chore_storage')
@@ -54,11 +56,45 @@ def write_reward_to_storage(conn, reward):
     """write a reward object to a location/connection"""
     _write_to_storage(conn, reward.data_dict)
 
-def get_available_chores(conn):
+def get_all_chores(conn):
     """get all chores, will later filter by user"""
     all_chores = []
     if os.path.exists(conn):
         all_chores = os.listdir(conn)
     return all_chores
 
-    
+def get_all_users(conn):
+    all_users = []
+    if os.path.exists(conn):
+        all_users = os.listdir(conn)
+    return all_users
+
+def get_user(conn=None, name=None):
+    all_users = get_all_users(conn)
+    for u in all_users:
+        if name in u:
+            m = User.User()
+            m.set_attr(attr='name', value=name)
+            m.load_from_db('user_storage')
+            return m
+
+def get_available_chores(conn):
+    return get_user_chores(conn=conn, user='')
+
+def get_chore(conn=None, name=None):
+    all_chores = get_all_chores(conn)
+    for c in all_chores:
+        if name in c:
+            c = Chore.Chore()
+            c.set_attr(attr='name', value=name)
+            c.load_from_db('chore_storage')
+            return c
+
+def get_user_chores(conn=None, user=None):
+    all_chores = get_all_chores(conn)
+    user_chores = []
+    for c in all_chores:
+        c_dict = get_chore(conn, c).data_dict
+        if user == c_dict['assigned_to']:
+            user_chores.append(c)
+    return user_chores

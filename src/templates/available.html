@@ -4,7 +4,7 @@
 <h3>Here will be a list of available chores</h3>
 
 {% for chore in order %}
-    {{ chore|replace('.json', '') }}<br>
+    <a href="{{ url_for('edit_chore', chore=chore) }}">{{ chore|replace('.json', '') }}</a><br>
     {% for field in data[chore] %}
         &nbsp&nbsp&nbsp&nbsp<b>{{ field|replace('_', ' ') }}:</b> {{ data[chore][field] }}  
     {% endfor %}

@@ -1,41 +1,97 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import json
+import calendar
+import datetime
+import traceback
+from functools import wraps
 
 from flask import Flask, render_template, Response, redirect, url_for, request, session, flash
 
 import db
+import User
 import Chore
 import Helpers
 from Log import _log
 
 app = Flask(__name__)
+#app.secret_key = 'i am a secret'
+app.secret_key = Helpers.get_creds('envs.crypt')['SECRET_KEY']
+
 
 # set some globals
 VERBOSITY = 1
 DB_CONN = db.CONN
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        for i in session:
+            _log(1, VERBOSITY, '{} :: {}'.format(i, session[i]))
+        if 'logged_in' not in session:
+            return redirect(url_for('login')) #, next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 
 
 # The actual website endpoints
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index')
+@login_required
 def index():
-    return render_template('index.html')
+    user_list = db.get_all_users(conn='user_storage')
+    user_dict = {}
+    for user in user_list:
+        u_dict = db.get_user(conn='user_storage', name=user)
+        user_dict[user] = u_dict.data_dict
+    return render_template('index.html', data={'users': user_dict})
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
+    try:
+        res = request.form
+        if Helpers.verify_user(res['username']):
+            u = db.get_user(conn='user_storage', name=res['username'])
+            if u.verify(passwd=res['password']):
+                ts = calendar.timegm(datetime.datetime.now().timetuple())
+                session['user'] = u.get_attr(attr='name')
+                session['logged_in'] = ts
+                for i in session:
+                    print('{} :: {}'.format(i, session[i]))
+                return redirect(url_for('index'))
+    except:
+        print(sys.exc_info())
+        traceback.print_tb(sys.exc_info()[-1])
+        return render_template('login.html')
     return render_template('login.html')
 
 @app.route('/logout')
 def logout():
+    user_name = session['user']
+    session.pop('user')
+    session.pop('logged_in')
+    for i in session:
+        print('{} :: {}'.format(i, session[i]))
+    return render_template('logout.html', user=user_name)
     return render_template('logout.html')
 
 
 @app.route('/chores', methods=['GET', 'POST'])
-def chores():
-    chores_dict = {'Take out trash': 1,  # build a fake chore dict
+@app.route('/chores/<user>', methods=['GET', 'POST'])
+@login_required
+def chores(user=None):
+    if user:
+        user_chores = db.get_user_chores(db.CONN, user)
+        chores_dict = {}
+        for c in user_chores:
+            chores_dict[c] = db.get_chore(db.CONN, c).data_dict
+    else:
+        chores_dict = {'Take out trash': 1,  # build a fake chore dict
                    'Take out recycling': 1, 
                    'Clean kitty litter': 2, 
                    'Clean chicken coop': 3, 
@@ -46,13 +102,14 @@ def chores():
                    'Vacuum': 1}
     return render_template('chores.html', data=chores_dict)
 
-
 @app.route('/new_chore', methods=['GET'])
+@login_required
 def new_chore():
     return render_template('new_chore.html')
 
 
 @app.route('/new_chore_results', methods=['GET', 'POST'])
+@login_required
 def new_chore_results():
     # general processing of the form we've received
     res = request.form
@@ -72,8 +129,8 @@ def new_chore_results():
     order_list = ['name', 'desc', 'assigned_to', 'points', 'due']
     return render_template('new_chore_results.html', order=order_list, data=res)
 
-
 @app.route('/available', methods=['GET'])
+@login_required
 def available():
     chores_list = db.get_available_chores(DB_CONN)  # get chores from db (currently a list of json files)
     chores_dict = {}
@@ -85,17 +142,32 @@ def available():
     return render_template('available.html', order=order_list, data=chores_dict)
 
 
+@app.route('/edit_chore')
+@app.route('/edit_chore/<chore>', methods=['GET', 'POST'])
+@login_required
+def edit_chore(chore=None):
+    if chore:
+        chore_dict = db.get_chore(DB_CONN, chore).data_dict
+        #chore_dict = db.get_chore(res['chore_name']).data_dict
+        return render_template('edit_chore.html', data=chore_dict)
+    else:
+        return redirect(url_for('error'))
+
+
+
 @app.route('/my_account', methods=['GET'])
+@login_required
 def my_account():
     return render_template('my_account.html')
 
-
 @app.route('/new_account', methods=['GET'])
+@login_required
 def new_account():
     return render_template('new_account.html')
 
 
 @app.route('/new_account_results', methods=['GET', 'POST'])
+@login_required
 def new_account_results():
     res = request.form
     if 'cancel' in res:  # check to see if the cancel button has been pressed
@@ -103,17 +175,25 @@ def new_account_results():
     return render_template('new_account_results.html')
 
 
+
+
+
 @app.route('/new_reward', methods=['GET'])
+@login_required
 def new_reward():
     return render_template('new_reward.html')
 
-
 @app.route('/new_reward_results', methods=['GET', 'POST'])
+@login_required
 def new_reward_results():
     res = request.form
     if 'cancel' in res:  # check to see if the cancel button has been pressed
         return redirect(url_for('index'))
     return render_template('new_reward_results.html')
+
+
+
+
 
 
 @app.route('/error', methods=['GET'])
