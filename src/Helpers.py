@@ -2,7 +2,10 @@
 #Helpers.py
 #this is a good spot to put functions that don't really fit other descriptions
 
+import os
+import json
 import datetime
+import subprocess
 
 import config
 from Log import _log
@@ -22,6 +25,18 @@ POSSIBLE_USER_KEYS = MANDATORY_USER_KEYS + OPTIONAL_USER_KEYS
 VERBOSITY = 1
 
 CHORE_ATTRS = config.CHORE_ATTRS
+
+def get_creds(path):
+    cmd = "openssl des3 -salt -d -in %s -pass pass:%s" % (path, os.path.basename(path))
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    output = proc.communicate()[0]
+    if (output):
+        try:
+            j = json.loads(output)
+            return j
+        except:
+            return output
+
 
 def _convert_form_keys(in_dict):
     """Converts an ImmutableDict to a regular Dict
@@ -81,4 +96,10 @@ def _process_user_form(res):
     missing = _validate_form_keys(ret_dict, MANDATORY_USER_KEYS)
     return ret_dict, missing
 
-
+def verify_user(name=None):
+    list_of_users = os.listdir('user_storage')
+    print('all users: {}'.format(list_of_users))
+    for u in list_of_users:
+        if name in u:
+            return True
+    return False

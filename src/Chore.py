@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import os
+import json
 import types
 import datetime
 
@@ -25,6 +27,9 @@ class Chore(object):
 
     def load_from_db(self, db_conn):
         """load the chore's attributes from a database"""
+        if os.path.exists(os.path.join(db_conn, self.data_dict['name'])):
+            with open(os.path.join(db_conn, self.data_dict['name']), 'r') as fp: 
+                self.data_dict = json.load(fp)
         return
 
     def update_in_db(self, db_conn):
