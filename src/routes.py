@@ -13,6 +13,7 @@ from flask import Flask, render_template, Response, redirect, url_for, request, 
 import db
 import User
 import Chore
+import Reward
 import Helpers
 from Log import _log
 
@@ -25,6 +26,7 @@ app.secret_key = Helpers.get_creds('envs.crypt')['SECRET_KEY']
 VERBOSITY = 1
 CHORE_CONN = db.CHORE_CONN
 USER_CONN = db.USER_CONN
+REWARD_CONN = db.REWARD_CONN
 
 def login_required(f):
     @wraps(f)
@@ -91,16 +93,6 @@ def chores(user=None):
         chores_dict = {}
         for c in user_chores:
             chores_dict[c] = db.get_chore(CHORE_CONN, c).data_dict
-    else:
-        chores_dict = {'Take out trash': 1,  # build a fake chore dict
-                   'Take out recycling': 1, 
-                   'Clean kitty litter': 2, 
-                   'Clean chicken coop': 3, 
-                   'Clean playroom': 1, 
-                   'Wash dishes': 2, 
-                   'Clean your room': 1, 
-                   'Clean bathroom': 3, 
-                   'Vacuum': 1}
     return render_template('chores.html', data=chores_dict)
 
 @app.route('/new_chore', methods=['GET'])
@@ -130,9 +122,9 @@ def new_chore_results():
     order_list = ['name', 'desc', 'assigned_to', 'points', 'due']
     return render_template('new_chore_results.html', order=order_list, data=res)
 
-@app.route('/available', methods=['GET'])
+@app.route('/available_chores', methods=['GET'])
 @login_required
-def available():
+def available_chores():
     chores_list = db.get_available_chores(CHORE_CONN)  # get chores from db (currently a list of json files)
     chores_dict = {}
     for chore in chores_list:  # build a large dict with all of the info in it
@@ -140,7 +132,21 @@ def available():
         chores_dict[chore] = this_chore
     order_list = [k for k in chores_dict]  # get keys(chore names)
     order_list.sort()  # sort the name list, can change sort type
-    return render_template('available.html', order=order_list, data=chores_dict)
+    return render_template('available_chores.html', order=order_list, data=chores_dict)
+
+
+@app.route('/available_rewards', methods=['GET'])
+@login_required
+def available_rewards():
+    rewards_list = db.get_available_rewards(REWARD_CONN)  # get rewards from db (currently a list of json files)
+    rewards_dict = {}
+    for reward in rewards_list:  # build a large dict with all of the info in it
+        rewards_dict[reward.get_attr(attr='name')] = reward.data_dict
+    order_list = [k for k in rewards_dict]  # get keys(reward names)
+    order_list.sort()  # sort the name list, can change sort type
+    print(rewards_dict)
+    return render_template('available_rewards.html', order=order_list, data=rewards_dict)
+
 
 
 @app.route('/edit_chore')
@@ -150,6 +156,17 @@ def edit_chore(chore=None):
     if chore:
         chore_dict = db.get_chore(CHORE_CONN, chore).data_dict
         return render_template('edit_chore.html', data=chore_dict)
+    else:
+        return redirect(url_for('error'))
+
+
+@app.route('/edit_reward')
+@app.route('/edit_reward/<reward>', methods=['GET', 'POST'])
+@login_required
+def edit_reward(reward=None):
+    if reward:
+        reward_dict = db.get_reward(REWARD_CONN, reward).data_dict
+        return render_template('edit_reward.html', data=reward_dict)
     else:
         return redirect(url_for('error'))
 
@@ -196,16 +213,21 @@ def new_reward_results():
     res = request.form
     if 'cancel' in res:  # check to see if the cancel button has been pressed
         return redirect(url_for('index'))
-    return render_template('new_reward_results.html')
-
-
+    else:
+        processed_res, missing = Helpers.process_reward_form(res)
+        if len(missing) > 0:
+            return redirect(url_for('error', data=missing))
+    # build a reward object, populate it, and stick it in the db
+    this_reward = Reward.Reward(processed_res)
+    db.write_reward_to_storage(REWARD_CONN, this_reward)
+    return render_template('new_reward_results.html', data=this_reward.data_dict)
 
 
 
 
 @app.route('/error', methods=['GET'])
-def error():
-    return render_template('error.html')
+def error(missing_list=None):
+    return render_template('error.html', data=missing_list)
 
 
 if __name__ == '__main__':

@@ -10,13 +10,16 @@
 
 import os
 import json
+import datetime
 
 import User
 import Chore
+import Reward
 from Log import _log
 
 CHORE_CONN = os.path.join(os.getcwd(), 'chore_storage')
 USER_CONN = os.path.join(os.getcwd(), 'user_storage')
+REWARD_CONN = os.path.join(os.getcwd(), 'reward_storage')
 
 def _validate_storage_location(conn):
     """make sure the storage location actually exists
@@ -54,6 +57,7 @@ def write_chore_to_storage(conn, chore):
     _write_to_storage(conn, chore.data_dict)
 
 def write_user_to_storage(conn, user):
+    """write a user object to a location/connection"""
     _write_to_storage(conn, user.data_dict)
 
 def write_reward_to_storage(conn, reward):
@@ -73,14 +77,40 @@ def get_all_users(conn):
         all_users = os.listdir(conn)
     return all_users
 
+def get_all_rewards(conn):
+    all_rewards = []
+    if os.path.exists(conn):
+        all_rewards = os.listdir(conn)
+    return all_rewards
+
+def get_reward(conn=None, name=None):
+    all_rewards = get_all_rewards(conn)
+    for r in all_rewards:
+        if name in r:
+            this_reward = Reward.Reward()
+            this_reward.set_attr(attr='name', value=name)
+            this_reward.load_from_db(conn)
+            return this_reward
+
 def get_user(conn=None, name=None):
     all_users = get_all_users(conn)
     for u in all_users:
         if name in u:
-            m = User.User()
-            m.set_attr(attr='name', value=name)
-            m.load_from_db(conn)
-            return m
+            this_user = User.User()
+            this_user.set_attr(attr='name', value=name)
+            this_user.load_from_db(conn)
+            return this_user
+
+def get_available_rewards(conn):
+    ret_list = []
+    all_rewards = get_all_rewards(conn)
+    for r in all_rewards:
+        this_reward = Reward.Reward()
+        this_reward.set_attr(attr='name', value=r)
+        this_reward.load_from_db(conn)
+        if True: #datetime.datetime.now() < this_reward.get_attr(attr='due'):
+            ret_list.append(this_reward)
+    return ret_list
 
 def get_available_chores(conn):
     return get_user_chores(conn=conn, user='')
@@ -89,10 +119,10 @@ def get_chore(conn=None, name=None):
     all_chores = get_all_chores(conn)
     for c in all_chores:
         if name in c:
-            c = Chore.Chore()
-            c.set_attr(attr='name', value=name)
-            c.load_from_db(conn)
-            return c
+            this_chore = Chore.Chore()
+            this_chore.set_attr(attr='name', value=name)
+            this_chore.load_from_db(conn)
+            return this_chore
 
 def get_user_chores(conn=None, user=None):
     all_chores = get_all_chores(conn)
