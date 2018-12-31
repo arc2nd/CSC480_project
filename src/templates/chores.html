@@ -1,12 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
 
+<!-- 
 <ul>
 {% for c in data %}
     <li><a href="{{ url_for('edit_chore', chore=c) }}">{{ c }}</a> :: {{ data[c] }}
 {% endfor %}
 </ul>
+-->
 
+
+{% for chore in data %}
+    <a href="{{ url_for('edit_chore', chore=chore) }}">{{ chore|replace('.json', '') }}</a><br>
+    {% for field in data[chore] %}
+        &nbsp&nbsp&nbsp&nbsp<b>{{ field|replace('_', ' ') }}:</b> {{ data[chore][field] }}  
+    {% endfor %}
+    <br>
+{% endfor %}
+
+<p>
 <p>
 <a href="{{ url_for('index') }}">back to index</a>
 
