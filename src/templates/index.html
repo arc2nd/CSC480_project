@@ -11,11 +11,11 @@ Let's do chores, yay!!!
 <div style="margin-left:50px; margin-right:50px;">
     Family Members (replace this static bit with a database user query):
     <ul>
-    <li><a href="{{ url_for('chores', user='James Boyer') }}">James Boyer</a>
+   <!--  <li><a href="{{ url_for('chores', user='James Boyer') }}">James Boyer</a>
     <li><a href="{{ url_for('chores', user='James McGhee') }}">James McGhee</a>
     <li><a href="{{ url_for('chores', user='James Parks') }}">James Parks</a>
     <li><a href="{{ url_for('chores', user='Rebecca Plaster') }}">Rebecca Plaster</a>
-    <li>
+    <li> -->
     {% for u in data.users %}
         <li><a href="{{ url_for('chores', user=data['users'][u]['full_name']) }}">{{ data['users'][u]['first_name'] }} {{ data['users'][u]['last_name'] }}</a>
     {% endfor %}
