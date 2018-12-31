@@ -76,7 +76,7 @@ def get_user(conn=None, name=None):
         if name in u:
             m = User.User()
             m.set_attr(attr='name', value=name)
-            m.load_from_db('user_storage')
+            m.load_from_db(conn)
             return m
 
 def get_available_chores(conn):
@@ -88,7 +88,7 @@ def get_chore(conn=None, name=None):
         if name in c:
             c = Chore.Chore()
             c.set_attr(attr='name', value=name)
-            c.load_from_db('chore_storage')
+            c.load_from_db(conn)
             return c
 
 def get_user_chores(conn=None, user=None):
