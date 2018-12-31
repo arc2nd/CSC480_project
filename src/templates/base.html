@@ -18,6 +18,9 @@
 <body>
 <div style="margin-left:50px; margin-right:50px;margin-top:50px;margin-bot:50px;">
     <h1>{{ title }}</h1>
+    {% if admin %}
+        admin<br>
+    {% endif %}
     {% block content %}{% endblock %}
 </div>
 

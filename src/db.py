@@ -113,7 +113,16 @@ def get_available_rewards(conn):
     return ret_list
 
 def get_available_chores(conn):
-    return get_user_chores(conn=conn, user='')
+    ret_list = []
+    all_chores = get_all_chores(conn)
+    for c in all_chores:
+        this_chore = Chore.Chore()
+        this_chore.set_attr(attr='name', value=c)
+        this_chore.load_from_db(conn)
+        if True and this_chore.get_attr(attr='assigned_to') == '': #datatime.datetime.now() < this_chore.get_attr(attr='due'):
+            ret_list.append(this_chore)
+    return ret_list
+    #return get_user_chores(conn=conn, user='')
 
 def get_chore(conn=None, name=None):
     all_chores = get_all_chores(conn)
