@@ -33,7 +33,7 @@ def _write_to_storage(conn, data):
     """write a data dict to a location/connection"""
     ret_val = False
     valid = _validate_storage_location(conn)
-    with open(os.path.join(conn, "{}.json".format(data['name'].replace(' ', '_'))), 'w') as fp:
+    with open(os.path.join(conn, "{}".format(data['name'].replace(' ', '_'))), 'w') as fp:
         json.dump(data, fp, indent=4, sort_keys=True)
         ret_val = True
     return ret_val
@@ -52,6 +52,9 @@ def _read_from_storage(conn, target):
 def write_chore_to_storage(conn, chore):
     """write a chore object to a location/connection"""
     _write_to_storage(conn, chore.data_dict)
+
+def write_user_to_storage(conn, user):
+    _write_to_storage(conn, user.data_dict)
 
 def write_reward_to_storage(conn, reward):
     """write a reward object to a location/connection"""

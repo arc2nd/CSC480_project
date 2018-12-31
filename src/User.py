@@ -5,7 +5,12 @@ import json
 import types
 import datetime
 
+import bcrypt
+
 import config
+from Log import _log
+
+VERBOSITY = 1
 
 class User(object):
     """The object to define a Chore"""
@@ -55,10 +60,15 @@ class User(object):
         #encrypt password and check against database
         #if so fill up all the possible fields from 
         #stored data
-        if passwd == self.get_attr(attr='pw_hash'):
+        if bcrypt.checkpw(str(passwd), str(self.get_attr(attr='pw_hash'))):
             return True
         else:
             return False
+
+        #if passwd == self.get_attr(attr='pw_hash'):
+        #    return True
+        #else:
+        #    return False
 
         """
         expected_hashed = self.get_pw_from_db() #who you say you are
@@ -88,7 +98,7 @@ class User(object):
 
     #rest ops
     def encrypt_passwd(self, plaintext, hashed=None):
-        self._log(6, hashed)
+        _log(6,VERBOSITY, hashed)
         if not hashed:
             hashed = bcrypt.gensalt(8)
         try:
@@ -103,7 +113,7 @@ class User(object):
         #    ciphertext = resp.text[1:-2]
         #else:
         #    ciphertext = 'error'
-        self._log(6, ciphertext)
+        _log(6, VERBOSITY, ciphertext)
         self.pw_hash=ciphertext
         return ciphertext
 

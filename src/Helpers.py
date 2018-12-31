@@ -7,6 +7,8 @@ import json
 import datetime
 import subprocess
 
+import bcrypt
+
 import config
 from Log import _log
 
@@ -18,13 +20,15 @@ MANDATORY_REWARD_KEYS = ['name', 'points']
 OPTIONAL_REWARD_KEYS = ['desc', 'expires']
 POSSIBLE_REWARD_KEYS = MANDATORY_REWARD_KEYS + OPTIONAL_REWARD_KEYS
 
-MANDATORY_USER_KEYS = ['name', 'email', 'type']
+MANDATORY_USER_KEYS = ['name', 'email', 'type', 'pw_hash']
 OPTIONAL_USER_KEYS = ['first', 'middle', 'last', 'dob', 'style']
 POSSIBLE_USER_KEYS = MANDATORY_USER_KEYS + OPTIONAL_USER_KEYS
 
 VERBOSITY = 1
 
 CHORE_ATTRS = config.CHORE_ATTRS
+REWARD_ATTRS = config.REWARD_ATTRS
+USER_ATTRS = config.USER_ATTRS
 
 def get_creds(path):
     cmd = "openssl des3 -salt -d -in %s -pass pass:%s" % (path, os.path.basename(path))
@@ -38,26 +42,50 @@ def get_creds(path):
             return output
 
 
-def _convert_form_keys(in_dict):
+def _convert_form_keys(in_dict, attr_dict):
     """Converts an ImmutableDict to a regular Dict
        and converts type if necessary
     """
     ret_dict = {}
+    pass_1 = pass_2 = None
     for key in in_dict:
+        _log(6, VERBOSITY, key)
         if 'submit' not in key.lower():
             val = in_dict[key]
-            if not isinstance(val, CHORE_ATTRS[key]):
-                if isinstance('string', CHORE_ATTRS[key]):
+            try:
+                _log(6, VERBOSITY, '{} :: {}'.format(val, type(val)))
+                _log(6, VERBOSITY, '{} :: {}'.format(key, attr_dict[key]))
+            except:
+                print('')
+            if key == 'pass_1':
+                pass_1 = in_dict[key]
+                print('pass_1: {}'.format(in_dict[key]))
+            elif key == 'pass_2':
+                pass_2 = in_dict[key]
+                print('pass_2: {}'.format(in_dict[key]))
+            elif not isinstance(val, attr_dict[key]):
+                if isinstance('string', attr_dict[key]):
+                    _log(6, VERBOSITY, 'coercing to string: {}'.format(val))
                     val = '{}'.format(val)
-                if isinstance(0.0, CHORE_ATTRS[key]):
+                if isinstance(0.0, attr_dict[key]):
+                    _log(6, VERBOSITY, 'coercing to float: {}'.format(val))
                     val = float(val)
-                if isinstance(1, CHORE_ATTRS[key]):
+                if isinstance(1, attr_dict[key]):
+                    _log(6, VERBOSITY, 'coercing to int: {}'.format(val))
                     val = int(val)
-                if isinstance(datetime.datetime.now(), CHORE_ATTRS[key]):
+                if isinstance(datetime.datetime.now(), attr_dict[key]):
+                    _log(6, VERBOSITY, 'coercing to datetime: {}'.format(val))
                     val = _convert_str_to_dt(val)
             ret_dict[key] = val
         else:
             _log(6, VERBOSITY, 'submit', 'chore.log')
+    if pass_1 and pass_2:
+        ret_dict.pop('pass_1')
+        ret_dict.pop('pass_2')
+        _log(1, VERBOSITY, 'have pass_1 and _2')
+        if pass_1 == pass_2:
+            _log(1, VERBOSITY, 'pass_1 and _2 match')
+            ret_dict['pw_hash'] = bcrypt.hashpw(str(pass_1), bcrypt.gensalt(8))
     return ret_dict
 
 def _convert_str_to_dt(val):
@@ -76,24 +104,31 @@ def _validate_form_keys(in_dict, mandatory_list):
     return missing
 
 
-def _process_chore_form(res):
+def process_chore_form(res):
     """convert chore form to Dict and find missing keys"""
-    ret_dict = _convert_form_keys(res)
+    ret_dict = _convert_form_keys(res, CHORE_ATTRS)
     missing = _validate_form_keys(ret_dict, MANDATORY_CHORE_KEYS)
+    print('in: {}'.format(res))
+    print('ret: {}'.format(ret_dict))
+    print('missing: {}'.format(missing))
     return ret_dict, missing
 
         
-def _process_reward_form(res):
+def process_reward_form(res):
     """convert reward form to Dict and find missing keys"""
-    ret_dict = _convert_form_keys(res)
+    ret_dict = _convert_form_keys(res, REWARD_ATTRS)
     missing = _validate_form_keys(ret_dict, MANDATORY_REWARD_KEYS)
     return ret_dict, missing
 
 
-def _process_user_form(res):
+def process_user_form(res):
     """convert user form to Dict and find missing keys"""
-    ret_dict = _convert_form_keys(res)
+    ret_dict = _convert_form_keys(res, USER_ATTRS)
     missing = _validate_form_keys(ret_dict, MANDATORY_USER_KEYS)
+    ret_dict['full'] = '{} {}'.format(ret_dict['first'], ret_dict['last'])
+    print('in: {}'.format(res))
+    print('ret: {}'.format(ret_dict))
+    print('missing: {}'.format(missing))
     return ret_dict, missing
 
 def verify_user(name=None):

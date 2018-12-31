@@ -117,7 +117,7 @@ def new_chore_results():
     if 'cancel' in res:  # check to see if the cancel button has been pressed
         return redirect(url_for('index'))
     _log(1, VERBOSITY, res)
-    processed_res, missing = Helpers._process_chore_form(res)  # process the form results and validate
+    processed_res, missing = Helpers.process_chore_form(res)  # process the form results and validate
     _log(6, VERBOSITY, missing)
     if len(missing) > 0:
         return render_template('error.html', data=missing)
@@ -149,7 +149,6 @@ def available():
 def edit_chore(chore=None):
     if chore:
         chore_dict = db.get_chore(CHORE_CONN, chore).data_dict
-        #chore_dict = db.get_chore(res['chore_name']).data_dict
         return render_template('edit_chore.html', data=chore_dict)
     else:
         return redirect(url_for('error'))
@@ -173,7 +172,14 @@ def new_account_results():
     res = request.form
     if 'cancel' in res:  # check to see if the cancel button has been pressed
         return redirect(url_for('index'))
-    return render_template('new_account_results.html')
+    else:
+        processed_res, missing = Helpers.process_user_form(res)
+        if len(missing) > 0:
+            return redirect(url_for('error', data=missing))
+        # build a user object, populate it, and stick it in the db
+        this_user = User.User(processed_res)
+        db.write_user_to_storage(USER_CONN, this_user)
+        return render_template('new_account_results.html', data=this_user.data_dict)
 
 
 
