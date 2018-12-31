@@ -23,7 +23,8 @@ app.secret_key = Helpers.get_creds('envs.crypt')['SECRET_KEY']
 
 # set some globals
 VERBOSITY = 1
-DB_CONN = db.CONN
+CHORE_CONN = db.CHORE_CONN
+USER_CONN = db.USER_CONN
 
 def login_required(f):
     @wraps(f)
@@ -44,10 +45,10 @@ def login_required(f):
 @app.route('/index')
 @login_required
 def index():
-    user_list = db.get_all_users(conn='user_storage')
+    user_list = db.get_all_users(conn=USER_CONN)
     user_dict = {}
     for user in user_list:
-        u_dict = db.get_user(conn='user_storage', name=user)
+        u_dict = db.get_user(conn=USER_CONN, name=user)
         user_dict[user] = u_dict.data_dict
     return render_template('index.html', data={'users': user_dict})
 
@@ -56,7 +57,7 @@ def login():
     try:
         res = request.form
         if Helpers.verify_user(res['username']):
-            u = db.get_user(conn='user_storage', name=res['username'])
+            u = db.get_user(conn=USER_CONN, name=res['username'])
             if u.verify(passwd=res['password']):
                 ts = calendar.timegm(datetime.datetime.now().timetuple())
                 session['user'] = u.get_attr(attr='name')
@@ -86,10 +87,10 @@ def logout():
 @login_required
 def chores(user=None):
     if user:
-        user_chores = db.get_user_chores(db.CONN, user)
+        user_chores = db.get_user_chores(CHORE_CONN, user)
         chores_dict = {}
         for c in user_chores:
-            chores_dict[c] = db.get_chore(db.CONN, c).data_dict
+            chores_dict[c] = db.get_chore(CHORE_CONN, c).data_dict
     else:
         chores_dict = {'Take out trash': 1,  # build a fake chore dict
                    'Take out recycling': 1, 
@@ -123,7 +124,7 @@ def new_chore_results():
 
     # build a chore object, populate it, and stick it in the db
     this_chore = Chore.Chore(processed_res)
-    db.write_chore_to_storage(DB_CONN, this_chore)
+    db.write_chore_to_storage(CHORE_CONN, this_chore)
 
     # proceed to the results page
     order_list = ['name', 'desc', 'assigned_to', 'points', 'due']
@@ -132,10 +133,10 @@ def new_chore_results():
 @app.route('/available', methods=['GET'])
 @login_required
 def available():
-    chores_list = db.get_available_chores(DB_CONN)  # get chores from db (currently a list of json files)
+    chores_list = db.get_available_chores(CHORE_CONN)  # get chores from db (currently a list of json files)
     chores_dict = {}
     for chore in chores_list:  # build a large dict with all of the info in it
-        status, this_chore = db._read_from_storage(DB_CONN, chore)
+        status, this_chore = db._read_from_storage(CHORE_CONN, chore)
         chores_dict[chore] = this_chore
     order_list = [k for k in chores_dict]  # get keys(chore names)
     order_list.sort()  # sort the name list, can change sort type
@@ -147,7 +148,7 @@ def available():
 @login_required
 def edit_chore(chore=None):
     if chore:
-        chore_dict = db.get_chore(DB_CONN, chore).data_dict
+        chore_dict = db.get_chore(CHORE_CONN, chore).data_dict
         #chore_dict = db.get_chore(res['chore_name']).data_dict
         return render_template('edit_chore.html', data=chore_dict)
     else:

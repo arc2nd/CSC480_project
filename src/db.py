@@ -15,7 +15,8 @@ import User
 import Chore
 from Log import _log
 
-CONN = os.path.join(os.getcwd(), 'chore_storage')
+CHORE_CONN = os.path.join(os.getcwd(), 'chore_storage')
+USER_CONN = os.path.join(os.getcwd(), 'user_storage')
 
 def _validate_storage_location(conn):
     """make sure the storage location actually exists
