@@ -5,3 +5,4 @@ notes.txt
 chore_storage/
 user_storage/
 reward_storage/
+*.vscode
