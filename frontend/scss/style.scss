@@ -1,0 +1,35 @@
+// Import Fonts
+// This is an example of how to grab fonts from google fonts, see usage below in font-family declarations
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:400,700|Open+Sans:400,700');
+
+// Import FontAwesome SCSS
+@import 'node_modules/font-awesome/scss/font-awesome';
+
+// Override Bootstrap options
+$body-bg:				#ffffff;
+$light-bg:				#f5f5f5;
+$body-color:			#212121;
+
+// Examples of overriding bootstrap variables:
+$brand-primary: #000102;
+// $brand-accent: ;
+// $link-color: $brand-primary;
+// $link-hover-color: ;
+
+$font-family-sans-serif: 'Open Sans', sans-serif;
+$font-family-serif: 'Merriweather', serif;
+$font-family-base: $font-family-sans-serif;
+$headings-font-family: 'Lato', sans-serif;
+
+// Include Bootstrap after overrides
+@import 'node_modules/bootstrap/scss/bootstrap';
+
+/* Custom CSS below this point */
+
+body {
+	font-family: 'Open Sans', sans-serif;
+	font-size: 1.1rem;
+	min-height: 90vh;
+	overflow-y: scroll;
+	padding-top: 6rem; // Allow for a sticky header
+}
