@@ -1,0 +1,15 @@
+{
+    "name": "admin", 
+    "first": "administrator", 
+    "full": "", 
+    "last": "", 
+    "middle": "", 
+    "email": "", 
+    "dob": "", 
+    "points": 0, 
+    "style": "default", 
+    "timeout": 10, 
+    "pw_hash": "$2b$12$Fpq8qcXWp9GV/eEZNJ.3huu7drTzoEyupyU2mIsc8gvMIa.upKoCa",
+    "id": 8, 
+    "role": "admin"
+}

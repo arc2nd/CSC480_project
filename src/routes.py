@@ -31,11 +31,23 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         for i in session:
-            _log(6, VERBOSITY, '{} :: {}'.format(i, session[i]))
+            _log(1, VERBOSITY, 'session: {} :: {}'.format(i, session[i]))
         if 'logged_in' not in session:
             return redirect(url_for('login')) #, next=request.url))
+        else:
+            print(session['logged_in'])
         return f(*args, **kwargs)
     return decorated_function
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session['role'].lower() == 'admin':
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('index'))
+    return decorated_function
+
 
 
 
@@ -46,7 +58,7 @@ def login_required(f):
 @app.route('/index')
 @login_required
 def index():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     user_list = db.get_all_users(conn=USER_CONN)
     user_dict = {}
     for user in user_list:
@@ -58,15 +70,18 @@ def index():
 def login():
     try:
         res = request.form
-        if Helpers.verify_user(res['username']):
+        t_dict = {}
+        for i in res:
+            t_dict[i] = res[i]
+        if Helpers.verify_user(t_dict['username']):
             u = db.get_user(conn=USER_CONN, name=res['username'])
             if u.verify(passwd=res['password']):
                 ts = calendar.timegm(datetime.datetime.now().timetuple())
                 session['user'] = u.get_attr(attr='name')
                 session['logged_in'] = ts
-                session['type'] = u.get_attr(attr='type')
-                for i in session:
-                    print('{} :: {}'.format(i, session[i]))
+                session['role'] = u.get_attr(attr='role')
+                #for i in session:
+                #    print('{} :: {}'.format(i, session[i]))
                 return redirect(url_for('index'))
     except:
         print(sys.exc_info())
@@ -89,7 +104,7 @@ def logout():
 @app.route('/chores/<user>', methods=['GET', 'POST'])
 @login_required
 def chores(user=None):
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     if user:
         user_chores = db.get_user_chores(CHORE_CONN, user)
         chores_dict = {}
@@ -100,14 +115,14 @@ def chores(user=None):
 @app.route('/new_chore', methods=['GET'])
 @login_required
 def new_chore():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     return render_template('new_chore.html', admin=is_admin)
 
 
 @app.route('/new_chore_results', methods=['GET', 'POST'])
 @login_required
 def new_chore_results():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     # general processing of the form we've received
     res = request.form
     if 'cancel' in res:  # check to see if the cancel button has been pressed
@@ -129,7 +144,7 @@ def new_chore_results():
 @app.route('/available_chores', methods=['GET'])
 @login_required
 def available_chores():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     chores_list = db.get_available_chores(CHORE_CONN)  # get chores from db (currently a list of json files)
     chores_dict = {}
     for chore in chores_list:  # build a large dict with all of the info in it
@@ -142,7 +157,7 @@ def available_chores():
 @app.route('/available_rewards', methods=['GET'])
 @login_required
 def available_rewards():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     rewards_list = db.get_available_rewards(REWARD_CONN)  # get rewards from db (currently a list of json files)
     rewards_dict = {}
     for reward in rewards_list:  # build a large dict with all of the info in it
@@ -158,7 +173,7 @@ def available_rewards():
 @app.route('/edit_chore/<chore>', methods=['GET', 'POST'])
 @login_required
 def edit_chore(chore=None):
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     if chore:
         chore_dict = db.get_chore(CHORE_CONN, chore).data_dict
         return render_template('edit_chore.html', data=chore_dict, admin=is_admin)
@@ -170,7 +185,7 @@ def edit_chore(chore=None):
 @app.route('/edit_reward/<reward>', methods=['GET', 'POST'])
 @login_required
 def edit_reward(reward=None):
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     if reward:
         reward_dict = db.get_reward(REWARD_CONN, reward).data_dict
         return render_template('edit_reward.html', data=reward_dict, admin=is_admin)
@@ -182,20 +197,21 @@ def edit_reward(reward=None):
 @app.route('/my_account', methods=['GET'])
 @login_required
 def my_account():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     return render_template('my_account.html', admin=is_admin)
 
 @app.route('/new_account', methods=['GET'])
 @login_required
+@admin_required
 def new_account():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     return render_template('new_account.html', admin=is_admin)
 
 
 @app.route('/new_account_results', methods=['GET', 'POST'])
 @login_required
 def new_account_results():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     res = request.form
     if 'cancel' in res:  # check to see if the cancel button has been pressed
         return redirect(url_for('index'))
@@ -213,13 +229,13 @@ def new_account_results():
 @app.route('/new_reward', methods=['GET'])
 @login_required
 def new_reward():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     return render_template('new_reward.html', admin=is_admin)
 
 @app.route('/new_reward_results', methods=['GET', 'POST'])
 @login_required
 def new_reward_results():
-    is_admin = True if session['type'] == 'admin' else False
+    is_admin = True if session['role'] == 'admin' else False
     res = request.form
     if 'cancel' in res:  # check to see if the cancel button has been pressed
         return redirect(url_for('index'))

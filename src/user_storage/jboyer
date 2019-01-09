@@ -9,5 +9,5 @@
     "points": 0.0,
     "pw_hash": "$2a$08$ZkkvZwfv7R7EE/5A7ioR5erwgxaN2LXsfZplfky.Q7qpuXUB3DQfq",
     "style": "default",
-    "type": "admin"
+    "role": "admin"
 }
