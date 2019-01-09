@@ -10,3 +10,5 @@ node_modules/
 *.min.css
 yarn.lock
 *.vscode
+src/static/fonts/*
+!.gitkeep
