@@ -9,3 +9,4 @@ node_modules/
 *.min.js
 *.min.css
 yarn.lock
+*.vscode
