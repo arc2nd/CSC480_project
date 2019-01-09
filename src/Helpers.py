@@ -30,16 +30,22 @@ CHORE_ATTRS = config.CHORE_ATTRS
 REWARD_ATTRS = config.REWARD_ATTRS
 USER_ATTRS = config.USER_ATTRS
 
-def get_creds(path):
-    cmd = "openssl des3 -salt -d -in %s -pass pass:%s" % (path, os.path.basename(path))
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-    output = proc.communicate()[0]
-    if (output):
-        try:
-            j = json.loads(output)
+def get_creds(path, crypt=False):
+    if crypt:
+        cmd = "openssl des3 -salt -d -in %s -pass pass:%s" % (path, os.path.basename(path))
+        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+        output = proc.communicate()[0]
+        if (output):
+            try:
+                j = json.loads(output)
+                return j
+            except:
+                return output
+    else:
+        if os.path.exists(path):
+            with open(path, 'r') as fp:
+                j = json.load(fp)
             return j
-        except:
-            return output
 
 
 def _convert_form_keys(in_dict, attr_dict):

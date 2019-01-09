@@ -18,7 +18,7 @@ import Helpers
 from Log import _log
 
 app = Flask(__name__)
-app.secret_key = Helpers.get_creds('envs.crypt')['SECRET_KEY']
+app.secret_key = Helpers.get_creds('envs.json')['SECRET_KEY']
 
 
 # set some globals
@@ -241,6 +241,6 @@ def error(missing_list=None):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=5005, debug=True)
 
 

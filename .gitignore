@@ -3,7 +3,6 @@ venv/
 *.swp
 notes.txt
 chore_storage/
-user_storage/
 reward_storage/
 node_modules/
 *.min.js
