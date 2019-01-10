@@ -28,18 +28,40 @@ USER_CONN = db.USER_CONN
 REWARD_CONN = db.REWARD_CONN
 
 def login_required(f):
+    """Things to do to check and make sure a user is logged in
+       1. check if session has a logged_in key, if not, send to login page
+       2. compare the current time to the last logged_in timestamp
+          if the difference is greater than the timeout, send back to the login page
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        # show me what's being stored in session
         for i in session:
             _log(1, VERBOSITY, 'session: {} :: {}'.format(i, session[i]))
+        # check to see if we're logged in 
         if 'logged_in' not in session:
             return redirect(url_for('login')) #, next=request.url))
         else:
-            print(session['logged_in'])
+            # get the current time and see if it's more than the timeout greater
+            #   than the last time a logged_in timestamp was stored
+            #   if it's not store a new logged_in timestamp
+            now = Helpers.get_now()
+            _log(1, VERBOSITY, 'now: {}'.format(now))
+            if 'timeout' in session:
+                delta = session['timeout'] * 60
+                if now - session['logged_in'] > delta:
+                    session.clear()
+                    return redirect(url_for('login'))
+                else:
+                    session['logged_in'] = now
+            else:
+                session['timeout'] = 10
         return f(*args, **kwargs)
     return decorated_function
 
 def admin_required(f):
+    """Check if the user is an admin user
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session['role'].lower() == 'admin':
@@ -76,10 +98,11 @@ def login():
         if Helpers.verify_user(t_dict['username']):
             u = db.get_user(conn=USER_CONN, name=res['username'])
             if u.verify(passwd=res['password']):
-                ts = calendar.timegm(datetime.datetime.now().timetuple())
+                now = Helpers.get_now() 
                 session['user'] = u.get_attr(attr='name')
-                session['logged_in'] = ts
-                session['role'] = u.get_attr(attr='role')
+                session['logged_in'] = now
+                session['role'] = u.get_attr(attr='role') if u.attr_exists(attr='role') else 'standard'
+                session['timeout'] = u.get_attr(attr='timeout') if u.attr_exists(attr='timeout') else 1
                 #for i in session:
                 #    print('{} :: {}'.format(i, session[i]))
                 return redirect(url_for('index'))
@@ -92,10 +115,9 @@ def login():
 @app.route('/logout')
 def logout():
     user_name = session['user']
-    session.pop('user')
-    session.pop('logged_in')
     for i in session:
         print('{} :: {}'.format(i, session[i]))
+    session.clear()
     return render_template('logout.html', user=user_name)
     return render_template('logout.html')
 

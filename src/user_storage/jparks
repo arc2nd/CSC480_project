@@ -9,5 +9,6 @@
     "points": 0.0,
     "pw_hash": "$2a$08$YYUe71RGJfZ1oGtpWUr3p.ebCtnpH1h5tozsL/6/Ps7zjrgSC4DKu",
     "style": "default",
-    "role": "standard"
+    "role": "standard", 
+    "timeout": 10 
 }

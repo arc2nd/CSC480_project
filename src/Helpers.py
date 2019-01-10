@@ -4,6 +4,7 @@
 
 import os
 import json
+import calendar
 import datetime
 import subprocess
 
@@ -29,6 +30,9 @@ VERBOSITY = 1
 CHORE_ATTRS = config.CHORE_ATTRS
 REWARD_ATTRS = config.REWARD_ATTRS
 USER_ATTRS = config.USER_ATTRS
+
+def get_now():
+    return calendar.timegm(datetime.datetime.now().timetuple())
 
 def get_creds(path, crypt=False):
     if crypt:

@@ -55,6 +55,13 @@ class User(object):
             ret_val = self.data_dict[attr]
         return ret_val
 
+    def attr_exists(self, attr):
+        """check if an attribute is in the attr_dict"""
+        ret_val = False
+        if attr in self.attr_dict.keys():
+            ret_val = True
+        return ret_val
+
     #CRUD ops
     def verify(self, passwd=None):
         #encrypt password and check against database

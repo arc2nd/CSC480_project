@@ -48,6 +48,13 @@ class Reward(object):
             ret_val = self.data_dict[attr]
         return ret_val
 
+    def attr_exists(self, attr):
+        """check if an attribute is in the attr_dict"""
+        ret_val = False
+        if attr in self.attr_dict.keys():
+            ret_val = True
+        return ret_val
+
     def mark_claimed(self):
         """mark this chore as being done on this datetime"""
         now = datetime.datetime.now()
