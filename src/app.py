@@ -1,6 +1,6 @@
 from flask import Flask, render_template, Response, redirect, url_for, request, session, abort, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
 from Log import _log
 
 import traceback
@@ -22,6 +22,8 @@ db = SQLAlchemy(app)
 # set some globals
 VERBOSITY = 1
 
+# session timeout in seconds (15m * 60s = 900s)
+SESSION_TIMEOUT = 900
 
 # Route decorators
 def login_required(f):
@@ -48,6 +50,27 @@ def admin_required(f):
 			return redirect(url_for('index'))
 	return decorated_function
 
+def session_timeout(f):
+	@wraps(f)
+	def decorated_function(*args, **kwargs):
+		print("checking timeout")
+		if 'logged_in' not in session:
+			print("not logged in")
+			return f(*args, **kwargs)
+		else:
+			print("logged in, checking timeout")
+			print("timeout: ")
+			print(session['session_timeout'])
+			currentTime = datetime.now()
+			print(currentTime)
+			
+			if(currentTime > (session['session_timeout'] + timedelta(seconds=SESSION_TIMEOUT))):
+				return redirect(url_for('logout'))
+			else:
+				session['session_timeout'] = currentTime
+				return f(*args, **kwargs)
+	return decorated_function
+
 # Account routes
 @app.route('/login', methods=['POST'])
 def login_process():
@@ -58,8 +81,11 @@ def login_process():
 	result = User.User.query.filter_by(username=POST_USERNAME, password=POST_PASSWORD).first()
 
 	if(result):
+		currentTime = datetime.now()
+
 		session['logged_in'] = True
 		session['role'] = result.role_id
+		session['session_timeout'] = currentTime
 		print('logged in')
 	else:
 		print('bad credentials')
@@ -107,6 +133,7 @@ def index():
 @app.route('/users', methods=['GET', 'POST'])
 @login_required
 @admin_required
+@session_timeout
 def users():
 	# create a user example
 	# testUser = User.User('test', 'test', 'test', 'test')
