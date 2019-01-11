@@ -25,6 +25,11 @@
 	<div class="text-center">
 		<a href="{{ url_for('index') }}">Index</a>
 		<a href="{{ url_for('users') }}">Users</a>
+		{% if session['logged_in'] %}
+		<a href="{{ url_for('logout') }}">Log out</a>
+		{% else %}
+		<a href="{{ url_for('login_form') }}">Log in</a>
+		{% endif %}
 	</div>
 	{% endif %}
 	<!-- Optional JavaScript -->

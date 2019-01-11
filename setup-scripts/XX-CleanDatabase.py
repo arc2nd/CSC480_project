@@ -46,7 +46,10 @@ def clean_database():
 		CREATE SCHEMA public;
 		""",
 		"""
-		GRANT ALL ON SCHEMA public TO postgres;
+		GRANT ALL ON SCHEMA public TO cxp;
+		""",
+		"""
+		ALTER SCHEMA public OWNER TO cxp
 		""",
 		"""
 		GRANT ALL ON SCHEMA public TO public;

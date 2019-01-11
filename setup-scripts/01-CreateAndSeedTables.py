@@ -43,7 +43,7 @@ def create_tables():
 		CREATE TABLE roles
 		(
 			id INT PRIMARY KEY,
-			name VARCHAR(255) NOT NULL
+			name VARCHAR(255) NOT NULL UNIQUE
 		)
 		""",
 		"""
@@ -51,12 +51,12 @@ def create_tables():
 		(
 			id SERIAL PRIMARY KEY,
 			role_id INT REFERENCES roles(id),
-			username VARCHAR(255) NOT NULL,
+			username VARCHAR(255) NOT NULL UNIQUE,
 			password VARCHAR(255) NOT NULL,
 			first_name VARCHAR(255) NOT NULL,
 			middle_name VARCHAR(255),
 			last_name VARCHAR(255),
-			email_address VARCHAR(255),
+			email_address VARCHAR(255) UNIQUE,
 			date_of_birth date,
 			points INT
 		)
@@ -75,7 +75,7 @@ def create_tables():
 		CREATE TABLE rewards
 		(
 			id INT PRIMARY KEY,
-			name VARCHAR(255) NOT NULL,
+			name VARCHAR(255) NOT NULL UNIQUE,
 			description VARCHAR(255) NOT NULL,
 			points INT NOT NULL
 		)

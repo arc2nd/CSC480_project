@@ -6,7 +6,7 @@ class Reward(db.Model):
 	__tablename__ = 'rewards'
 
 	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-	name = db.Column(db.String(255), nullable = False)
+	name = db.Column(db.String(255), unique=True, nullable = False)
 	description = db.Column(db.String(255))
 	points = db.Column(db.Integer, nullable = False)
 
