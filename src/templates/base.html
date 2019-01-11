@@ -24,9 +24,14 @@
 	{% if not footer %}
 	<div class="text-center">
 		<a href="{{ url_for('index') }}">Index</a>
+		<a href="{{ url_for('chores') }}">Chores</a>
 		<a href="{{ url_for('users') }}">Users</a>
 		{% if session['logged_in'] %}
 		<a href="{{ url_for('logout') }}">Log out</a>
+		{% if session['role_id'] == 0 %}
+		Admin stuff:
+		<a href="{{ url_for('user_add') }}">Add a user</a>
+		{% endif %}
 		{% else %}
 		<a href="{{ url_for('login_form') }}">Log in</a>
 		{% endif %}

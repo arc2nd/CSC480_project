@@ -1,4 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <h1>Chores</h1>
+	{% for chore in chores %}
+		<p>{{chore.name}}</p>
+	{% endfor %}
 {% endblock %}

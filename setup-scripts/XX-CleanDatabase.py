@@ -44,7 +44,7 @@ def clean_database():
 		BEGIN 
 			IF 
 				EXISTS (SELECT 1 FROM pg_type WHERE typname = 'recurrence_options') 
-				THEN DROP TYPE recurrence_options; 
+				THEN DROP TYPE recurrence_options CASCADE; 
 			END IF;
 		END$$;
 		""",

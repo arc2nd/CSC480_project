@@ -1,5 +1,6 @@
 import psycopg2
 import sys
+import bcrypt
 
 table_creation_succeeded = True
 user_creation_succeeded = True
@@ -119,6 +120,10 @@ def seed_roles():
 
 def seed_admin_user():
 
+	unencrypted_password = 'test'
+
+	encrypted_password = bcrypt.hashpw(unencrypted_password.encode('utf-8'), bcrypt.gensalt(12)).decode('utf-8')
+
 	""" Seed the admin user """
 
 	commands = [
@@ -126,8 +131,8 @@ def seed_admin_user():
 		INSERT INTO users
 			(id, role_id, username, password, first_name, middle_name, last_name, email_address, date_of_birth)
 			VALUES
-			(0, 0, 'administrator', 'password', 'first', 'middle', 'last', 'test@email.com', TO_DATE('01 Jan 1945', 'DD Mon YYYY'))
-		"""
+			(0, 0, 'administrator', '%s', 'first', 'middle', 'last', 'test@email.com', TO_DATE('01 Jan 1945', 'DD Mon YYYY'))
+		""" % (encrypted_password)
 	]
 
 	if(execute_commands(commands)):
