@@ -62,13 +62,19 @@ def create_tables():
 		)
 		""",
 		"""
+		CREATE TYPE recurrence_options AS ENUM ('daily', 'weekly');
+		""",
+		"""
 		CREATE TABLE chores
 		(
 			id INT PRIMARY KEY,
+			assigned_to INT REFERENCES users(id),
 			due_date date,
 			name VARCHAR(255),
 			description VARCHAR(255),
-			points INT NOT NULL
+			points INT NOT NULL,
+			complete BOOL,
+			recurrence recurrence_options
 		)
 		""",
 		"""

@@ -40,6 +40,15 @@ def clean_database():
 
 	commands = [
 		"""
+		DO $$
+		BEGIN 
+			IF 
+				EXISTS (SELECT 1 FROM pg_type WHERE typname = 'recurrence_options') 
+				THEN DROP TYPE recurrence_options; 
+			END IF;
+		END$$;
+		""",
+		"""
 		DROP SCHEMA public CASCADE;
 		""",
 		"""
