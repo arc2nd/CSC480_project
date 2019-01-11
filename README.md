@@ -16,7 +16,19 @@
 1. Install requirements:
 	- `pip install -r requirements.txt`
 1. run temp server:
-	- `python src/routes.py`
+	- `python src/app.py`
+
+Point your web browser to `localhost:5000`
+
+# Database setup
+1. Install PostgresSQL (https://www.postgresql.org/download/)
+	- Use an admin username/password that we can all agree on during the setup procedure.
+	- This is different based on your OS, just make sure you don't deviate from the defaults.
+1. Set your database URL environmental variable by running this at the command prompt/shell:
+	* Linux: `export DATABASE_URL="postgresql://cxp:choresarereallyfun@localhost/ChoreExplore"`
+	* Windows (cmd): `setx DATABASE_URL "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore"`
+	* *Note: that cxp and choresarereallyfun are just sample username/password values*
+	* *Note: ChoreExplore is the database name, and this is case-sensitive*
 
 # Building the frontend
 
@@ -32,4 +44,4 @@ Open your terminal, execute the following in the root folder:
 	- You need to re-run `gulp min` every time you make a change to JS/CSS files for it to re-minify and pick up your changes.
 
 
-Point your web browser to `localhost:5000`
+

@@ -23,9 +23,8 @@
 	{% block content %}{% endblock %}
 	{% if not footer %}
 	<div class="text-center">
-		<a href="{{ url_for('index') }}">Index</a> |
-		<a href="{{ url_for('my_account') }}">My Account</a> |
-		<a href="{{ url_for('logout') }}">Logout</a>
+		<a href="{{ url_for('index') }}">Index</a>
+		<a href="{{ url_for('users') }}">Users</a>
 	</div>
 	{% endif %}
 	<!-- Optional JavaScript -->

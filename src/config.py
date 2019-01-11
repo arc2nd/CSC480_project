@@ -1,40 +1,52 @@
 import types
 import datetime
+import os
 
-USER_ATTRS = {'name': types.StringTypes, 
-              'email': types.StringTypes, 
-              'first': types.StringTypes, 
-              'last': types.StringTypes, 
-              'middle': types.StringTypes, 
-              'full': types.StringTypes, 
-              'dob': datetime.datetime, 
-              'points': types.FloatType,  
-              'type': types.StringType, 
-              'style': types.StringType, 
-              'timeout': types.IntType, 
-              'pw_hash': types.StringType, 
-              'id': types.IntType
+basedir = os.path.abspath(os.path.dirname(__file__))
+
+
+""" Environment Configuration """
+
+class Config(object):
+	SECRET_KEY = "thisisnotasecret"
+	CSRF_ENABLED = True
+	SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+
+
+USER_ATTRS = {'name': str, 
+              'email': str, 
+              'first': str, 
+              'last': str, 
+              'middle': str, 
+              'full': str, 
+              'dob': datetime, 
+              'points': float,  
+              'type': str, 
+              'style': str, 
+              'timeout': int, 
+              'pw_hash': str, 
+              'id': int
              }
 
-CHORE_ATTRS = {'name': types.StringTypes, 
-               'desc': types.StringTypes, 
-               'due': datetime.datetime, 
-               'expired': types.BooleanType, 
-               'points': types.FloatType, 
-               'creator': types.StringTypes, 
-               'assigned_to': types.StringTypes, 
-               'done': datetime.datetime, 
-               'id': types.IntType
+CHORE_ATTRS = {'name': str, 
+               'desc': str, 
+               'due': datetime, 
+               'expired': bool, 
+               'points': float, 
+               'creator': str, 
+               'assigned_to': str, 
+               'done': datetime, 
+               'id': int
                }
 
-REWARD_ATTRS = {'name': types.StringTypes,
-                'desc': types.StringTypes, 
-                'due': datetime.datetime, 
-                'expired': types.BooleanType, 
-                'points': types.FloatType,  
-                'creator': types.StringTypes, 
-                'assigned_to': types.StringTypes, 
-                'claimed': types.BooleanType, 
-                'recurring': types.StringTypes, 
-                'id': types.IntType
+REWARD_ATTRS = {'name': str,
+                'desc': str, 
+                'due': datetime, 
+                'expired': bool, 
+                'points': float,  
+                'creator': str, 
+                'assigned_to': str, 
+                'claimed': bool, 
+                'recurring': str, 
+                'id': int
                }

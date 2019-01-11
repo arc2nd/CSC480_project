@@ -49,7 +49,7 @@ def create_tables():
 		"""
 		CREATE TABLE users
 		(
-			id INT PRIMARY KEY,
+			id SERIAL PRIMARY KEY,
 			role_id INT REFERENCES roles(id),
 			username VARCHAR(255) NOT NULL,
 			password VARCHAR(255) NOT NULL,
@@ -57,7 +57,8 @@ def create_tables():
 			middle_name VARCHAR(255),
 			last_name VARCHAR(255),
 			email_address VARCHAR(255),
-			date_of_birth date
+			date_of_birth date,
+			points INT
 		)
 		""",
 		"""
