@@ -11,7 +11,7 @@ import bcrypt, os, sys, traceback
 import config
 
 CREDS = config.get_creds('envs.json', crypt=False)
-
+_log(1, 1, CREDS)
 # Static files path
 app = Flask(__name__, static_url_path='/static')
 
@@ -64,12 +64,12 @@ def login_required(f):
             #   than the last time a logged_in timestamp was stored
             #   if it's not store a new logged_in timestamp
             now = config.get_now()
-            _log(6, VERBOSITY, 'now: {}'.format(now))
+            _log(1, VERBOSITY, 'now: {}'.format(now))
             if 'timeout' in session:
                 delta = session['timeout'] * 60
                 if now - session['logged_in'] > delta:
                     session.clear()
-                    return redirect(url_for('login'))
+                    return redirect(url_for('login_form'))
                 else:
                     session['logged_in'] = now
             else:

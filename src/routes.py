@@ -40,7 +40,7 @@ def login_required(f):
             _log(1, VERBOSITY, 'session: {} :: {}'.format(i, session[i]))
         # check to see if we're logged in 
         if 'logged_in' not in session:
-            return redirect(url_for('login')) #, next=request.url))
+            return redirect(url_for('login_form')) #, next=request.url))
         else:
             # get the current time and see if it's more than the timeout greater
             #   than the last time a logged_in timestamp was stored
@@ -51,7 +51,7 @@ def login_required(f):
                 delta = session['timeout'] * 60
                 if now - session['logged_in'] > delta:
                     session.clear()
-                    return redirect(url_for('login'))
+                    return redirect(url_for('login_form'))
                 else:
                     session['logged_in'] = now
             else:
@@ -69,8 +69,6 @@ def admin_required(f):
         else:
             return redirect(url_for('index'))
     return decorated_function
-
-
 
 
 
