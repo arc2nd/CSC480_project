@@ -3,18 +3,18 @@ from datetime import datetime
 from app import db
 
 class Reward(db.Model):
-	__tablename__ = 'rewards'
+    __tablename__ = 'rewards'
 
-	id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-	name = db.Column(db.String(255), unique=True, nullable = False)
-	description = db.Column(db.String(255))
-	points = db.Column(db.Integer, nullable = False)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255), unique=True, nullable = False)
+    description = db.Column(db.String(255))
+    points = db.Column(db.Integer, nullable = False)
 
-	def __init__(self, name):
-		self.name = name
+    def __init__(self, name):
+        self.name = name
 
-	def __repr__(self):
-		return '<Reward  %r>' % self.name
+    def __repr__(self):
+        return '<Reward  %r>' % self.name
 
     def mark_claimed(self):
         """mark this chore as being done on this datetime"""
