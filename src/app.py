@@ -6,14 +6,17 @@ from functools import wraps
 from datetime import datetime, timedelta
 from Log import _log
 
-import Helpers
 import bcrypt, os, sys, traceback
+
+import config
+
+CREDS = config.get_creds('envs.json', crypt=False)
 
 # Static files path
 app = Flask(__name__, static_url_path='/static')
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHECMY_TRACK_MODIFICATIONS'] #False
+app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI'] #os.environ['DATABASE_URL']
 
 db = SQLAlchemy(app)
 
@@ -22,7 +25,7 @@ import Chore, Reward, Role, User
 
 # set some globals
 VERBOSITY = 1
-WTF_CSRF_SECRET_KEY = 'this-needs-to-change-in-production'
+WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY'] #'this-needs-to-change-in-production'
 # session timeout in seconds (15m * 60s = 900s)
 SESSION_TIMEOUT = 900
 
@@ -45,16 +48,35 @@ class LoginForm(FlaskForm):
 
 # Route decorators
 def login_required(f):
-	@wraps(f)
-	def decorated_function(*args, **kwargs):
-		print("login check")
-		if 'logged_in' not in session:
-			print("user not logged in")
-			return redirect(url_for('login_form'))
-		else:
-			print("user logged in")
-		return f(*args, **kwargs)
-	return decorated_function
+    """Things to do to check and make sure a user is logged in
+       1. check if session has a logged_in key, if not, send to login page
+       2. compare the current time to the last logged_in timestamp
+          if the difference is greater than the timeout, send back to the login page
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        _log(1, VERBOSITY, 'login check')
+        # check to see if we're logged in 
+        if 'logged_in' not in session:
+            return redirect(url_for('login_form'))
+        else:
+            # get the current time and see if it's more than the timeout greater
+            #   than the last time a logged_in timestamp was stored
+            #   if it's not store a new logged_in timestamp
+            now = config.get_now()
+            _log(6, VERBOSITY, 'now: {}'.format(now))
+            if 'timeout' in session:
+                delta = session['timeout'] * 60
+                if now - session['logged_in'] > delta:
+                    session.clear()
+                    return redirect(url_for('login'))
+                else:
+                    session['logged_in'] = now
+            else:
+                session['timeout'] = 10
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 def admin_required(f):
 	@wraps(f)
@@ -67,6 +89,7 @@ def admin_required(f):
 			print("user not admin")
 			return redirect(url_for('index'))
 	return decorated_function
+
 
 def session_timeout(f):
 	@wraps(f)
@@ -98,7 +121,8 @@ def login_process():
 
 	result = User.User.query.filter_by(username=POST_USERNAME).first()
 
-	if(result and (bcrypt.checkpw(POST_PASSWORD.encode('utf-8'), result.password.encode('utf-8')))):
+	# if(result and (bcrypt.checkpw(POST_PASSWORD.encode('utf-8'), result.password.encode('utf-8')))):
+    if result and result.verify(passwd_to_test=POST_PASSWORD):
 		currentTime = datetime.now()
 
 		session['logged_in'] = True

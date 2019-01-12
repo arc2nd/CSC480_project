@@ -1,0 +1,14 @@
+{
+    "dob": "",
+    "email": "admin@mcghee.com",
+    "first": "James",
+    "full": "James McGhee",
+    "last": "McGhee",
+    "middle": "",
+    "name": "jmcghee",
+    "points": 0.0,
+    "pw_hash": "$2a$08$2a/mvMgEq5DJW77uJ9tlN.hof3dkWTQAMOOiQw1cYUYIOzfjflIO6",
+    "style": "default",
+    "role": "admin", 
+    "timeout": 10
+}

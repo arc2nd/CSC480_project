@@ -1,6 +1,6 @@
 // Import Fonts
 // This is an example of how to grab fonts from google fonts, see usage below in font-family declarations
-@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:400,700|Open+Sans:400,700');
+@import url('https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:400,700|Open+Sans:400,700|Coming+Soon:400,700');
 
 // Import FontAwesome SCSS
 @import 'node_modules/font-awesome/scss/font-awesome';
@@ -16,6 +16,7 @@ $brand-primary: #000102;
 // $link-color: $brand-primary;
 // $link-hover-color: ;
 
+$font-family-cursive: 'Coming Soon';
 $font-family-sans-serif: 'Open Sans', sans-serif;
 $font-family-serif: 'Merriweather', serif;
 $font-family-base: $font-family-sans-serif;

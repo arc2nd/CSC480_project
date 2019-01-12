@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from datetime import datetime
 from app import db
 
@@ -19,3 +20,28 @@ class Chore(db.Model):
 
 	def __repr__(self):
 		return '<Chore  %r>' % self.name
+
+    def mark_done(self):
+        """mark this chore as being done on this datetime"""
+        now = datetime.datetime.now()
+        self.complete = now
+        return now
+
+    def check_due(self):
+        """compare now to the due datetime value"""
+        ret_val = False
+        now = datetime.now()
+        if now >= self.data_dict['due']:
+            # set an expired flag
+            # we can also set a threshold and use this function to spawn an reminder later
+            #self.expired = True
+            ret_val = True
+        return ret_val
+
+    def assign_to(self, user):
+        """assign this chore to a specified user"""
+        self.assigned_to = user
+        return
+
+
+
