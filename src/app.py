@@ -63,11 +63,12 @@ def login_required(f):
             # get the current time and see if it's more than the timeout greater
             #   than the last time a logged_in timestamp was stored
             #   if it's not store a new logged_in timestamp
-            now = config.get_now()
-            _log(1, VERBOSITY, 'now: {}'.format(now))
             if 'timeout' in session:
+                now = config.get_now()
                 delta = session['timeout'] * 60
+                _log(1, VERBOSITY, 'now: {}\ndelta: {}\nelapsedd: {}'.format(now, delta, now - session['logged_in']))
                 if now - session['logged_in'] > delta:
+                    _log(1, VERBOSITY, 'session timed out')
                     session.clear()
                     return redirect(url_for('login_form'))
                 else:
@@ -125,9 +126,10 @@ def login_process():
     if result and result.verify(passwd_to_test=POST_PASSWORD):
         currentTime = datetime.now()
 
-        session['logged_in'] = True
+        session['logged_in'] = config.get_now() #True
         session['role_id'] = result.role_id
         session['session_timeout'] = currentTime
+        session['timeout'] = 10
         print('logged in')
     else:
         print('bad credentials')
@@ -177,7 +179,7 @@ def index():
 @app.route('/users', methods=['GET'])
 @login_required
 @admin_required
-@session_timeout
+#@session_timeout
 def users():
     # create a user example
     # testUser = User.User('test', 'test', 'test', 'test')
@@ -198,7 +200,7 @@ def users():
 @app.route('/user_add', methods=['GET', 'POST'])
 @login_required
 @admin_required
-@session_timeout
+#@session_timeout
 def user_add():
     print("user_add")
 
@@ -228,7 +230,7 @@ def user_add():
 # Chore routes
 @app.route('/chores', methods=['GET'])
 @login_required
-@session_timeout
+#@session_timeout
 def chores():
     # create a user example
     # testUser = User.User('test', 'test', 'test', 'test')
