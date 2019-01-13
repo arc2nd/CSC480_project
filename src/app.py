@@ -42,16 +42,16 @@ class UserForm(FlaskForm):
     password = PasswordField('Password:', validators=[validators.required()])
     email_address = TextField('Email:', validators=[validators.required()])
     first_name = TextField('First Name:', validators=[validators.required()])
-    middle_name = TextField('Middle Name:', validators=[validators.required()])
-    last_name = TextField('Last Name:', validators=[validators.required()])
+    middle_name = TextField('Middle Name:', validators=[validators.optional()])
+    last_name = TextField('Last Name:', validators=[validators.optional()])
     date_of_birth = DateField('Birth date:', format='%Y-%m-%d', validators=[validators.required()])
 
 class ChoreForm(FlaskForm):
     chorename = TextField('Chore Name:', validators=[validators.required()])
     description = TextField('Description:', validators=[validators.required()])
-    due_date = DateField('Due Date:', format='%Y-%m-%d', validators=[validators.Optional()])
-    points = IntegerField('Points:', validators=[])
-    assigned_to = TextField('Assigned To:', validators=[validators.Optional()])
+    due_date = DateField('Due Date:', format='%Y-%m-%d', validators=[validators.optional()])
+    points = IntegerField('Points:', validators=[validators.required()])
+    assigned_to = TextField('Assigned To:', validators=[validators.optional()])
     #recurrence = SelectField('Recurrence:', choices = [('once', 'Once'), ('weekly', 'Weekly'), ('daily', 'Daily')])
 
 class LoginForm(FlaskForm):
@@ -257,6 +257,8 @@ def chore_add():
             thisUser = User.User.query.filter_by(username=form.assigned_to.data).first()
             if thisUser:
                 form.assigned_to.data = thisUser.id
+            else:
+                form.assigned_to.data = None
             newChore = Chore.Chore(form.chorename.data)
             form.populate_obj(newChore)
 
