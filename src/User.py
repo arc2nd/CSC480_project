@@ -31,18 +31,14 @@ class User(db.Model):
     
         # encrypt the password
         self.password = self.password.encode('utf-8')
-        
         self.password = bcrypt.hashpw(self.password, bcrypt.gensalt(12)).decode('utf-8')
 
         # Default to standard role, start with 0 points
         self.role_id = 1
         self.points = 0
-
         print(self)
-
         db.session.add(self)
         db.session.commit()
-        
         print(self.username)
 
 

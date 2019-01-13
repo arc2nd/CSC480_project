@@ -14,14 +14,6 @@ import config
 
 CREDS = config.get_creds('envs.json', crypt=False)
 _log(6, 1, CREDS)
-if not CREDS:
-    CREDS = {
-                "SECRET_KEY": "I am a secret key", 
-                "CSRF_ENABLED": True, 
-                "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 
-                "SQLALCHEMY_TRACK_MODIFICATIONS": False, 
-                "WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
-            }
 
 
 # Static files path
@@ -212,8 +204,7 @@ def user_add():
             form.populate_obj(newUser)
 
             newUser.Add()
-            print("added user: ")
-            print(newUser)
+            print("added user: {}".format(newUser))
 
             return (redirect(url_for('users')))
 
@@ -240,6 +231,39 @@ def chores():
     chores = Chore.Chore.query.all()
 
     return render_template('chores.html', chores=chores)
+
+
+@app.route('/chore_add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def chore_add():
+    print("chore_add")
+
+    if request.method == "GET":
+        form = ChoreForm()
+
+    if request.method == "POST":
+        form = ChoreForm(request.form)
+        print (form.errors)
+
+        if form.validate():
+            print (form.errors)
+            print("form validated")
+            thisUser = User.User.query.filter_by(username=form.assigned_to.data).first()
+            form.assigned_to.data = thisUser.id
+            newChore = Chore.Chore(form.chorename.data)
+            form.populate_obj(newChore)
+
+            newChore.Add()
+            print("added chore: {}".format(newChore))
+
+            return (redirect(url_for('chores')))
+
+        print (form.errors)
+
+    return render_template('chore_add.html', form=form)
+
+
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

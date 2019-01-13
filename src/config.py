@@ -12,6 +12,13 @@ def get_now():
     return calendar.timegm(datetime.datetime.now().timetuple())
 
 def get_creds(path, crypt=False):
+    ret_dict = { 
+                "SECRET_KEY": "I am a secret key", 
+                "CSRF_ENABLED": True, 
+                "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 
+                "SQLALCHEMY_TRACK_MODIFICATIONS": False, 
+                "WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
+               }
     if crypt:
         # this section must be replaced with a more cross-platform encrypt/decrypt function
         cmd = "openssl des3 -salt -d -in %s -pass pass:%s" % (path, os.path.basename(path))
@@ -22,13 +29,16 @@ def get_creds(path, crypt=False):
                 j = json.loads(output)
                 return j
             except:
-                return output
+                return ret_dict 
     else:
         path = os.path.join(basedir, path)
         if os.path.exists(path):
-            with open(path, 'r') as fp: 
-                j = json.load(fp)
-            return j
+            try:
+                with open(path, 'r') as fp: 
+                    j = json.load(fp)
+                return j
+            except:
+                return ret_dict
 
 
 

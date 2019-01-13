@@ -35,6 +35,27 @@ def execute_commands(commands):
 		
 	return True
 
+def delete_tables():
+    """ Delete all the tables so they can be recreated"""
+    commands = [
+        """
+        DROP TABLE roles CASCADE;
+        """,
+        """
+        DROP TABLE users CASCADE;
+        """,
+        """
+        DROP TABLE chores CASCADE;
+        """,
+        """
+        DROP TABLE rewards CASCADE;
+        """
+        ]
+
+    if execute_commands(commands):
+        return True
+    return False
+
 def create_tables():
 
 	""" Create necessary tables in the database """
@@ -68,7 +89,7 @@ def create_tables():
 		"""
 		CREATE TABLE chores
 		(
-			id INT PRIMARY KEY,
+			id SERIAL PRIMARY KEY,
 			assigned_to INT REFERENCES users(id),
 			due_date date,
 			name VARCHAR(255),
@@ -81,7 +102,7 @@ def create_tables():
 		"""
 		CREATE TABLE rewards
 		(
-			id INT PRIMARY KEY,
+			id SERIAL PRIMARY KEY,
 			name VARCHAR(255) NOT NULL UNIQUE,
 			description VARCHAR(255) NOT NULL,
 			points INT NOT NULL

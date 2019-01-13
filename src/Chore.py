@@ -13,13 +13,20 @@ class Chore(db.Model):
     description = db.Column(db.String(255))
     points = db.Column(db.Integer)
     complete = db.Column(db.Boolean)
-    recurrence = db.Column(db.Enum)
+    #recurrence = db.Column(db.Enum)
 
     def __init__(self, name):
         self.name = name
 
     def __repr__(self):
         return '<Chore  %r>' % self.name
+
+    def Add(self):
+        print(self)
+        db.session.add(self)
+        db.session.commit()
+        print(self.chorename)
+
 
     def mark_done(self):
         """mark this chore as being done on this datetime"""
