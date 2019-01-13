@@ -4,7 +4,7 @@ import os
 import json
 import calendar
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = os.path.dirname(os.path.realpath(__file__))
 
 """ Environment Configuration """
 
@@ -24,6 +24,7 @@ def get_creds(path, crypt=False):
             except:
                 return output
     else:
+        path = os.path.join(basedir, path)
         if os.path.exists(path):
             with open(path, 'r') as fp: 
                 j = json.load(fp)
@@ -31,7 +32,7 @@ def get_creds(path, crypt=False):
 
 
 
-#class Config(object):
-	#SECRET_KEY = "thisisnotasecret"
-	#CSRF_ENABLED = True
-	#SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+class Config(object):
+	SECRET_KEY = "thisisnotasecret"
+	CSRF_ENABLED = True
+	SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']

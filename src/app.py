@@ -12,6 +12,7 @@ import config
 
 CREDS = config.get_creds('envs.json', crypt=False)
 _log(1, 1, CREDS)
+
 # Static files path
 app = Flask(__name__, static_url_path='/static')
 
@@ -122,7 +123,7 @@ def login_process():
 
     result = User.User.query.filter_by(username=POST_USERNAME).first()
 
-    # if(result and (bcrypt.checkpw(POST_PASSWORD.encode('utf-8'), result.password.encode('utf-8')))):
+    #if(result and (bcrypt.checkpw(POST_PASSWORD.encode('utf-8'), result.password.encode('utf-8')))):
     if result and result.verify(passwd_to_test=POST_PASSWORD):
         currentTime = datetime.now()
 
