@@ -1,5 +1,6 @@
 from flask import Flask, render_template, Response, redirect, url_for, request, session, abort, flash, send_from_directory
-from wtforms import TextField, PasswordField, DateField, StringField, SubmitField, validators
+from wtforms import TextField, PasswordField, StringField, SubmitField, validators
+from wtforms.fields.html5 import DateField
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
@@ -50,7 +51,7 @@ class UserForm(FlaskForm):
     first_name = TextField('First Name:', validators=[validators.required()])
     middle_name = TextField('Middle Name:', validators=[validators.required()])
     last_name = TextField('Last Name:', validators=[validators.required()])
-    date_of_birth = DateField('Birth date:', format='%m/%d/%Y', validators=[validators.required()])
+    date_of_birth = DateField('Birth date:', format='%Y-%m-%d', validators=[validators.required()])
 
 class LoginForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
