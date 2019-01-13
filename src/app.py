@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from flask import Flask, render_template, Response, redirect, url_for, request, session, abort, flash, send_from_directory
-from wtforms import TextField, PasswordField, DateField, IntegerField, StringField, SubmitField, validators
+from wtforms import TextField, PasswordField, IntegerField, StringField, SubmitField, SelectField, validators
+from wtforms.fields.html5 import DateField
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
@@ -43,14 +44,15 @@ class UserForm(FlaskForm):
     first_name = TextField('First Name:', validators=[validators.required()])
     middle_name = TextField('Middle Name:', validators=[validators.required()])
     last_name = TextField('Last Name:', validators=[validators.required()])
-    date_of_birth = DateField('Birth date:', format='%m/%d/%Y', validators=[validators.required()])
+    date_of_birth = DateField('Birth date:', format='%Y-%m-%d', validators=[validators.required()])
 
 class ChoreForm(FlaskForm):
     chorename = TextField('Chore Name:', validators=[validators.required()])
     description = TextField('Description:', validators=[validators.required()])
-    due_date = DateField('Due Date:', format='%m/%d/%Y', validators=[])
+    due_date = DateField('Due Date:', format='%Y-%m-%d', validators=[validators.Optional()])
     points = IntegerField('Points:', validators=[])
-    assigned_to = TextField('Assigned To:', validators=[])
+    assigned_to = TextField('Assigned To:', validators=[validators.Optional()])
+    #recurrence = SelectField('Recurrence:', choices = [('once', 'Once'), ('weekly', 'Weekly'), ('daily', 'Daily')])
 
 class LoginForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
@@ -243,14 +245,18 @@ def chore_add():
         form = ChoreForm()
 
     if request.method == "POST":
+        
         form = ChoreForm(request.form)
-        print (form.errors)
+        print(form.errors)
+        print('wtform due_date: {}'.format(form.due_date.data))
+        print('request form due_data: {}'.format(request.form['due_date']))
 
         if form.validate():
             print (form.errors)
             print("form validated")
             thisUser = User.User.query.filter_by(username=form.assigned_to.data).first()
-            form.assigned_to.data = thisUser.id
+            if thisUser:
+                form.assigned_to.data = thisUser.id
             newChore = Chore.Chore(form.chorename.data)
             form.populate_obj(newChore)
 

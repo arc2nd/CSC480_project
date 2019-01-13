@@ -3,12 +3,12 @@
 
 <h1>Add a Chore</h1>
 <form action="/chore_add" method="post">
-	{{ form.hidden_tag() }}
-	{{ form.chorename.label }} {{ form.chorename }}<br>
+    {{ form.hidden_tag() }}
+    {{ form.chorename.label }} {{ form.chorename }}<br>
     {{ form.description.label }} {{ form.description }}<br>
     {{ form.due_date.label }} {{ form.due_date }}<br>
     {{ form.assigned_to.label }} {{ form.assigned_to }}<br>
     {{ form.points.label }} {{ form.points }}<br>
-	<input type="submit" value="Add Chore">
+    <input type="submit" value="Add Chore">
 </form>
 {% endblock %}
