@@ -12,7 +12,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     role_id = db.Column(db.Integer, db.ForeignKey("roles.id"), primary_key=True)
     username = db.Column(db.String(255), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False) # you mean the password hash right?
+    password = db.Column(db.String(60), nullable=False)
     email_address = db.Column(db.String(255), unique=True, nullable=False)
     first_name = db.Column(db.String(255), nullable=False)
     middle_name = db.Column(db.String(255))
@@ -49,8 +49,6 @@ class User(db.Model):
 
     def verify(self, passwd_to_test=None):
         #encrypt password and check against database
-        #if so fill up all the possible fields from 
-        #stored data
         if(bcrypt.checkpw(passwd_to_test.encode('utf-8'), self.password.encode('utf-8'))):
             return True
         else:
