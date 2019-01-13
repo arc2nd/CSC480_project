@@ -51,7 +51,7 @@ class User(db.Model):
         #encrypt password and check against database
         #if so fill up all the possible fields from 
         #stored data
-        if bcrypt.checkpw(str(passwd_to_test), str(self.password)):
+        if(bcrypt.checkpw(passwd_to_test.encode('utf-8'), self.password.encode('utf-8'))):
             return True
         else:
             return False
