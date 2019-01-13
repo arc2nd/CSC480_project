@@ -32,7 +32,7 @@ def get_creds(path, crypt=False):
 
 
 
-class Config(object):
-	SECRET_KEY = "thisisnotasecret"
-	CSRF_ENABLED = True
-	SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+#class Config(object):
+#	SECRET_KEY = "thisisnotasecret"
+#	CSRF_ENABLED = True
+#	SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
