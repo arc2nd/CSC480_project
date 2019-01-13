@@ -1,5 +1,7 @@
+#!/usr/bin/env python
+
 from flask import Flask, render_template, Response, redirect, url_for, request, session, abort, flash, send_from_directory
-from wtforms import TextField, PasswordField, DateField, StringField, SubmitField, validators
+from wtforms import TextField, PasswordField, DateField, IntegerField, StringField, SubmitField, validators
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
@@ -11,8 +13,7 @@ import bcrypt, os, sys, traceback
 import config
 
 CREDS = config.get_creds('envs.json', crypt=False)
-_log(1, 1, CREDS)
-
+_log(6, 1, CREDS)
 if not CREDS:
     CREDS = {
                 "SECRET_KEY": "I am a secret key", 
@@ -22,11 +23,12 @@ if not CREDS:
                 "WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
             }
 
+
 # Static files path
 app = Flask(__name__, static_url_path='/static')
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS'] #False
-app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI'] #os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS'] 
+app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI'] 
 
 db = SQLAlchemy(app)
 
@@ -35,9 +37,8 @@ import Chore, Reward, Role, User
 
 # set some globals
 VERBOSITY = 1
-WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY'] #'this-needs-to-change-in-production'
-# session timeout in seconds (15m * 60s = 900s)
-SESSION_TIMEOUT = 900
+WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY'] 
+
 
 # forms
 csrf = CSRFProtect()
@@ -52,9 +53,17 @@ class UserForm(FlaskForm):
     last_name = TextField('Last Name:', validators=[validators.required()])
     date_of_birth = DateField('Birth date:', format='%m/%d/%Y', validators=[validators.required()])
 
+class ChoreForm(FlaskForm):
+    chorename = TextField('Chore Name:', validators=[validators.required()])
+    description = TextField('Description:', validators=[validators.required()])
+    due_date = DateField('Due Date:', format='%m/%d/%Y', validators=[])
+    points = IntegerField('Points:', validators=[])
+    assigned_to = TextField('Assigned To:', validators=[])
+
 class LoginForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
     password = PasswordField('Password:', validators=[validators.required()])
+
 
 # Route decorators
 def login_required(f):
@@ -76,7 +85,7 @@ def login_required(f):
             if 'timeout' in session:
                 now = config.get_now()
                 delta = session['timeout'] * 60
-                _log(1, VERBOSITY, 'now: {}\ndelta: {}\nelapsedd: {}'.format(now, delta, now - session['logged_in']))
+                _log(6, VERBOSITY, 'now: {}\ndelta: {}\nelapsedd: {}'.format(now, delta, now - session['logged_in']))
                 if now - session['logged_in'] > delta:
                     _log(1, VERBOSITY, 'session timed out')
                     session.clear()
@@ -102,55 +111,30 @@ def admin_required(f):
     return decorated_function
 
 
-def session_timeout(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        print("checking timeout")
-        if 'logged_in' not in session:
-            print("not logged in")
-            return f(*args, **kwargs)
-        else:
-            print("logged in, checking timeout")
-            print("timeout: ")
-            print(session['session_timeout'])
-            currentTime = datetime.now()
-            print(currentTime)
-            
-            if(currentTime > (session['session_timeout'] + timedelta(seconds=SESSION_TIMEOUT))):
-                return redirect(url_for('logout'))
-            else:
-                session['session_timeout'] = currentTime
-                return f(*args, **kwargs)
-    return decorated_function
-
 # Account routes
 @app.route('/login', methods=['POST'])
 def login_process():
-
     POST_USERNAME = str(request.form['username'])
     POST_PASSWORD = str(request.form['password'])
 
     result = User.User.query.filter_by(username=POST_USERNAME).first()
 
-    #if(result and (bcrypt.checkpw(POST_PASSWORD.encode('utf-8'), result.password.encode('utf-8')))):
     if result and result.verify(passwd_to_test=POST_PASSWORD):
-        currentTime = datetime.now()
-
-        session['logged_in'] = config.get_now() #True
+        session['logged_in'] = config.get_now() 
         session['role_id'] = result.role_id
-        session['session_timeout'] = currentTime
-        session['timeout'] = 10
-        print('logged in')
+        session['timeout'] = 10 #result.timeout
+        _log(1, VERBOSITY, 'logged in')
     else:
-        print('bad credentials')
+        _log(1, VERBOSITY, 'bad credentials')
 
     return index()
+
 
 @app.route('/login', methods=['GET'])
 def login_form():
     form = UserForm()
-
     return render_template('login.html', form=form)
+
 
 @app.route('/logout', methods=['GET'])
 @login_required
@@ -158,11 +142,10 @@ def logout():
 
     if session.get('logged_in'):
         session.clear()
-    
         return render_template('logout.html')
-    
     # not logged in, send them to the index
     return index()
+
 
 # Static routes
 @app.route('/css/<path:path>')
@@ -177,19 +160,21 @@ def send_fonts(path):
 def send_css(path):
     return send_from_directory('static/js', path)
 
+
 # Default Route
 @app.route('/', methods=['GET'])
+@login_required
 def index():
-    if not session.get('logged_in'):
-        return login_form()
-    else:
-        return render_template('index.html')
+    return render_template('index.html')
+#    if not session.get('logged_in'):
+#        return login_form()
+#    else:
+#        return render_template('index.html')
 
 # User routes
 @app.route('/users', methods=['GET'])
 @login_required
 @admin_required
-#@session_timeout
 def users():
     # create a user example
     # testUser = User.User('test', 'test', 'test', 'test')
@@ -204,13 +189,12 @@ def users():
     
     # Get from DB example
     users = User.User.query.all()
-
     return render_template('users.html', users=users)
+
 
 @app.route('/user_add', methods=['GET', 'POST'])
 @login_required
 @admin_required
-#@session_timeout
 def user_add():
     print("user_add")
 
@@ -240,7 +224,6 @@ def user_add():
 # Chore routes
 @app.route('/chores', methods=['GET'])
 @login_required
-#@session_timeout
 def chores():
     # create a user example
     # testUser = User.User('test', 'test', 'test', 'test')
