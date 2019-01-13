@@ -74,7 +74,7 @@ def create_tables():
 			id SERIAL PRIMARY KEY,
 			role_id INT REFERENCES roles(id),
 			username VARCHAR(255) NOT NULL UNIQUE,
-			password VARCHAR(255) NOT NULL,
+			password VARCHAR(60) NOT NULL,
 			first_name VARCHAR(255) NOT NULL,
 			middle_name VARCHAR(255),
 			last_name VARCHAR(255),
