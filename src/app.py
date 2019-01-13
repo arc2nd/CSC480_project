@@ -13,6 +13,15 @@ import config
 CREDS = config.get_creds('envs.json', crypt=False)
 _log(1, 1, CREDS)
 
+if not CREDS:
+    CREDS = {
+                "SECRET_KEY": "I am a secret key", 
+                "CSRF_ENABLED": True, 
+                "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 
+                "SQLALCHEMY_TRACK_MODIFICATIONS": False, 
+                "WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
+            }
+
 # Static files path
 app = Flask(__name__, static_url_path='/static')
 
