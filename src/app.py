@@ -295,6 +295,11 @@ def chore_add():
 
 # Reward Routes
 
+@app.route('/rewards', methods=['GET'])
+@login_required
+def rewards():
+    rewards = Reward.Reward.query.all()
+    return render_template('rewards.html', rewards=rewards)
 
 @app.route('/reward_add', methods=['GET', 'POST'])
 @login_required
