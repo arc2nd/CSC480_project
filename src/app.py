@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
-import User
-import Role
-import Reward
-import Chore
 from flask import Flask, render_template, Response, redirect, url_for, request, session, abort, flash, send_from_directory
-from wtforms import TextField, PasswordField, IntegerField, StringField, SubmitField, SelectField, validators
-from wtforms.fields.html5 import DateField
+from wtforms import TextField, PasswordField, StringField, SubmitField, SelectField, validators
+from wtforms.fields.html5 import DateField, IntegerField
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
@@ -33,6 +29,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI']
 db = SQLAlchemy(app)
 
 # Our models, import here after db has been instantiated
+import Reward, Role, User, Chore
 
 # set some globals
 VERBOSITY = 1
@@ -295,6 +292,37 @@ def chore_add():
         print(form.errors)
 
     return render_template('chore_add.html', form=form)
+
+# Reward Routes
+
+
+@app.route('/reward_add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def reward_add():
+    print("reward_add")
+
+    if request.method == "GET":
+        form = RewardForm()
+
+    if request.method == "POST":
+        form = RewardForm(request.form)
+        print(form.errors)
+
+        if form.validate():
+            print(form.errors)
+            print("form validated")
+            newReward = Reward.Reward(form.name.data)
+            form.populate_obj(newReward)
+
+            newReward.Add()
+            print("added reward: {}".format(newReward))
+
+            return (redirect(url_for('rewards')))
+
+        print(form.errors)
+
+    return render_template('reward_add.html', form=form)
 
 
 if __name__ == '__main__':

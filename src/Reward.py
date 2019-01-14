@@ -16,3 +16,8 @@ class Reward(db.Model):
 
     def __repr__(self):
         return '<Reward  %r>' % self.name
+
+    def Add(self):
+        print(self)
+        db.session.add(self)
+        db.session.commit()
