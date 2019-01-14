@@ -2,6 +2,11 @@
 {% block content %}
 <h1>Chores</h1>
 	{% for chore in chores %}
-		<p>{{chore.name}}</p>
+		<p>
+			{{chore.name}}
+			{% if chore.assigned_to == None %}
+				| <a href="{{ url_for('chore_claim') }}?chore_id={{chore.id}}">Claim</a>
+			{% endif %}
+		</p>
 	{% endfor %}
 {% endblock %}

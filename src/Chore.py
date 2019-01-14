@@ -48,7 +48,14 @@ class Chore(db.Model):
     def assign_to(self, user):
         """assign this chore to a specified user"""
         self.assigned_to = user
-        return
+
+        chore = db.session.query(Chore).get(self.id)
+
+        chore.assigned_to = user.id
+
+        db.session.commit()
+
+        return True
 
 
 
