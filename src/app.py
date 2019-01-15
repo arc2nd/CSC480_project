@@ -129,7 +129,8 @@ def login_process():
     result = User.User.query.filter_by(username=POST_USERNAME).first()
 
     if result and result.verify(passwd_to_test=POST_PASSWORD):
-        session['logged_in'] = config.get_now()
+        session['logged_in'] = config.get_now() 
+        session['user_id'] = result.id
         session['role_id'] = result.role_id
         session['timeout'] = 10  # result.timeout
         _log(1, VERBOSITY, 'logged in')
@@ -293,6 +294,26 @@ def chore_add():
 
     return render_template('chore_add.html', form=form)
 
+@app.route('/chore_claim', methods=['GET'])
+@login_required
+def chore_claim():
+    print("chore_claim")
+    chore_id = request.args.get('chore_id')
+    user_id = session['user_id']
+
+    user = User.User.query.filter_by(id=user_id).first()
+    chore = Chore.Chore.query.filter_by(id=chore_id).first()
+
+    if user and chore and chore.assigned_to == None:
+        if chore.assign_to(user):
+            _log(1, VERBOSITY, 'chore assigned successfully')
+        else:
+            _log(1, VERBOSITY, 'error assigning chore')
+    else:
+        _log(1, VERBOSITY, 'chore already claimed')
+
+    return render_template('chores.html')
+
 # Reward Routes
 
 @app.route('/rewards', methods=['GET'])
@@ -328,7 +349,6 @@ def reward_add():
         print(form.errors)
 
     return render_template('reward_add.html', form=form)
-
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
