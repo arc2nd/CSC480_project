@@ -17,23 +17,17 @@ def get_now():
 
 def get_creds(path, crypt=False):
     ret_dict = { 
-                "SECRET_KEY": "I am a secret key", 
+                "SECRET_KEY": "I am a default secret key",
                 "CSRF_ENABLED": True, 
                 "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 
                 "SQLALCHEMY_TRACK_MODIFICATIONS": False, 
                 "WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
                }
     if crypt:
-        # this section must be replaced with a more cross-platform encrypt/decrypt function
-        cmd = "openssl des3 -salt -d -in %s -pass pass:%s" % (path, os.path.basename(path))
-        proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-        output = proc.communicate()[0]
-        if (output):
-            try:
-                j = json.loads(output)
-                return j
-            except:
-                return ret_dict 
+        import my_crypto as mc
+        if os.path.exists(path):
+            ret_dict = mc.decrypt_from_file(path)
+        return ret_dict
     else:
         path = os.path.join(basedir, path)
         if os.path.exists(path):

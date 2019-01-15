@@ -2,15 +2,20 @@
 
 import os
 import json
-import subprocess
+import my_crypto as mc
 
 
 def encrypt(path):
-    crypt_path = '{}.crypt'.format(os.path.splitext(path)[0])
-    cmd = 'openssl des3 -salt -e -in {} -pass pass:{} -out {}'.format(path, crypt_path, crypt_path)
-    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-    if os.path.exists(crypt_path):
-        return 0
+    ret_val = -1
+    if os.path.exists(path):
+        with open(path, 'r') as fp:
+            in_dict = json.load(fp)
+        if in_dict:
+            crypt_path = '{}.crypt'.format(os.path.splitext(path)[0])
+            mc.encrypt_to_file(crypt_path, in_dict)
+        if os.path.exists(crypt_path):
+            ret_val = 0
+    return ret_val
 
 if __name__ == '__main__':
     in_file = 'envs.json'

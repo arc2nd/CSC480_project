@@ -16,7 +16,7 @@ import traceback
 
 import config
 
-CREDS = config.get_creds('envs.json', crypt=False)
+CREDS = config.get_creds('envs.crypt', crypt=True)
 _log(6, 1, CREDS)
 BASE_DIR = config.get_base_directory()
 
