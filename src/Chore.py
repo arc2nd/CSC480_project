@@ -3,13 +3,14 @@
 from datetime import datetime
 from app import db
 
+
 class Chore(db.Model):
     __tablename__ = 'chores'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     assigned_to = db.Column(db.Integer, db.ForeignKey("users.id"))
     due_date = db.Column(db.DateTime)
-    name = db.Column(db.String(255), nullable = False)
+    name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255))
     points = db.Column(db.Integer)
     complete = db.Column(db.Boolean)
@@ -26,7 +27,6 @@ class Chore(db.Model):
         db.session.add(self)
         db.session.commit()
         print(self.chorename)
-
 
     def mark_done(self):
         """mark this chore as being done on this datetime"""
@@ -48,7 +48,7 @@ class Chore(db.Model):
     def assign_to(self, user):
         """assign this chore to a specified user"""
         self.assigned_to = user
-
+        
         chore = db.session.query(Chore).get(self.id)
 
         chore.assigned_to = user.id
@@ -56,6 +56,3 @@ class Chore(db.Model):
         db.session.commit()
 
         return True
-
-
-

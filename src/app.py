@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 
 from flask import Flask, render_template, Response, redirect, url_for, request, session, abort, flash, send_from_directory
-from wtforms import TextField, PasswordField, IntegerField, StringField, SubmitField, SelectField, validators
-from wtforms.fields.html5 import DateField
+from wtforms import TextField, PasswordField, StringField, SubmitField, SelectField, validators
+from wtforms.fields.html5 import DateField, IntegerField
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from datetime import datetime, timedelta
 from Log import _log
 
-import bcrypt, os, sys, traceback
+import bcrypt
+import os
+import sys
+import traceback
 
 import config
 
@@ -20,22 +23,23 @@ _log(6, 1, CREDS)
 # Static files path
 app = Flask(__name__, static_url_path='/static')
 
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS'] 
-app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI'] 
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS']
+app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI']
 
 db = SQLAlchemy(app)
 
 # Our models, import here after db has been instantiated
-import Chore, Reward, Role, User
+import Reward, Role, User, Chore
 
 # set some globals
 VERBOSITY = 1
-WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY'] 
+WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY']
 
 
 # forms
 csrf = CSRFProtect()
 csrf.init_app(app)
+
 
 class UserForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
@@ -44,15 +48,25 @@ class UserForm(FlaskForm):
     first_name = TextField('First Name:', validators=[validators.required()])
     middle_name = TextField('Middle Name:', validators=[validators.optional()])
     last_name = TextField('Last Name:', validators=[validators.optional()])
-    date_of_birth = DateField('Birth date:', format='%Y-%m-%d', validators=[validators.required()])
+    date_of_birth = DateField(
+        'Birth date:', format='%Y-%m-%d', validators=[validators.required()])
+
 
 class ChoreForm(FlaskForm):
     chorename = TextField('Chore Name:', validators=[validators.required()])
     description = TextField('Description:', validators=[validators.required()])
-    due_date = DateField('Due Date:', format='%Y-%m-%d', validators=[validators.optional()])
+    due_date = DateField('Due Date:', format='%Y-%m-%d',
+                         validators=[validators.optional()])
     points = IntegerField('Points:', validators=[validators.required()])
     assigned_to = TextField('Assigned To:', validators=[validators.optional()])
     #recurrence = SelectField('Recurrence:', choices = [('once', 'Once'), ('weekly', 'Weekly'), ('daily', 'Daily')])
+
+
+class RewardForm(FlaskForm):
+    name = TextField('Reward Name:', validators=[validators.required()])
+    description = TextField('Description:', validators=[validators.required()])
+    points = IntegerField('Points:', validators=[validators.required()])
+
 
 class LoginForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
@@ -69,7 +83,7 @@ def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         _log(1, VERBOSITY, 'login check')
-        # check to see if we're logged in 
+        # check to see if we're logged in
         if 'logged_in' not in session:
             return redirect(url_for('login_form'))
         else:
@@ -79,7 +93,8 @@ def login_required(f):
             if 'timeout' in session:
                 now = config.get_now()
                 delta = session['timeout'] * 60
-                _log(6, VERBOSITY, 'now: {}\ndelta: {}\nelapsedd: {}'.format(now, delta, now - session['logged_in']))
+                _log(6, VERBOSITY, 'now: {}\ndelta: {}\nelapsedd: {}'.format(
+                    now, delta, now - session['logged_in']))
                 if now - session['logged_in'] > delta:
                     _log(1, VERBOSITY, 'session timed out')
                     session.clear()
@@ -117,7 +132,7 @@ def login_process():
         session['logged_in'] = config.get_now() 
         session['user_id'] = result.id
         session['role_id'] = result.role_id
-        session['timeout'] = 10 #result.timeout
+        session['timeout'] = 10  # result.timeout
         _log(1, VERBOSITY, 'logged in')
     else:
         _log(1, VERBOSITY, 'bad credentials')
@@ -147,9 +162,11 @@ def logout():
 def send_js(path):
     return send_from_directory('static/css', path)
 
+
 @app.route('/fonts/<path:path>')
 def send_fonts(path):
     return send_from_directory('static/fonts', path)
+
 
 @app.route('/js/<path:path>')
 def send_css(path):
@@ -167,6 +184,8 @@ def index():
 #        return render_template('index.html')
 
 # User routes
+
+
 @app.route('/users', methods=['GET'])
 @login_required
 @admin_required
@@ -179,9 +198,9 @@ def users():
 
     # db.session.add(testUser)
     # db.session.commit()
-    
+
     # print(testUser.username)
-    
+
     # Get from DB example
     users = User.User.query.all()
     return render_template('users.html', users=users)
@@ -198,10 +217,10 @@ def user_add():
 
     if request.method == "POST":
         form = UserForm(request.form)
-        print (form.errors)
+        print(form.errors)
 
-        if form.validate(): 
-            print (form.errors)
+        if form.validate():
+            print(form.errors)
             print("form validated")
             newUser = User.User()
             form.populate_obj(newUser)
@@ -211,11 +230,13 @@ def user_add():
 
             return (redirect(url_for('users')))
 
-        print (form.errors)
+        print(form.errors)
 
     return render_template('user_add.html', form=form)
 
 # Chore routes
+
+
 @app.route('/chores', methods=['GET'])
 @login_required
 def chores():
@@ -227,9 +248,9 @@ def chores():
 
     # db.session.add(testUser)
     # db.session.commit()
-    
+
     # print(testUser.username)
-    
+
     # Get from DB example
     chores = Chore.Chore.query.all()
 
@@ -246,16 +267,17 @@ def chore_add():
         form = ChoreForm()
 
     if request.method == "POST":
-        
+
         form = ChoreForm(request.form)
         print(form.errors)
         print('wtform due_date: {}'.format(form.due_date.data))
         print('request form due_data: {}'.format(request.form['due_date']))
 
         if form.validate():
-            print (form.errors)
+            print(form.errors)
             print("form validated")
-            thisUser = User.User.query.filter_by(username=form.assigned_to.data).first()
+            thisUser = User.User.query.filter_by(
+                username=form.assigned_to.data).first()
             if thisUser:
                 form.assigned_to.data = thisUser.id
             else:
@@ -268,7 +290,7 @@ def chore_add():
 
             return (redirect(url_for('chores')))
 
-        print (form.errors)
+        print(form.errors)
 
     return render_template('chore_add.html', form=form)
 
@@ -292,6 +314,41 @@ def chore_claim():
 
     return render_template('chores.html')
 
+# Reward Routes
+
+@app.route('/rewards', methods=['GET'])
+@login_required
+def rewards():
+    rewards = Reward.Reward.query.all()
+    return render_template('rewards.html', rewards=rewards)
+
+@app.route('/reward_add', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def reward_add():
+    print("reward_add")
+
+    if request.method == "GET":
+        form = RewardForm()
+
+    if request.method == "POST":
+        form = RewardForm(request.form)
+        print(form.errors)
+
+        if form.validate():
+            print(form.errors)
+            print("form validated")
+            newReward = Reward.Reward(form.name.data)
+            form.populate_obj(newReward)
+
+            newReward.Add()
+            print("added reward: {}".format(newReward))
+
+            return (redirect(url_for('rewards')))
+
+        print(form.errors)
+
+    return render_template('reward_add.html', form=form)
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

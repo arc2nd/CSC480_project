@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Rewards</h1>
+	{% for reward in rewards %}
+		<p>{{reward.name}}</p>
+	{% endfor %}
+{% endblock %}
