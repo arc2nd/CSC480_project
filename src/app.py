@@ -336,6 +336,39 @@ def reward_add():
     return render_template('reward_add.html', form=form)
 
 
+# Test Routes
+@app.route('/test/chore', methods=['GET'])
+def test_chore():
+    # Chore tests
+
+    # Constructor
+    chore = Chore.Chore("test1")
+
+    # Assignments
+    chore.description = "test1"
+    chore.points = 1
+
+    # Create
+    Chore.Chore.Add(chore)
+
+    # Read
+    singleChore = Chore.Chore.GetById(chore.id)
+    allChores = Chore.Chore.GetAll()
+
+    # Update
+    user = User.User.GetById(0)
+
+    chore.AssignTo(user)
+
+    # Utility
+    checkOverdue = chore.IsOverdue()
+
+    # Delete
+    Chore.Chore.Remove(chore)
+
+    return redirect(url_for('index'))
+
+
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.run()

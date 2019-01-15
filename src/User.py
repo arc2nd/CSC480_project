@@ -41,7 +41,11 @@ class User(db.Model):
         db.session.commit()
         print(self.username)
 
+    # Read operations
+    def GetById(user_id):
+        """ Return a single user by ID """
 
+        return User.query.filter_by(id=user_id).first()
 
     def verify(self, passwd_to_test=None):
         #encrypt password and check against database
