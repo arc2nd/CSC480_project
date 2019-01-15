@@ -2,7 +2,7 @@
 {% block content %}
 
 <h1>Add a Chore</h1>
-<form action="/chore_add" method="post">
+<form action="/chore/add" method="post">
     {{ form.hidden_tag() }}
     {{ form.chorename.label }} {{ form.chorename }}<br>
     {{ form.description.label }} {{ form.description }}<br>

@@ -8,6 +8,10 @@ basedir = os.path.dirname(os.path.realpath(__file__))
 
 """ Environment Configuration """
 
+def get_base_directory():
+    print(basedir)
+    return basedir
+
 def get_now():
     return calendar.timegm(datetime.datetime.now().timetuple())
 
@@ -39,7 +43,6 @@ def get_creds(path, crypt=False):
                 return j
             except:
                 return ret_dict
-
 
 
 #class Config(object):
