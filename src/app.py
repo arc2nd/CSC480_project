@@ -18,6 +18,7 @@ import config
 
 CREDS = config.get_creds('envs.json', crypt=False)
 _log(6, 1, CREDS)
+BASE_DIR = config.get_base_directory()
 
 
 # Static files path
@@ -36,12 +37,14 @@ VERBOSITY = 1
 WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY']
 
 
-# forms
+# Forms
+
+# Cross site protection
 csrf = CSRFProtect()
 csrf.init_app(app)
 
-
-class UserForm(FlaskForm):
+# User Add Form
+class UserAddForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
     password = PasswordField('Password:', validators=[validators.required()])
     email_address = TextField('Email:', validators=[validators.required()])
@@ -51,8 +54,8 @@ class UserForm(FlaskForm):
     date_of_birth = DateField(
         'Birth date:', format='%Y-%m-%d', validators=[validators.required()])
 
-
-class ChoreForm(FlaskForm):
+# Chore Add Form
+class ChoreAddForm(FlaskForm):
     chorename = TextField('Chore Name:', validators=[validators.required()])
     description = TextField('Description:', validators=[validators.required()])
     due_date = DateField('Due Date:', format='%Y-%m-%d',
@@ -61,19 +64,21 @@ class ChoreForm(FlaskForm):
     assigned_to = TextField('Assigned To:', validators=[validators.optional()])
     #recurrence = SelectField('Recurrence:', choices = [('once', 'Once'), ('weekly', 'Weekly'), ('daily', 'Daily')])
 
-
-class RewardForm(FlaskForm):
+# Reward Add Form
+class RewardAddForm(FlaskForm):
     name = TextField('Reward Name:', validators=[validators.required()])
     description = TextField('Description:', validators=[validators.required()])
     points = IntegerField('Points:', validators=[validators.required()])
 
-
-class LoginForm(FlaskForm):
+# User Login Form
+class UserLoginForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
     password = PasswordField('Password:', validators=[validators.required()])
 
 
 # Route decorators
+
+# Ensures the user is logged in, or forwards to login form if not
 def login_required(f):
     """Things to do to check and make sure a user is logged in
        1. check if session has a logged_in key, if not, send to login page
@@ -85,7 +90,7 @@ def login_required(f):
         _log(1, VERBOSITY, 'login check')
         # check to see if we're logged in
         if 'logged_in' not in session:
-            return redirect(url_for('login_form'))
+            return redirect(url_for('user_login'))
         else:
             # get the current time and see if it's more than the timeout greater
             #   than the last time a logged_in timestamp was stored
@@ -98,7 +103,7 @@ def login_required(f):
                 if now - session['logged_in'] > delta:
                     _log(1, VERBOSITY, 'session timed out')
                     session.clear()
-                    return redirect(url_for('login_form'))
+                    return redirect(url_for('user_login'))
                 else:
                     session['logged_in'] = now
             else:
@@ -106,7 +111,9 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-
+# Ensures the user is admin, and forwards to the index if not
+# TODO: This should probably flash a message that says "not admin" or 404 or something if 
+# they aren't admin.
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -120,103 +127,88 @@ def admin_required(f):
     return decorated_function
 
 
-# Account routes
-@app.route('/login', methods=['POST'])
-def login_process():
-    POST_USERNAME = str(request.form['username'])
-    POST_PASSWORD = str(request.form['password'])
-
-    result = User.User.query.filter_by(username=POST_USERNAME).first()
-
-    if result and result.verify(passwd_to_test=POST_PASSWORD):
-        session['logged_in'] = config.get_now() 
-        session['user_id'] = result.id
-        session['role_id'] = result.role_id
-        session['timeout'] = 10  # result.timeout
-        _log(1, VERBOSITY, 'logged in')
-    else:
-        _log(1, VERBOSITY, 'bad credentials')
-
-    return index()
-
-
-@app.route('/login', methods=['GET'])
-def login_form():
-    form = UserForm()
-    return render_template('login.html', form=form)
-
-
-@app.route('/logout', methods=['GET'])
-@login_required
-def logout():
-
-    if session.get('logged_in'):
-        session.clear()
-        return render_template('logout.html')
-    # not logged in, send them to the index
-    return index()
-
-
-# Static routes
-@app.route('/css/<path:path>')
-def send_js(path):
-    return send_from_directory('static/css', path)
-
-
-@app.route('/fonts/<path:path>')
-def send_fonts(path):
-    return send_from_directory('static/fonts', path)
-
-
-@app.route('/js/<path:path>')
+# Static file routes
+# CSS
+@app.route('/css')
 def send_css(path):
-    return send_from_directory('static/js', path)
+    return send_from_directory(path)
+
+# Fonts
+@app.route('/fonts')
+def send_fonts(path):
+    return send_from_directory(path)
+
+# JavaScript
+@app.route('/js')
+def send_js(path):
+    return send_from_directory(path)
 
 
-# Default Route
+# Default route
+
 @app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 @login_required
 def index():
     return render_template('index.html')
-#    if not session.get('logged_in'):
-#        return login_form()
-#    else:
-#        return render_template('index.html')
+
 
 # User routes
 
-
-@app.route('/users', methods=['GET'])
+# default
+@app.route('/user', methods=['GET'])
 @login_required
 @admin_required
-def users():
-    # create a user example
-    # testUser = User.User('test', 'test', 'test', 'test')
-    # testUser.role_id = 0
-
-    # print(testUser)
-
-    # db.session.add(testUser)
-    # db.session.commit()
-
-    # print(testUser.username)
-
-    # Get from DB example
+def user():
     users = User.User.query.all()
-    return render_template('users.html', users=users)
+    return render_template('user.html', users=users)
 
+# login
+@app.route('/user/login', methods=['GET', 'POST'])
+def user_login():
+    if(request.method == 'POST'):
 
-@app.route('/user_add', methods=['GET', 'POST'])
+        POST_USERNAME = str(request.form['username'])
+        POST_PASSWORD = str(request.form['password'])
+
+        result = User.User.query.filter_by(username=POST_USERNAME).first()
+
+        if result and result.verify(passwd_to_test=POST_PASSWORD):
+            session['logged_in'] = config.get_now() 
+            session['user_id'] = result.id
+            session['role_id'] = result.role_id
+            session['timeout'] = 10  # result.timeout
+            _log(1, VERBOSITY, 'logged in')
+        else:
+            _log(1, VERBOSITY, 'bad credentials')
+
+        return index()
+    else:
+        form = UserAddForm()
+        return render_template('user_login.html', form=form)
+
+# logout
+@app.route('/user/logout', methods=['GET'])
+@login_required
+def user_logout():
+    if session.get('logged_in'):
+        session.clear()
+        return render_template('user_logout.html')
+    # not logged in, send them to the index
+    return index()
+
+# add
+@app.route('/user/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def user_add():
-    print("user_add")
+    print("/user/add")
 
     if request.method == "GET":
-        form = UserForm()
+        form = UserAddForm()
 
     if request.method == "POST":
-        form = UserForm(request.form)
+        form = UserAddForm(request.form)
         print(form.errors)
 
         if form.validate():
@@ -228,47 +220,36 @@ def user_add():
             newUser.Add()
             print("added user: {}".format(newUser))
 
-            return (redirect(url_for('users')))
+            return (redirect(url_for('user')))
 
         print(form.errors)
 
     return render_template('user_add.html', form=form)
 
+
 # Chore routes
 
-
-@app.route('/chores', methods=['GET'])
+# default
+@app.route('/chore', methods=['GET'])
 @login_required
-def chores():
-    # create a user example
-    # testUser = User.User('test', 'test', 'test', 'test')
-    # testUser.role_id = 0
-
-    # print(testUser)
-
-    # db.session.add(testUser)
-    # db.session.commit()
-
-    # print(testUser.username)
-
-    # Get from DB example
+def chore():
     chores = Chore.Chore.query.all()
 
-    return render_template('chores.html', chores=chores)
+    return render_template('chore.html', chores=chores)
 
-
-@app.route('/chore_add', methods=['GET', 'POST'])
+# add
+@app.route('/chore/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def chore_add():
-    print("chore_add")
+    print("chore/add")
 
     if request.method == "GET":
-        form = ChoreForm()
+        form = ChoreAddForm()
 
     if request.method == "POST":
 
-        form = ChoreForm(request.form)
+        form = ChoreAddForm(request.form)
         print(form.errors)
         print('wtform due_date: {}'.format(form.due_date.data))
         print('request form due_data: {}'.format(request.form['due_date']))
@@ -288,17 +269,18 @@ def chore_add():
             newChore.Add()
             print("added chore: {}".format(newChore))
 
-            return (redirect(url_for('chores')))
+            return (redirect(url_for('chore')))
 
         print(form.errors)
 
     return render_template('chore_add.html', form=form)
 
-@app.route('/chore_claim', methods=['GET'])
+# claim
+@app.route('/chore/claim/<int:chore_id>', methods=['GET'])
 @login_required
-def chore_claim():
-    print("chore_claim")
-    chore_id = request.args.get('chore_id')
+def chore_claim(chore_id=None):
+    print("chore/claim")
+    
     user_id = session['user_id']
 
     user = User.User.query.filter_by(id=user_id).first()
@@ -312,27 +294,30 @@ def chore_claim():
     else:
         _log(1, VERBOSITY, 'chore already claimed')
 
-    return render_template('chores.html')
+    return redirect(url_for('chore'))
+
 
 # Reward Routes
 
-@app.route('/rewards', methods=['GET'])
+# default
+@app.route('/reward', methods=['GET'])
 @login_required
-def rewards():
+def reward():
     rewards = Reward.Reward.query.all()
-    return render_template('rewards.html', rewards=rewards)
+    return render_template('reward.html', rewards=rewards)
 
-@app.route('/reward_add', methods=['GET', 'POST'])
+# add
+@app.route('/reward/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def reward_add():
-    print("reward_add")
+    print("reward/add")
 
     if request.method == "GET":
-        form = RewardForm()
+        form = RewardAddForm()
 
     if request.method == "POST":
-        form = RewardForm(request.form)
+        form = RewardAddForm(request.form)
         print(form.errors)
 
         if form.validate():
@@ -344,11 +329,12 @@ def reward_add():
             newReward.Add()
             print("added reward: {}".format(newReward))
 
-            return (redirect(url_for('rewards')))
+            return (redirect(url_for('reward')))
 
         print(form.errors)
 
     return render_template('reward_add.html', form=form)
+
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)

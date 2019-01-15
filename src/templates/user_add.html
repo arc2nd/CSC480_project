@@ -2,7 +2,7 @@
 {% block content %}
 
 <h1>Add a User</h1>
-<form action="/user_add" method="post">
+<form action="/user/add" method="post">
 	{{ form.hidden_tag() }}
 	{{ form.username.label }} {{ form.username }}<br>
 	{{ form.password.label }} {{ form.password }}<br>

@@ -7,7 +7,7 @@
 
 {% else %}
 <h1>Login</h1>
-<form action="/login" method="post" name="login">
+<form action="/user/login" method="post" name="login">
 	{{ form.hidden_tag() }}
 	{{ form.username.label }} {{ form.username }}<br>
 	{{ form.password.label }} {{ form.password }}<br>

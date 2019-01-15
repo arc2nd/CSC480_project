@@ -6,7 +6,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<link rel="stylesheet" href="css/style.min.css">
+	<link rel="stylesheet" href="{{ url_for('send_css') }}/style.min.css">
 
 	{% if title %}
 	<title>{{ title }}</title>
@@ -24,10 +24,10 @@
 	{% if not footer %}
 	<div class="text-center">
 		<a href="{{ url_for('index') }}">Index</a>
-		<a href="{{ url_for('chores') }}">Chores</a>
-		<a href="{{ url_for('users') }}">Users</a>
+		<a href="{{ url_for('chore') }}">Chores</a>
+		<a href="{{ url_for('user') }}">Users</a>
 		{% if session['logged_in'] %}
-		<a href="{{ url_for('logout') }}">Log out</a>
+		<a href="{{ url_for('user_logout') }}">Log out</a>
 		{% if session['role_id'] == 0 %}
 		Admin stuff:
 		<a href="{{ url_for('user_add') }}">Add a user</a>
@@ -35,19 +35,11 @@
 		<a href="{{ url_for('reward_add') }}">Add a reward</a>
 		{% endif %}
 		{% else %}
-		<a href="{{ url_for('login_form') }}">Log in</a>
+		<a href="{{ url_for('user_login') }}">Log in</a>
 		{% endif %}
 	</div>
 	{% endif %}
-	<!-- Optional JavaScript -->
-	<!-- jQuery first, then Popper.js, then Bootstrap JS -->
-	<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-	 crossorigin="anonymous"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-	 crossorigin="anonymous"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
-	 crossorigin="anonymous"></script>
-	<script src="js/scripts.min.js"></script>
+	<script src="{{ url_for('send_js') }}/scripts.min.js"></script>
 </body>
 
 </html>
