@@ -18,7 +18,6 @@ import config
 
 CREDS = config.get_creds('envs.json', crypt=False)
 _log(6, 1, CREDS)
-BASE_DIR = config.get_base_directory()
 
 
 # Static files path
@@ -127,24 +126,6 @@ def admin_required(f):
             print("user not admin")
             return redirect(url_for('index'))
     return decorated_function
-
-
-# Static file routes
-# CSS
-@app.route('/css')
-def send_css(path):
-    return send_from_directory(path)
-
-# Fonts
-@app.route('/fonts')
-def send_fonts(path):
-    return send_from_directory(path)
-
-# JavaScript
-@app.route('/js')
-def send_js(path):
-    return send_from_directory(path)
-
 
 # Default route
 
