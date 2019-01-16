@@ -8,6 +8,9 @@
 			{% if chore.assigned_to == None %}
 				| <a href="{{ url_for('chore_claim', chore_id = chore.id) }}">Claim</a>
 			{% endif %}
+			{% if is_admin %}
+			| <a href="{{ url_for('chore_remove', chore_id = chore.id) }}">Delete</a>
+			{% endif %}
 		</p>
 	{% endfor %}
 

@@ -12,6 +12,7 @@ def get_now():
 
 def get_creds(path, crypt=False):
     ret_dict = { 
+                "ADMIN_ROLE_ID": 0,
                 "SECRET_KEY": "I am a secret key", 
                 "CSRF_ENABLED": True, 
                 "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 
@@ -38,9 +39,3 @@ def get_creds(path, crypt=False):
                 return j
             except:
                 return ret_dict
-
-
-#class Config(object):
-#	SECRET_KEY = "thisisnotasecret"
-#	CSRF_ENABLED = True
-#	SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']

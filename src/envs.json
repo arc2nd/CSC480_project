@@ -1,7 +1,8 @@
 {
-  "SECRET_KEY": "I am a secret key", 
-  "CSRF_ENABLED": true, 
-  "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 
-  "SQLALCHEMY_TRACK_MODIFICATIONS": false, 
-  "WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
+	"ADMIN_ROLE_ID": 0,
+	"SECRET_KEY": "I am a secret key",
+	"CSRF_ENABLED": true,
+	"SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore",
+	"SQLALCHEMY_TRACK_MODIFICATIONS": false,
+	"WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
 }

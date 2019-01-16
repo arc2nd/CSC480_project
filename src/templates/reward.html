@@ -3,7 +3,12 @@
 {% block content %}
 
 	{% for reward in rewards %}
-		<p>{{reward.name}}</p>
+		<p>
+			{{reward.name}}
+			{% if is_admin %}
+				 | <a href="{{ url_for('reward_remove', reward_id=reward.id) }}">Delete</a>
+			{% endif %}
+		</p>
 	{% endfor %}
 
 {% endblock %}
