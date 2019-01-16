@@ -138,7 +138,7 @@ def index():
 
 # User routes
 
-# default
+# user default
 @app.route('/user', methods=['GET'])
 @login_required
 @admin_required
@@ -146,7 +146,7 @@ def user():
     users = User.User.GetAll()
     return render_template('user.html', users=users)
 
-# login
+# user login
 @app.route('/user/login', methods=['GET', 'POST'])
 def user_login():
     if(request.method == 'POST'):
@@ -172,7 +172,7 @@ def user_login():
         #TODO: Show a success message
         return render_template('user_login.html', form=form)
 
-# logout
+# user logout
 @app.route('/user/logout', methods=['GET'])
 @login_required
 def user_logout():
@@ -183,7 +183,7 @@ def user_logout():
     #TODO: Show an error message
     return index()
 
-# add
+# user add
 @app.route('/user/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -231,7 +231,7 @@ def user_remove(user_id=None):
 
 # Chore routes
 
-# default
+# chore default
 @app.route('/chore', methods=['GET'])
 @login_required
 def chore():
@@ -239,7 +239,7 @@ def chore():
 
     return render_template('chore.html', chores=chores)
 
-# add
+# chore add
 @app.route('/chore/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -280,7 +280,7 @@ def chore_add():
 
     return render_template('chore_add.html', form=form, errors=errors)
 
-# claim
+# chore claim
 @app.route('/chore/claim/<int:chore_id>', methods=['GET'])
 @login_required
 def chore_claim(chore_id=None):
@@ -320,14 +320,14 @@ def chore_remove(chore_id=None):
 
 # Reward Routes
 
-# default
+# reward default
 @app.route('/reward', methods=['GET'])
 @login_required
 def reward():
     rewards = Reward.Reward.GetAll()
     return render_template('reward.html', rewards=rewards)
 
-# add
+# reward add
 @app.route('/reward/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
@@ -359,7 +359,7 @@ def reward_add():
     return render_template('reward_add.html', form=form, errors=errors)
 
 
-# remove reward
+# reward remove 
 @app.route('/reward/remove/<int:reward_id>', methods=['GET'])
 @login_required
 @admin_required
