@@ -28,11 +28,13 @@
 				<li class="nav-item"><a class="nav-link" href="{{ url_for('chore') }}">Chores</a></li>
 				<li class="nav-item"><a class="nav-link" href="{{ url_for('reward') }}">Rewards</a></li>
 				{% if is_admin %}
-					<li class="nav-item mr-2"><a class="nav-link" href="{{ url_for('admin') }}">Admin</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('admin') }}">Admin</a></li>
 				{% endif %}
 	
 				{% if session['logged_in'] %}
 					<li class="nav-item"><a class="nav-link" href="{{ url_for('user_logout') }}">Log out</a></li>
+				{% else %}
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('user_login') }}">Log in</a></li>
 				{% endif %}
 			</ul>
 		</div>

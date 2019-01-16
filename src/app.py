@@ -133,7 +133,7 @@ def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         _log(1, VERBOSITY, 'admin check')
-        if is_admin:
+        if session['role_id'] == app.config['ADMIN_ROLE_ID']:
             _log(1, VERBOSITY, 'user is admin')
             return f(*args, **kwargs)
         else:
