@@ -22,37 +22,67 @@ class Chore(db.Model):
     def __repr__(self):
         return '<Chore  %r>' % self.name
 
-    def Add(self):
-        print(self)
-        db.session.add(self)
-        db.session.commit()
-        print(self.chorename)
+    # Create operations
+    @staticmethod
+    def Add(chore):
+        """ Add a chore """
 
-    def mark_done(self):
-        """mark this chore as being done on this datetime"""
-        now = datetime.datetime.now()
-        self.complete = now
-        return now
-
-    def check_due(self):
-        """compare now to the due datetime value"""
-        ret_val = False
-        now = datetime.now()
-        if now >= self.data_dict['due']:
-            # set an expired flag
-            # we can also set a threshold and use this function to spawn an reminder later
-            #self.expired = True
-            ret_val = True
-        return ret_val
-
-    def assign_to(self, user):
-        """assign this chore to a specified user"""
-        self.assigned_to = user
-        
-        chore = db.session.query(Chore).get(self.id)
-
-        chore.assigned_to = user.id
-
+        db.session.add(chore)
         db.session.commit()
 
         return True
+
+    # Read operations
+    @staticmethod
+    def GetById(chore_id):
+        """ Return a single chore by ID """
+
+        return Chore.query.filter_by(id=chore_id).first()
+
+    @staticmethod
+    def GetAll():
+        """ Return all chores """
+
+        return Chore.query.all()
+
+    # Update operations
+    def AssignTo(self, user):
+        """ Assign a chore to a user """
+        chore = Chore.GetById(self.id)
+        chore.assigned_to = user.id
+        db.session.commit()
+
+        return True
+
+    def MarkCompleted(self):
+        """ Mark a chore as completed """
+        
+        chore = Chore.GetById(self.id)
+        chore.complete = True
+        db.session.commit()
+
+        return True
+
+    # Delete operations
+    @staticmethod
+    def Remove(chore):
+        """ Remove a chore """
+
+        db.session.delete(chore)
+        db.session.commit()
+
+        return True
+
+    # Utility operations
+    def IsOverdue(self):
+        """ Check to see if a chore is overdue"""
+
+        if self.due_date == None:
+            return False
+
+        now = datetime.now()
+
+        if now >= self.due_date:
+            return True
+
+        return False

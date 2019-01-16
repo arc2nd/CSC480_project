@@ -6,7 +6,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<link rel="stylesheet" href="{{ url_for('send_css') }}/style.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.min.css') }}">
 
 	{% if title %}
 	<title>{{ title }}</title>
@@ -31,7 +31,7 @@
 		{% if session['role_id'] == 0 %}
 		Admin stuff:
 		<a href="{{ url_for('user_add') }}">Add a user</a>
-        <a href="{{ url_for('chore_add') }}">Add a chore</a>
+		<a href="{{ url_for('chore_add') }}">Add a chore</a>
 		<a href="{{ url_for('reward_add') }}">Add a reward</a>
 		{% endif %}
 		{% else %}
@@ -39,7 +39,7 @@
 		{% endif %}
 	</div>
 	{% endif %}
-	<script src="{{ url_for('send_js') }}/scripts.min.js"></script>
+	<script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
 </body>
 
 </html>

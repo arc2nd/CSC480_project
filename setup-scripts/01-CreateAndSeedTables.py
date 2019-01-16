@@ -43,7 +43,7 @@ def create_tables():
 		"""
 		CREATE TABLE roles
 		(
-			id INT PRIMARY KEY,
+			id SERIAL PRIMARY KEY,
 			name VARCHAR(255) NOT NULL UNIQUE
 		)
 		""",
@@ -129,9 +129,9 @@ def seed_admin_user():
 	commands = [
 		"""
 		INSERT INTO users
-			(id, role_id, username, password, first_name, middle_name, last_name, email_address, date_of_birth)
+			(id, role_id, username, password, first_name, middle_name, last_name, email_address, date_of_birth, points)
 			VALUES
-			(0, 0, 'administrator', '%s', 'first', 'middle', 'last', 'test@email.com', TO_DATE('01 Jan 1945', 'DD Mon YYYY'))
+			(0, 0, 'administrator', '%s', 'first', 'middle', 'last', 'test@email.com', TO_DATE('01 Jan 1945', 'DD Mon YYYY'), 0)
 		""" % (encrypted_password)
 	]
 
