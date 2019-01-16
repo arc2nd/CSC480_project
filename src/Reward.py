@@ -17,7 +17,38 @@ class Reward(db.Model):
     def __repr__(self):
         return '<Reward  %r>' % self.name
 
-    def Add(self):
-        print(self)
-        db.session.add(self)
+    # Create operations
+    def Add(reward):
+        """ Add a reward """
+
+        db.session.add(reward)
         db.session.commit()
+
+        return True
+
+    # Read operations
+    @staticmethod
+    def GetById(reward_id):
+        """ Return a single reward by ID """
+
+        return Reward.query.filter_by(id=reward_id).first()
+
+    @staticmethod
+    def GetAll():
+        """ Return all rewards """
+
+        return Reward.query.all()
+
+    # Update operations
+
+    # Delete operations
+    @staticmethod
+    def Remove(reward):
+        """ Remove a reward """
+
+        db.session.delete(reward)
+        db.session.commit()
+
+        return True
+
+    # Utility operations

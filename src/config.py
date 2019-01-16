@@ -7,11 +7,6 @@ import calendar
 basedir = os.path.dirname(os.path.realpath(__file__))
 
 """ Environment Configuration """
-
-def get_base_directory():
-    print(basedir)
-    return basedir
-
 def get_now():
     return calendar.timegm(datetime.datetime.now().timetuple())
 

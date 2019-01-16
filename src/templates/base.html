@@ -60,3 +60,32 @@
 </html>
 
 
+=======
+<body>
+	<h1>{{ title }}</h1>
+	{% if admin %}
+	admin<br>
+	{% endif %}
+	{% block content %}{% endblock %}
+	{% if not footer %}
+	<div class="text-center">
+		<a href="{{ url_for('index') }}">Index</a>
+		<a href="{{ url_for('chore') }}">Chores</a>
+		<a href="{{ url_for('user') }}">Users</a>
+		{% if session['logged_in'] %}
+		<a href="{{ url_for('user_logout') }}">Log out</a>
+		{% if session['role_id'] == 0 %}
+		Admin stuff:
+		<a href="{{ url_for('user_add') }}">Add a user</a>
+		<a href="{{ url_for('chore_add') }}">Add a chore</a>
+		<a href="{{ url_for('reward_add') }}">Add a reward</a>
+		{% endif %}
+		{% else %}
+		<a href="{{ url_for('user_login') }}">Log in</a>
+		{% endif %}
+	</div>
+	{% endif %}
+	<script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
+</body>
+
+</html>
