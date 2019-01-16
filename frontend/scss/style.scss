@@ -1,3 +1,6 @@
+// Import Mixins
+@import url('mixins.scss');
+
 // Import Fonts
 // This is an example of how to grab fonts from google fonts, see usage below in font-family declarations
 @import url('https://fonts.googleapis.com/css?family=Lato:400,700|Merriweather:400,700|Open+Sans:400,700|Coming+Soon:400,700');
@@ -25,6 +28,32 @@ $headings-font-family: 'Lato', sans-serif;
 // Include Bootstrap after overrides
 @import 'node_modules/bootstrap/scss/bootstrap';
 
+/* Shadows */
+/* Allows z height to be added to elements with <element z="1"> */
+*[z="0"] {
+	@include shadow-d0;
+}
+
+*[z="1"] {
+	@include shadow-d1;
+}
+
+*[z="2"] {
+	@include shadow-d2;
+}
+
+*[z="3"] {
+	@include shadow-d3;
+}
+
+*[z="4"] {
+	@include shadow-d4;
+}
+
+*[z="5"] {
+	@include shadow-d5;
+}
+
 /* Custom CSS below this point */
 
 body {
@@ -37,50 +66,55 @@ body {
 
 /* Alerts */
 .alert {
-    background-color: #fff;
-    border-radius: 0;
-    border: 0;
-    border-left: 2px solid #0d5302;
-    margin: 1rem
+	@include shadow-d1;
+	background-color: #fff;
+	border-radius: 0;
+	border: 0;
+	border-left: 2px solid #0d5302;
+	margin: 1rem
 }
 
 .alert-danger:before,.alert-info:before,.alert-success:before,.alert-warning:before {
-    font-family: FontAwesome;
-    padding: .5rem
+	font-family: FontAwesome;
+	padding: .5rem
 }
 
 .alert-success {
-    color: #0d5302;
-    border-left: 2px solid #0d5302
+	background-color: tint(#0d5302, 95%);
+	color: #0d5302;
+	border-left: 2px solid #0d5302
 }
 
 .alert-success:before {
-    content: "\f00c " // Checkmark symbol
+	content: "\f00c " // Checkmark symbol
 }
 
 .alert-info {
-    color: #4e6cef;
-    border-left: 2px solid #4e6cef
+	background-color: tint(#4e6cef, 95%);
+	color: #4e6cef;
+	border-left: 2px solid #4e6cef
 }
 
 .alert-info:before {
-    content: "\f129 " // Information symbol
+	content: "\f129 " // Information symbol
 }
 
 .alert-warning {
-    color: #ffc809;
-    border-left: 2px solid #ffc809
+	background-color: tint(#ffc809, 95%);
+	color: #ffc809;
+	border-left: 2px solid #ffc809
 }
 
 .alert-warning:before {
-    content: "\f12a " // Exclamation warning symbol
+	content: "\f12a " // Exclamation warning symbol
 }
 
 .alert-danger {
-    color: #dd191d;
-    border-left: 2px solid #dd191d
+	background-color: tint(#dd191d, 95%);
+	color: #dd191d;
+	border-left: 2px solid #dd191d
 }
 
 .alert-danger:before {
-    content: "\f00d " // Error symbol
+	content: "\f00d " // Error symbol
 }

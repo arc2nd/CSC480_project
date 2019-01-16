@@ -1,0 +1,63 @@
+/// Slightly lighten a color
+/// @param {Color} $color - color to tint
+/// @param {Number} $percentage - percentage of `$color` in returned color
+/// @return {Color}
+@function tint($color, $percentage) {
+	@return mix(white, $color, $percentage);
+	}
+	
+/// Slightly darken a color
+/// @param {Color} $color - color to shade
+/// @param {Number} $percentage - percentage of `$color` in returned color
+/// @return {Color}
+@function shade($color, $percentage) {
+	@return mix(black, $color, $percentage);
+}
+
+/// Transitions defaults
+/// @param {Text} $transition-property - transition name
+/// @param {Number} $transition-time - transition time in seconds
+/// @param {Text} $method - transition method
+@mixin transition($transition-property: all, $transition-time: .25s, $method: cubic-bezier) {
+	transition: $transition-property $transition-time $method;
+}
+
+/// Auto-prefix and z-index for shadows
+/// @param {Text} $shadow-property - all shadow properties
+/// @param {Number} $z-index - element's z-index
+@mixin shadow($shadow-property, $z-index)
+{
+	box-shadow: $shadow-property;
+	z-index: $z-index;
+}
+
+// Shadows for different depth levels
+@mixin shadow-d0 {
+	@include transition;
+@include shadow(none, 0);
+}
+
+@mixin shadow-d1 {
+	@include transition;
+	@include shadow((0 1px 4px 0 rgba(0, 0, 0, .25)), 1);
+}
+
+@mixin shadow-d2 {
+	@include transition;
+	@include shadow((0 7px 10px 0 rgba(0, 0, 0, .25), 0 2px 2px 0 rgba(0, 0, 0, .25)), 2);
+}
+
+@mixin shadow-d3 {
+	@include transition;
+	@include shadow((0 14px 25px 0 rgba(0, 0, 0, .05), 0 11px 7px 0 rgba(0, 0, 0, .12)), 3);
+}
+
+@mixin shadow-d4 {
+	@include transition;
+	@include shadow((0 21px 40px 0 rgba(0, 0, 0, .05), 0 14px 12px 0 rgba(0, 0, 0, .12)), 4);
+}
+
+@mixin shadow-d5 {
+	@include transition;
+	@include shadow((0 28px 55px 0 rgba(0, 0, 0, .05), 0 17px 17px 0 rgba(0, 0, 0, .12)), 5);
+}
