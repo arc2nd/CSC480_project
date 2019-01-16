@@ -29,7 +29,7 @@ class Chore(db.Model):
         db.session.add(chore)
         db.session.commit()
 
-        return
+        return True
 
     # Read operations
     def GetById(chore_id):
@@ -58,7 +58,7 @@ class Chore(db.Model):
         chore.complete = True
         db.session.commit()
 
-        return
+        return True
 
     # Delete operations
     def Remove(chore):
@@ -67,7 +67,7 @@ class Chore(db.Model):
         db.session.delete(chore)
         db.session.commit()
 
-        return
+        return True
 
     # Utility operations
     def IsOverdue(self):

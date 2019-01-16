@@ -27,58 +27,72 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
-    def Add(self):
-    
+    # Create operations
+    def Add(user):
+        """ Add a user """
+
         # encrypt the password
-        self.password = self.password.encode('utf-8')
-        self.password = bcrypt.hashpw(self.password, bcrypt.gensalt(12)).decode('utf-8')
+        user.password = User.EncryptPassword(user.password)
 
         # Default to standard role, start with 0 points
-        self.role_id = 1
-        self.points = 0
-        print(self)
-        db.session.add(self)
+        user.role_id = 1
+        user.points = 0
+
+        db.session.add(user)
         db.session.commit()
-        print(self.username)
+
+        return True
 
     # Read operations
     def GetById(user_id):
         """ Return a single user by ID """
 
         return User.query.filter_by(id=user_id).first()
+    
+    def GetByUsername(username):
+        """ Return a user by username """
+        
+        return User.query.filter_by(username=username).first()
 
-    def verify(self, passwd_to_test=None):
+    def GetAll():
+        """ Return all users """
+
+        return User.query.all()
+
+    # Update operations
+    def UpdatePassword(self, new_password=None, new_password_verify=None, old_password=None):
+        """ Updates a user's password """
+        if new_password == new_password_verify:
+            if self.VerifyPassword(old_password):
+                new_password = User.EncryptPassword(new_password)
+                self.password = new_password
+                db.session.commit()
+                return True
+        return False
+
+    # Delete operations
+    def Remove(user):
+        """ Remove a user """
+
+        db.session.delete(user)
+        db.session.commit()
+
+        return True
+
+    # Utility operations
+    def EncryptPassword(password_to_encrypt):
+        """ Encode, encrypt, and return the hashed password"""
+        password_to_encrypt = password_to_encrypt.encode('utf-8')
+        password_to_encrypt = bcrypt.hashpw(password_to_encrypt, bcrypt.gensalt(12)).decode('utf-8')
+        
+        return password_to_encrypt
+
+    def VerifyPassword(self, password_to_test=None):
+        """ Verifies that an entered password is correct """
         #encrypt password and check against database
-        if(bcrypt.checkpw(passwd_to_test.encode('utf-8'), self.password.encode('utf-8'))):
+        if(bcrypt.checkpw(password_to_test.encode('utf-8'), self.password.encode('utf-8'))):
             return True
         else:
             return False
-
-    def encrypt_passwd(self, plaintext, hashed=None):
-        _log(6,VERBOSITY, hashed)
-        if not hashed:
-            hashed = bcrypt.gensalt(12)
-        try:
-            ciphertext = bcrypt.hashpw(str(plaintext), str(hashed))
-        except:
-            ciphertext = 'bad salt: {}'.format(sys.exc_info())
-
-        _log(6, VERBOSITY, ciphertext)
-        self.pw_hash=ciphertext
-        return ciphertext
-
-    #user ops
-    # change me!!
-    def get_age(self):
-        #calculate age
-        return
-
-    # change me!!
-    def change_passwd(self, new_pass1=None, new_pass2=None, old_pass=None):
-        if new_pass1 == new_pass2:
-            if self.verify(old_pass):
-                new_hash = self.encrypt_passwd(new_pass)
-                self.pw_hash = new_hash
-                self.update({'pw_hash': self.pw_hash})
 
 
