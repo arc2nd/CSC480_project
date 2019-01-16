@@ -3,7 +3,12 @@
 {% block content %}
 
 	{% for user in users %}
-		<p>{{user.username}}</p>
+		<p>
+			{{user.username}}
+			{% if is_admin and user.role != admin_role_id %}
+				<a href="{{ url_for('user_remove', user_id=user.id) }}">Delete</a>
+			{% endif %}
+		</p>
 	{% endfor %}
 
 {% endblock %}

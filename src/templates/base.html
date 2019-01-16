@@ -27,7 +27,7 @@
 				<li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
 				<li class="nav-item"><a class="nav-link" href="{{ url_for('chore') }}">Chores</a></li>
 				<li class="nav-item"><a class="nav-link" href="{{ url_for('reward') }}">Rewards</a></li>
-				{% if session['role_id'] == 0 %}
+				{% if is_admin %}
 					<li class="nav-item mr-2"><a class="nav-link" href="{{ url_for('admin') }}">Admin</a></li>
 				{% endif %}
 	
@@ -43,6 +43,13 @@
 	<div class="container">
 		<h1>{{ title }}</h1>
 		<br>
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				{% for category, message in messages %}
+					<div class="alert alert-{{ category }}">{{ message }}</div>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
 		{% block content %}{% endblock %}
 	</div>
 	<br>
