@@ -26,7 +26,7 @@ class Chore(db.Model):
         print(self)
         db.session.add(self)
         db.session.commit()
-        print(self.chorename)
+        print(self.name)
 
     def mark_done(self):
         """mark this chore as being done on this datetime"""

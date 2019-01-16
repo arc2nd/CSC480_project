@@ -2,12 +2,37 @@
 
 {% block content %}
 
-	<form action="/reward/add" method="post">
+	<form action="{{ url_for('reward_add') }}" method="post">
 		{{ form.hidden_tag() }}
-		{{ form.name.label }} {{ form.name }}<br>
-		{{ form.description.label }} {{ form.description }}<br>
-		{{ form.points.label }} {{ form.points }}<br>
-		<input type="submit" value="Add reward">
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form.name.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Movie night") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form.description.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.description(class_="form-control mb-2 mr-sm-2",placeholder="e.g. We will rent and watch a movie of your choice and have popcorn together as a family.") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form.points.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.points(class_="form-control mb-2 mr-sm-2") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-12 text-center">
+				<button class="btn btn-primary" type="submit">Add Reward</button>
+			</div>
+		</div>
 	</form>
 
 {% endblock %}

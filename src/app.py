@@ -56,7 +56,7 @@ class UserAddForm(FlaskForm):
 
 # Chore Add Form
 class ChoreAddForm(FlaskForm):
-    chorename = TextField('Chore Name:', validators=[validators.required()])
+    name = TextField('Chore Name:', validators=[validators.required()])
     description = TextField('Description:', validators=[validators.required()])
     due_date = DateField('Due Date:', format='%Y-%m-%d',
                          validators=[validators.optional()])
@@ -255,7 +255,7 @@ def chore_add():
                 form.assigned_to.data = thisUser.id
             else:
                 form.assigned_to.data = None
-            newChore = Chore.Chore(form.chorename.data)
+            newChore = Chore.Chore(form.name.data)
             form.populate_obj(newChore)
 
             newChore.Add()
