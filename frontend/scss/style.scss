@@ -34,3 +34,53 @@ body {
 	overflow-y: scroll;
 	padding-top: 6rem; // Allow for a sticky header
 }
+
+/* Alerts */
+.alert {
+    background-color: #fff;
+    border-radius: 0;
+    border: 0;
+    border-left: 2px solid #0d5302;
+    margin: 1rem
+}
+
+.alert-danger:before,.alert-info:before,.alert-success:before,.alert-warning:before {
+    font-family: FontAwesome;
+    padding: .5rem
+}
+
+.alert-success {
+    color: #0d5302;
+    border-left: 2px solid #0d5302
+}
+
+.alert-success:before {
+    content: "\f00c " // Checkmark symbol
+}
+
+.alert-info {
+    color: #4e6cef;
+    border-left: 2px solid #4e6cef
+}
+
+.alert-info:before {
+    content: "\f129 " // Information symbol
+}
+
+.alert-warning {
+    color: #ffc809;
+    border-left: 2px solid #ffc809
+}
+
+.alert-warning:before {
+    content: "\f12a " // Exclamation warning symbol
+}
+
+.alert-danger {
+    color: #dd191d;
+    border-left: 2px solid #dd191d
+}
+
+.alert-danger:before {
+    content: "\f00d " // Error symbol
+}
