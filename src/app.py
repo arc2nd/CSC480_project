@@ -213,6 +213,22 @@ def user_add():
     return render_template('user_add.html', form=form, errors=errors)
 
 
+# user remove
+@app.route('/user/remove/<int:user_id>', methods=['GET'])
+@login_required
+@admin_required
+def user_remove(user_id=None):
+    user = User.User.GetById(user_id)
+    if user:
+        if user.Remove(user):
+            _log(1, VERBOSITY, 'user removed successfully')
+        else:
+            _log(1, VERBOSITY, 'error removing user')
+    else:
+        _log(1, VERBOSITY, 'error finding user')
+    return redirect(url_for('user'))
+
+
 # Chore routes
 
 # default
@@ -286,6 +302,22 @@ def chore_claim(chore_id=None):
     return redirect(url_for('chore'))
 
 
+# chore remove
+@app.route('/chore/remove/<int:chore_id>', methods=['GET'])
+@login_required
+@admin_required
+def chore_remove(chore_id=None):
+    chore = Chore.Chore.GetById(chore_id)
+    if chore:
+        if chore.Remove(chore):
+            _log(1, VERBOSITY, 'chore removed successfully')
+        else:
+            _log(1, VERBOSITY, 'error removing chore')
+    else:
+        _log(1, VERBOSITY, 'error finding chore')
+    return redirect(url_for('chore'))
+
+
 # Reward Routes
 
 # default
@@ -325,6 +357,22 @@ def reward_add():
             errors = form.errors
         
     return render_template('reward_add.html', form=form, errors=errors)
+
+
+# remove reward
+@app.route('/reward/remove/<int:reward_id>', methods=['GET'])
+@login_required
+@admin_required
+def reward_remove(reward_id=None):
+    reward = Reward.Reward.GetById(reward_id)
+    if reward:
+        if reward.Remove(reward):
+            _log(1, VERBOSITY, 'removed reward successfully')
+        else:
+            _log(1, VERBOSITY, 'error removing reward')
+    else:
+        _log(1, VERBOSITY, 'error finding reward')
+    return redirect(url_for('reward'))
 
 
 # Test Routes
