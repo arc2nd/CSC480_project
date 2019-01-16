@@ -23,6 +23,7 @@ class Chore(db.Model):
         return '<Chore  %r>' % self.name
 
     # Create operations
+    @staticmethod
     def Add(chore):
         """ Add a chore """
 
@@ -32,11 +33,13 @@ class Chore(db.Model):
         return True
 
     # Read operations
+    @staticmethod
     def GetById(chore_id):
         """ Return a single chore by ID """
 
         return Chore.query.filter_by(id=chore_id).first()
 
+    @staticmethod
     def GetAll():
         """ Return all chores """
 
@@ -61,6 +64,7 @@ class Chore(db.Model):
         return True
 
     # Delete operations
+    @staticmethod
     def Remove(chore):
         """ Remove a chore """
 

@@ -16,6 +16,7 @@ class Role(db.Model):
         return '<Role %r>' % self.name
 
     # Create operations
+    @staticmethod
     def Add(role):
         """ Add a role """
 
@@ -25,11 +26,13 @@ class Role(db.Model):
         return True
 
     # Read operations
+    @staticmethod
     def GetById(role_id):
         """ Return a single role by ID """
 
         return Role.query.filter_by(id=role_id).first()
 
+    @staticmethod
     def GetAll():
         """ Return all roles """
 
@@ -38,6 +41,7 @@ class Role(db.Model):
     # Update operations
 
     # Delete operations
+    @staticmethod
     def Remove(role):
         """ Remove a role """
 

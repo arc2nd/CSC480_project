@@ -27,11 +27,13 @@ class Reward(db.Model):
         return True
 
     # Read operations
+    @staticmethod
     def GetById(reward_id):
         """ Return a single reward by ID """
 
         return Reward.query.filter_by(id=reward_id).first()
 
+    @staticmethod
     def GetAll():
         """ Return all rewards """
 
@@ -40,6 +42,7 @@ class Reward(db.Model):
     # Update operations
 
     # Delete operations
+    @staticmethod
     def Remove(reward):
         """ Remove a reward """
 

@@ -28,6 +28,7 @@ class User(db.Model):
         return '<User %r>' % self.username
 
     # Create operations
+    @staticmethod
     def Add(user):
         """ Add a user """
 
@@ -44,16 +45,19 @@ class User(db.Model):
         return True
 
     # Read operations
+    @staticmethod
     def GetById(user_id):
         """ Return a single user by ID """
 
         return User.query.filter_by(id=user_id).first()
     
+    @staticmethod
     def GetByUsername(username):
         """ Return a user by username """
         
         return User.query.filter_by(username=username).first()
 
+    @staticmethod
     def GetAll():
         """ Return all users """
 
@@ -71,6 +75,7 @@ class User(db.Model):
         return False
 
     # Delete operations
+    @staticmethod
     def Remove(user):
         """ Remove a user """
 
@@ -80,6 +85,7 @@ class User(db.Model):
         return True
 
     # Utility operations
+    @staticmethod
     def EncryptPassword(password_to_encrypt):
         """ Encode, encrypt, and return the hashed password"""
         password_to_encrypt = password_to_encrypt.encode('utf-8')
