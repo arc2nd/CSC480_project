@@ -1,12 +1,13 @@
 {% extends "base.html" %}
+
 {% block content %}
 
-<h1>Add a Reward</h1>
-<form action="/reward/add" method="post">
-	{{ form.hidden_tag() }}
-	{{ form.name.label }} {{ form.name }}<br>
-	{{ form.description.label }} {{ form.description }}<br>
-	{{ form.points.label }} {{ form.points }}<br>
-	<input type="submit" value="Add reward">
-</form>
+	<form action="/reward/add" method="post">
+		{{ form.hidden_tag() }}
+		{{ form.name.label }} {{ form.name }}<br>
+		{{ form.description.label }} {{ form.description }}<br>
+		{{ form.points.label }} {{ form.points }}<br>
+		<input type="submit" value="Add reward">
+	</form>
+
 {% endblock %}

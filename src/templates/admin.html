@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	<i class="fa fa-fw fa-user" aria-hidden></i> <a href="{{ url_for('user_add') }}">Add a user</a><br>
+	<i class="fa fa-fw fa-check" aria-hidden></i> <a href="{{ url_for('chore_add') }}">Add a chore</a><br>
+	<i class="fa fa-fw fa-tasks" aria-hidden></i> <a href="{{ url_for('reward_add') }}">Add a reward</a><br>
+
+{% endblock %}

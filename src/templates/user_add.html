@@ -1,16 +1,17 @@
 {% extends "base.html" %}
+
 {% block content %}
 
-<h1>Add a User</h1>
-<form action="/user/add" method="post">
-	{{ form.hidden_tag() }}
-	{{ form.username.label }} {{ form.username }}<br>
-	{{ form.password.label }} {{ form.password }}<br>
-	{{ form.email_address.label }} {{ form.email_address }}<br>
-	{{ form.first_name.label }} {{ form.first_name }}<br>
-	{{ form.middle_name.label }} {{ form.middle_name }}<br>
-	{{ form.last_name.label }} {{ form.last_name }}<br>
-	{{ form.date_of_birth.label }} {{ form.date_of_birth }}<br>
-	<input type="submit" value="Add user">
-</form>
+	<form action="/user/add" method="post">
+		{{ form.hidden_tag() }}
+		{{ form.username.label }} {{ form.username }}<br>
+		{{ form.password.label }} {{ form.password }}<br>
+		{{ form.email_address.label }} {{ form.email_address }}<br>
+		{{ form.first_name.label }} {{ form.first_name }}<br>
+		{{ form.middle_name.label }} {{ form.middle_name }}<br>
+		{{ form.last_name.label }} {{ form.last_name }}<br>
+		{{ form.date_of_birth.label }} {{ form.date_of_birth }}<br>
+		<input type="submit" value="Add user">
+	</form>
+
 {% endblock %}

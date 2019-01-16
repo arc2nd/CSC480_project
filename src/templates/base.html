@@ -6,7 +6,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-	<link rel="stylesheet" href="{{ url_for('send_css') }}/style.min.css">
+	<link rel="stylesheet" href="{{ url_for('static', filename='css/style.min.css') }}">
 
 	{% if title %}
 	<title>{{ title }}</title>
@@ -15,31 +15,48 @@
 	{% endif %}
 </head>
 
-<body>
-	<h1>{{ title }}</h1>
-	{% if admin %}
-	admin<br>
-	{% endif %}
-	{% block content %}{% endblock %}
-	{% if not footer %}
-	<div class="text-center">
-		<a href="{{ url_for('index') }}">Index</a>
-		<a href="{{ url_for('chore') }}">Chores</a>
-		<a href="{{ url_for('user') }}">Users</a>
-		{% if session['logged_in'] %}
-		<a href="{{ url_for('user_logout') }}">Log out</a>
-		{% if session['role_id'] == 0 %}
-		Admin stuff:
-		<a href="{{ url_for('user_add') }}">Add a user</a>
-        <a href="{{ url_for('chore_add') }}">Add a chore</a>
-		<a href="{{ url_for('reward_add') }}">Add a reward</a>
-		{% endif %}
-		{% else %}
-		<a href="{{ url_for('user_login') }}">Log in</a>
-		{% endif %}
-	</div>
-	{% endif %}
-	<script src="{{ url_for('send_js') }}/scripts.min.js"></script>
-</body>
+<body class="d-flex flex-column">
+<header class="container">
+	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+		<button class="navbar-toggler my-auto btn btn-circle" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+			<i class="fa fa-fw fa-bars"></i>
+		</button>
+		<a class="navbar-brand mr-auto px-2" href="{{ url_for('index') }}">Chore Explore</a>
+		<div class="collapse navbar-collapse" id="navbarToggler">
+			<ul class="navbar-nav mr-auto">
+				<li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+				<li class="nav-item"><a class="nav-link" href="{{ url_for('chore') }}">Chores</a></li>
+				<li class="nav-item"><a class="nav-link" href="{{ url_for('reward') }}">Rewards</a></li>
+				{% if session['role_id'] == 0 %}
+					<li class="nav-item mr-2"><a class="nav-link" href="{{ url_for('admin') }}">Admin</a></li>
+				{% endif %}
+	
+				{% if session['logged_in'] %}
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('user_logout') }}">Log out</a></li>
+				{% endif %}
+			</ul>
+		</div>
+	</nav>
+</header>
 
+<main class="flex-fill">
+	<div class="container">
+		<h1>{{ title }}</h1>
+		<br>
+		{% block content %}{% endblock %}
+	</div>
+	<br>
+</main>
+
+<footer class="footer">
+	<div class="container text-center text-md-left">
+		<span class="text-muted">&copy; Our Team Name</span>
+	</div>
+</footer>
+
+<script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
+
+</body>
 </html>
+
+
