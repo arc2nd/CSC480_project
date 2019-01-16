@@ -1,16 +1,70 @@
 {% extends "base.html" %}
+
 {% block content %}
 
-<h1>Add a User</h1>
-<form action="/user/add" method="post">
-	{{ form.hidden_tag() }}
-	{{ form.username.label }} {{ form.username }}<br>
-	{{ form.password.label }} {{ form.password }}<br>
-	{{ form.email_address.label }} {{ form.email_address }}<br>
-	{{ form.first_name.label }} {{ form.first_name }}<br>
-	{{ form.middle_name.label }} {{ form.middle_name }}<br>
-	{{ form.last_name.label }} {{ form.last_name }}<br>
-	{{ form.date_of_birth.label }} {{ form.date_of_birth }}<br>
-	<input type="submit" value="Add user">
-</form>
+	<form action="{{ url_for('user_add') }}" method="post">
+		{{ form.hidden_tag() }}
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form.username.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.username(class_="form-control mb-2 mr-sm-2",placeholder="e.g. ChoreDestroyer123") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form.password.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.password(class_="form-control mb-2 mr-sm-2") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form.email_address.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.email_address(class_="form-control mb-2 mr-sm-2",placeholder="e.g. ChoreDestroyer123@CleanHouse.com") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form.first_name.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.first_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Jane, John") }}
+			</div>
+		</div>
+		<div class="form-row">		
+			<div class="form-group col-md-6">
+				{{ form.middle_name.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.middle_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Alex, Erin") }}
+			</div>
+		</div>
+		<div class="form-row">		
+			<div class="form-group col-md-6">
+				{{ form.last_name.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.last_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Smith") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-6">
+				{{ form.date_of_birth.label }}
+			</div>
+			<div class="form-group col-md-6">
+				{{ form.date_of_birth(class_="form-control mb-2 mr-sm-2") }}
+			</div>
+		</div>
+		<div class="form-row">
+			<div class="form-group col-md-12 text-center">
+				<button class="btn btn-primary" type="submit">Add User</button>
+			</div>
+		</div>
+	</form>
+
 {% endblock %}

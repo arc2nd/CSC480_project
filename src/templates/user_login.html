@@ -1,18 +1,20 @@
 {% extends "base.html" %}
+
 {% block content %}
 
-{% if session['logged_in'] %}
+	{% if session['logged_in'] %}
 
-<p>Already logged in.</p>
+		<p>You're already logged in!</p>
 
-{% else %}
-<h1>Login</h1>
-<form action="/user/login" method="post" name="login">
-	{{ form.hidden_tag() }}
-	{{ form.username.label }} {{ form.username }}<br>
-	{{ form.password.label }} {{ form.password }}<br>
+	{% else %}
+		<form action="{{ url_for('user_login')}}" method="post" name="login">
+			{{ form.hidden_tag() }}
+			{{ form.username.label(class_="sr-only") }}
+			{{ form.username(class_="form-control mb-2 mr-sm-2",placeholder="Username") }}<br>
+			{{ form.password.label(class_="sr-only") }}
+			{{ form.password(class_="form-control mb-2 mr-sm-2",placeholder="Password") }}<br>
+			<input class="btn btn-primary" type="submit" value="Log in">
+		</form>
+	{% endif %}
 
-	<input type="submit" value="Sign in">
-</form>
-{% endif %}
 {% endblock %}

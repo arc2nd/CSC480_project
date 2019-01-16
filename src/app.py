@@ -127,13 +127,22 @@ def admin_required(f):
             return redirect(url_for('index'))
     return decorated_function
 
+  
 # Default route
 
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
 @login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', title="Home")
+
+
+# Admin functions route
+@app.route('/admin', methods=['GET'])
+@login_required
+@admin_required
+def admin():
+    return render_template('admin.html', title="Admin Functions")
 
 
 # User routes
@@ -144,7 +153,7 @@ def index():
 @admin_required
 def user():
     users = User.User.GetAll()
-    return render_template('user.html', users=users)
+    return render_template('user.html', users=users, title="Users")
 
 # login
 @app.route('/user/login', methods=['GET', 'POST'])
@@ -159,6 +168,7 @@ def user_login():
         if result and result.VerifyPassword(POST_PASSWORD):
             session['logged_in'] = config.get_now() 
             session['user_id'] = result.id
+            session['username'] = result.username
             session['role_id'] = result.role_id
             session['timeout'] = 10
             _log(1, VERBOSITY, 'logged in')
@@ -170,7 +180,7 @@ def user_login():
     else:
         form = UserAddForm()
         #TODO: Show a success message
-        return render_template('user_login.html', form=form)
+        return render_template('user_login.html', form=form, title="Log in")
 
 # logout
 @app.route('/user/logout', methods=['GET'])
@@ -178,7 +188,7 @@ def user_login():
 def user_logout():
     if session.get('logged_in'):
         session.clear()
-        return render_template('user_logout.html')
+        return render_template('user_logout.html', title="Log out")
     # not logged in, send them to the index
     #TODO: Show an error message
     return index()
@@ -210,7 +220,7 @@ def user_add():
         else:
             errors = form.errors
 
-    return render_template('user_add.html', form=form, errors=errors)
+    return render_template('user_add.html', form=form, errors=errors, title="Add a user")
 
 
 # Chore routes
@@ -221,7 +231,7 @@ def user_add():
 def chore():
     chores = Chore.Chore.GetAll()
 
-    return render_template('chore.html', chores=chores)
+    return render_template('chore.html', chores=chores, title="Chores")
 
 # add
 @app.route('/chore/add', methods=['GET', 'POST'])
@@ -262,7 +272,7 @@ def chore_add():
         else:
             errors = form.errors
 
-    return render_template('chore_add.html', form=form, errors=errors)
+    return render_template('chore_add.html', form=form, errors=errors, title="Add a chore")
 
 # claim
 @app.route('/chore/claim/<int:chore_id>', methods=['GET'])
@@ -293,7 +303,7 @@ def chore_claim(chore_id=None):
 @login_required
 def reward():
     rewards = Reward.Reward.GetAll()
-    return render_template('reward.html', rewards=rewards)
+    return render_template('reward.html', rewards=rewards, title="Rewards")
 
 # add
 @app.route('/reward/add', methods=['GET', 'POST'])
@@ -448,7 +458,6 @@ def test_role():
     Role.Role.Remove(role)
 
     return redirect(url_for('index'))
-
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
