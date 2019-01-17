@@ -13,7 +13,7 @@ class Chore(db.Model):
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255))
     points = db.Column(db.Integer)
-    complete = db.Column(db.Boolean)
+    complete = db.Column(db.Boolean, nullable=False, default=False)
     #recurrence = db.Column(db.Enum)
 
     def __init__(self, name):
@@ -26,6 +26,9 @@ class Chore(db.Model):
     @staticmethod
     def Add(chore):
         """ Add a chore """
+        
+        """ Default to false """
+        chore.complete = False
 
         db.session.add(chore)
         db.session.commit()
@@ -38,6 +41,12 @@ class Chore(db.Model):
         """ Return a single chore by ID """
 
         return Chore.query.filter_by(id=chore_id).first()
+
+    @staticmethod
+    def GetByUser(user, completed):
+        """ Return all chores assigned to a single user """
+
+        return Chore.query.filter_by(assigned_to=user.id,complete=completed).all()
 
     @staticmethod
     def GetAll():
