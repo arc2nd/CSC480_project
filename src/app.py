@@ -344,28 +344,24 @@ def chore_claim(chore_id=None):
     return redirect(url_for('chore'))
 
 
-# chore finish
-@app.route('/chore/finish/<int:chore_id>', methods=['GET'])
+# chore complete
+@app.route('/chore/complete/<int:chore_id>', methods=['GET'])
 @login_required
-def chore_finish(chore_id=None):
-    _log(1, VERBOSITY, 'chore/finish')
+def chore_complete(chore_id=None):
+    _log(1, VERBOSITY, 'chore/complete')
     user = User.User.GetById(session['user_id'])
     chore = Chore.Chore.GetById(chore_id)
     _log(1, VERBOSITY, chore.assigned_to)
-    if user and chore and chore.assigned_to == session['user_id']:
-        if chore.MarkCompleted():
-            if user.AddPoints(chore.points):
-                _log(1, VERBOSITY, 'chore finished successfully')
-                flash('Success: Chore finished', category='success')
-            else:
-                _log(1, VERBOSITY, 'points not added')
-                flash('Error: Points not added') 
+    if user and chore and chore.assigned_to == user.id:
+        if chore.MarkCompleted() and user.AddPoints(chore.points):
+                _log(1, VERBOSITY, 'chore completed successfully')
+                flash('Success: Chore completed', category='success')
         else:
             _log(1, VERBOSITY, 'error marking chore complete')
-            flash('Error: Chore not marked complete', category='danger')
+            flash('Error: Chore not completed', category='danger')
     else:
-        _log(1, VERBOSITY, 'Warning: Not your chore')
-        flash('Warning: Not your chore', category='warning')
+        _log(1, VERBOSITY, 'user attempt to complete another user\'s chore')
+        flash('Warning: You cannot complete another user\'s chore', category='warning')
     return redirect(url_for('chore'))
 
 # chore remove

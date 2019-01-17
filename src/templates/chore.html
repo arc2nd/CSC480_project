@@ -2,21 +2,19 @@
 
 {% block content %}
 
-	{% for chore in chores %}
-		<p>
-			{{chore.name}}
-			{% if chore.assigned_to == None %}
-				| <a href="{{ url_for('chore_claim', chore_id = chore.id) }}">Claim</a>
+    {% for chore in chores %}
+        <p>
+            {{chore.name}}
+            {% if chore.assigned_to == None %}
+                | <a href="{{ url_for('chore_claim', chore_id = chore.id) }}">Claim</a>
             {% endif %}
-            {% if chore.assigned_to == session['user_id'] %}
-                {% if not chore.complete %}
-                    | <a href="{{ url_for('chore_finish', chore_id = chore.id) }}">Finish</a>
-                {% endif %}
-			{% endif %}
-			{% if is_admin %}
-			| <a href="{{ url_for('chore_remove', chore_id = chore.id) }}">Delete</a>
-			{% endif %}
-		</p>
-	{% endfor %}
+            {% if chore.assigned_to == session['user_id'] and not chore.complete %}
+                | <a href="{{ url_for('chore_complete', chore_id = chore.id) }}">Complete</a>
+            {% endif %}
+            {% if is_admin %}
+                | <a href="{{ url_for('chore_remove', chore_id = chore.id) }}">Delete</a>
+            {% endif %}
+        </p>
+    {% endfor %}
 
 {% endblock %}
