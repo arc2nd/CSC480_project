@@ -97,7 +97,7 @@ def admin_role_id():
 # Ensures the user is logged in, or forwards to login form if not
 def login_required(f):
     """Things to do to check and make sure a user is logged in
-       1. check if session has a logged_in key, if not, send to login page
+       1. check if session has a logged_in key, if not, send to splash page
        2. compare the current time to the last logged_in timestamp
           if the difference is greater than the timeout, send back to the login page
     """
@@ -106,8 +106,7 @@ def login_required(f):
         _log(1, VERBOSITY, 'login check')
         # check to see if we're logged in
         if 'logged_in' not in session:
-            flash('Error: You must be logged in to access that function', category='danger')
-            return redirect(url_for('user_login'))
+            return splash()
         else:
             # get the current time and see if it's more than the timeout greater
             #   than the last time a logged_in timestamp was stored
@@ -128,7 +127,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Ensures the user is admin, and forwards to the index if not
+# Ensures the user is admin, and forwards to the splash if not
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -139,10 +138,9 @@ def admin_required(f):
         else:
             _log(1, VERBOSITY, 'attempt by a non-admin to access an admin page')
             flash('Error: You must be an administrator to access this page', category='danger')
-            return redirect(url_for('index'))
+            return splash()
     return decorated_function
 
-  
 # Default route
 
 @app.route('/', methods=['GET'])
@@ -151,6 +149,11 @@ def admin_required(f):
 def index():
     return render_template('index.html', title="Home")
 
+# Splash page
+@app.route('/splash', methods=['GET'])
+def splash():
+    form = UserAddForm()
+    return render_template('splash.html', form=form, title="Welcome to Chore Explore!")
 
 # Admin functions route
 @app.route('/admin', methods=['GET'])
@@ -204,12 +207,8 @@ def user_logout():
     if session.get('logged_in'):
         session.clear()
         _log(1, VERBOSITY, 'user logged out')
-        flash('Success: You are now logged out', category='success')
-        return render_template('user_logout.html', title="Log out")
-    # not logged in, send them to the index
-    _log(1, VERBOSITY, 'user tried to log out, but not logged in')
-    flash('Warning: You must be logged in to log out', category='warning')
-    return index()
+
+    return splash()
 
 # user add
 @app.route('/user/add', methods=['GET', 'POST'])

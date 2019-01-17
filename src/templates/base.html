@@ -16,30 +16,27 @@
 </head>
 
 <body class="d-flex flex-column">
-<header class="container">
-	<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-		<button class="navbar-toggler my-auto btn btn-circle" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
-			<i class="fa fa-fw fa-bars"></i>
-		</button>
-		<a class="navbar-brand mr-auto px-2" href="{{ url_for('index') }}">Chore Explore</a>
-		<div class="collapse navbar-collapse" id="navbarToggler">
-			<ul class="navbar-nav mr-auto">
-				<li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
-				<li class="nav-item"><a class="nav-link" href="{{ url_for('chore') }}">Chores</a></li>
-				<li class="nav-item"><a class="nav-link" href="{{ url_for('reward') }}">Rewards</a></li>
-				{% if is_admin %}
-					<li class="nav-item"><a class="nav-link" href="{{ url_for('admin') }}">Admin</a></li>
-				{% endif %}
-	
-				{% if session['logged_in'] %}
-					<li class="nav-item"><a class="nav-link" href="{{ url_for('user_logout') }}">Log out</a></li>
-				{% else %}
-					<li class="nav-item"><a class="nav-link" href="{{ url_for('user_login') }}">Log in</a></li>
-				{% endif %}
-			</ul>
-		</div>
-	</nav>
-</header>
+{% if session['logged_in'] %}
+	<header class="container">
+		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+			<button class="navbar-toggler my-auto btn btn-circle" data-toggle="collapse" data-target="#navbarToggler" aria-controls="navbarToggler" aria-expanded="false" aria-label="Toggle navigation">
+				<i class="fa fa-fw fa-bars"></i>
+			</button>
+			<a class="navbar-brand mr-auto px-2" href="{{ url_for('index') }}">Chore Explore</a>
+			<div class="collapse navbar-collapse" id="navbarToggler">
+				<ul class="navbar-nav mr-auto">
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Home</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('chore') }}">Chores</a></li>
+					<li class="nav-item"><a class="nav-link" href="{{ url_for('reward') }}">Rewards</a></li>
+					{% if is_admin %}
+						<li class="nav-item"><a class="nav-link" href="{{ url_for('admin') }}">Admin</a></li>
+					{% endif %}
+						<li class="nav-item"><a class="nav-link" href="{{ url_for('user_logout') }}">Log out</a></li>
+				</ul>
+			</div>
+		</nav>
+	</header>
+{% endif %}
 
 <main class="flex-fill">
 	<div class="container">
