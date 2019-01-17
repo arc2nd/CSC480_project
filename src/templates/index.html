@@ -2,4 +2,24 @@
 
 {% block content %}
 
+	{% if is_admin %} 
+
+		<h2>Chores</h2>
+		{% for chore in chores %}
+			Name: {{chore.name}} | Points: {{chore.points}} | Due date: {{chore.due_date}} | Assigned to: {{ full_name(chore.assigned_to) }}<br>
+		{% endfor %}
+
+	{% else %}
+
+		<h2>My Chores</h2>
+		{% for chore in chores %}
+			Name: {{chore.name}} | Points: {{chore.points}} | Due date: {{chore.due_date}}<br>
+		{% endfor %}
+
+	{% endif %}
+		
+		<br><br>
+		<h2>My Reward Points</h2>
+		I currently have {{user.points}} points to spend on <a href="{{ url_for('reward') }}">rewards</a>
+
 {% endblock %}
