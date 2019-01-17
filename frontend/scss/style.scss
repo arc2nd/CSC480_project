@@ -12,9 +12,10 @@
 $body-bg:				#ffffff;
 $light-bg:				#f5f5f5;
 $body-color:			#212121;
+$body-color-light:		#efefef;
 
 // Examples of overriding bootstrap variables:
-$brand-primary: #000102;
+$brand-primary: #b45100;
 // $brand-accent: ;
 // $link-color: $brand-primary;
 // $link-hover-color: ;
@@ -62,6 +63,27 @@ body {
 	min-height: 90vh;
 	overflow-y: scroll;
 	padding-top: 6rem; // Allow for a sticky header
+
+	&.no-header
+	{
+		padding-top: 0; // Pages without the header (splash)
+	}
+}
+
+/* Splash Page */
+
+// #663300, #DD4E10, #EFFF3C, #d0cdc8, rgb(17,17,17)
+
+body.splash {
+	background-color: #663300;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100%25' height='100%25' viewBox='0 0 800 400'%3E%3Cdefs%3E%3CradialGradient id='a' cx='396' cy='281' r='514' gradientUnits='userSpaceOnUse'%3E%3Cstop offset='0' stop-color='%23dd4e10'/%3E%3Cstop offset='1' stop-color='%23663300'/%3E%3C/radialGradient%3E%3ClinearGradient id='b' gradientUnits='userSpaceOnUse' x1='400' y1='148' x2='400' y2='333'%3E%3Cstop offset='0' stop-color='%23efff3c' stop-opacity='0'/%3E%3Cstop offset='1' stop-color='%23efff3c' stop-opacity='0.5'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23a)' width='800' height='400'/%3E%3Cg fill-opacity='0.13'%3E%3Ccircle fill='url(%23b)' cx='267.5' cy='61' r='300'/%3E%3Ccircle fill='url(%23b)' cx='532.5' cy='61' r='300'/%3E%3Ccircle fill='url(%23b)' cx='400' cy='30' r='300'/%3E%3C/g%3E%3C/svg%3E");
+	background-attachment: fixed;
+	background-size: cover;
+	color: $body-color-light;
+}
+
+h1.splash-header {
+	font-family: $font-family-cursive;
 }
 
 /* Alerts */
@@ -117,4 +139,22 @@ body {
 
 .alert-danger:before {
 	content: "\f00d " // Error symbol
+}
+
+/* Buttons */
+.btn-primary {
+	@include button-variant($brand-primary, darken($brand-primary, 5%), darken($brand-primary, 7%), lighten($brand-primary,2%), lighten($brand-primary, 7%), darken($brand-primary,15%));
+}
+
+.btn-outline-primary {
+	@include button-outline-variant($brand-primary, #222222, lighten($brand-primary,2%), $brand-primary);
+}
+
+/* Cards */
+.card {
+	background: rgb(234,234,234); /* Old browsers */
+	background: -moz-linear-gradient(top, rgba(234,234,234,1) 8%, rgba(175,175,175,1) 95%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, rgba(234,234,234,1) 8%,rgba(175,175,175,1) 95%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom, rgba(234,234,234,1) 8%,rgba(175,175,175,1) 95%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaeaea', endColorstr='#afafaf',GradientType=0 ); /* IE6-9 */
 }

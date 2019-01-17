@@ -106,7 +106,7 @@ def login_required(f):
         _log(1, VERBOSITY, 'login check')
         # check to see if we're logged in
         if 'logged_in' not in session:
-            return render_template('splash.html')
+            return splash()
         else:
             # get the current time and see if it's more than the timeout greater
             #   than the last time a logged_in timestamp was stored
@@ -138,7 +138,7 @@ def admin_required(f):
         else:
             _log(1, VERBOSITY, 'attempt by a non-admin to access an admin page')
             flash('Error: You must be an administrator to access this page', category='danger')
-            return redirect(url_for('splash'))
+            return splash()
     return decorated_function
 
 # Default route
@@ -152,7 +152,8 @@ def index():
 # Splash page
 @app.route('/splash', methods=['GET'])
 def splash():
-    return render_template('splash.html', title='Welcome to Chore Explore!')
+    form = UserAddForm()
+    return render_template('splash.html', form=form, title="Welcome to Chore Explore!")
 
 # Admin functions route
 @app.route('/admin', methods=['GET'])
@@ -207,7 +208,7 @@ def user_logout():
         session.clear()
         _log(1, VERBOSITY, 'user logged out')
 
-    return redirect(url_for('splash'))
+    return splash()
 
 # user add
 @app.route('/user/add', methods=['GET', 'POST'])
