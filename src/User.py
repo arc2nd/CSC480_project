@@ -101,4 +101,9 @@ class User(db.Model):
         else:
             return False
 
-
+    # Add Points
+    def AddPoints(self, points):
+        """ Add a chore's points to the user account """
+        self.points += points
+        db.session.commit()
+        return True

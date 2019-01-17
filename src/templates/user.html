@@ -5,9 +5,11 @@
 	{% for user in users %}
 		<p>
 			{{user.username}}
+            | <b>Points: </b>{{ user.points }}<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 			{% if is_admin and user.role != admin_role_id %}
 				<a href="{{ url_for('user_remove', user_id=user.id) }}">Delete</a>
-			{% endif %}
+			{% endif %} 
 		</p>
 	{% endfor %}
 
