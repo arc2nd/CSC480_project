@@ -93,6 +93,19 @@ class User(db.Model):
         
         return password_to_encrypt
 
+    def GetFullName(self):
+        """ Returns a users full name in 'first middle last' format """
+
+        name = self.first_name
+
+        if self.middle_name != None:
+            name += ' ' + self.middle_name
+
+        if self.last_name != None:
+            name += ' ' + self.last_name
+
+        return name
+
     def VerifyPassword(self, password_to_test=None):
         """ Verifies that an entered password is correct """
         #encrypt password and check against database
