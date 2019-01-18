@@ -63,7 +63,7 @@ def create_tables():
 		)
 		""",
 		"""
-		CREATE TYPE recurrence_options AS ENUM ('daily', 'weekly');
+		CREATE TYPE recurrence_options AS ENUM ('none', 'daily', 'weekly');
 		""",
 		"""
 		CREATE TABLE chores
