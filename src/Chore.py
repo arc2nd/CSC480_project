@@ -14,7 +14,7 @@ class Chore(db.Model):
     description = db.Column(db.String(255))
     points = db.Column(db.Integer)
     complete = db.Column(db.Boolean, nullable=False, default=False)
-    #recurrence = db.Column(db.Enum)
+    recurrence_id = db.Column(db.Integer, db.ForeignKey("recurrences.id"), nullable=True)
 
     def __init__(self, name):
         self.name = name
