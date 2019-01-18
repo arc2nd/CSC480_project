@@ -8,6 +8,12 @@
     {% endif %}
 
     <h2>Reassign {{chore.name}}</h2>
+    {% if chore.assigned_to %}
+        <p>Currently assigned to: {{user_full_name(chore.assigned_to)}}</p>
+    {% else %}
+        <p>Not currently assigned to anyone.</p>
+    {% endif %}
+    
     <form action="{{ url_for('chore_reassign',chore_id=chore.id) }}" method="post">
         {{ form.hidden_tag() }}
         <div class="form-row">
