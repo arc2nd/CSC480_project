@@ -62,7 +62,7 @@ class ChoreAddForm(FlaskForm):
                          validators=[validators.optional()])
     points = IntegerField('Points:', validators=[validators.required()])
     assigned_to = SelectField('Assign To:', coerce=int, validators=[validators.optional()])
-    #recurrence = SelectField('Recurrence:', choices = [('once', 'Once'), ('weekly', 'Weekly'), ('daily', 'Daily')])
+    recurrence = SelectField('Recurrence:', validators=[validators.required()])
 
 # Chore Reassign Form
 class ChoreReassignForm(FlaskForm):
