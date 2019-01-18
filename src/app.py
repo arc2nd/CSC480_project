@@ -438,6 +438,54 @@ def chore_view(chore_id=None):
     return render_template('chore_view.html', chore=chore, title="Viewing {}".format(chore.name))
 
 
+# chore edit
+@app.route('/chore/edit/<int:chore_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def chore_edit(chore_id=None):
+    errors=None
+    old_chore = Chore.Chore.GetById(chore_id)
+
+    if request.method == "GET":
+        form = ChoreAddForm()
+        assigned_to_user = User.User.GetById(old_chore.assigned_to).username
+        form.name.data = old_chore.name
+        form.description.data = old_chore.description
+        form.points.data = old_chore.points
+        form.due_date.data = old_chore.due_date
+        form.assigned_to.data = assigned_to_user
+
+    if request.method == "POST":
+        form = ChoreAddForm(request.form)
+        old_chore = Chore.Chore.GetById(chore_id)
+        _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
+
+        if form.validate():
+            _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
+            _log(1, VERBOSITY, 'form validated')
+
+            assignTo = User.User.GetByUsername(form.assigned_to.data)
+
+            if assignTo:
+                form.assigned_to.data = assignTo.id
+            else:
+                form.assigned_to.data = None
+
+            form.populate_obj(old_chore)
+            old_chore.UpdateData()
+
+            _log(1, VERBOSITY, 'edited chore: {}'.format(old_chore.name))
+            flash('Success: Chore edited', category='success')
+
+            return (redirect(url_for('chore')))
+
+        else:
+            _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+            flash('Error: Chore not added', category='danger')
+            errors = form.errors
+
+    return render_template('chore_edit.html', form=form, errors=errors, chore=old_chore, title="Edit a chore")
+
 # Reward Routes
 
 # reward default

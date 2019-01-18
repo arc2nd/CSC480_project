@@ -72,6 +72,9 @@ class Chore(db.Model):
 
         return True
 
+    def UpdateData(self):
+        db.session.commit()
+
     # Delete operations
     @staticmethod
     def Remove(chore):

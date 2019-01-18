@@ -13,6 +13,7 @@
             {% endif %}
                 | <a href="{{ url_for('chore_view', chore_id=chore.id) }}">View chore details</a>
             {% if is_admin %}
+                | <a href="{{ url_for('chore_edit', chore_id=chore.id) }}">Edit</a> 
                 | <a href="{{ url_for('chore_remove', chore_id = chore.id) }}">Delete</a>
             {% endif %}
         </p>
