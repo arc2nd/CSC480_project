@@ -277,11 +277,11 @@ def user_view(user_id=None):
     if not user:
         _log(1, VERBOSITY, 'error finding user')
         flash('Warning: Could not find that user', category='danger')
-        return redirect(url_for('user.html'))
+        return redirect(url_for('user'))
 
     _log(1, VERBOSITY, 'user found')
 
-    return redirect(url_for('user_view.html'), user=user)
+    return render_template('user_view.html', user=user, title="Viewing {}".format(user.username))
 
 # Chore routes
 
