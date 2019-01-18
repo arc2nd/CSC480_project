@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% if errors %}
+        {% for error in errors: %}
+            {{error}}<br>
+        {% endfor %}
+    {% endif %}
+
+    <h2>Reassign {{chore.name}}</h2>
+    {% if chore.assigned_to %}
+        <p>Currently assigned to: {{user_full_name(chore.assigned_to)}}</p>
+    {% else %}
+        <p>Not currently assigned to anyone.</p>
+    {% endif %}
+    
+    <form action="{{ url_for('chore_reassign',chore_id=chore.id) }}" method="post">
+        {{ form.hidden_tag() }}
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.reassign_to.label }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.reassign_to(class_="form-control mb-2 mr-sm-2") }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-12 text-center">
+                <button class="btn btn-primary" type="submit">Reassign Chore</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}

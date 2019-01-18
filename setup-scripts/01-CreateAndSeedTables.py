@@ -103,13 +103,13 @@ def seed_roles():
 		INSERT INTO roles
 			(id, name)
 			VALUES
-			(0, 'Administrator')
+			(1, 'Administrator')
 		""",
 		"""
 		INSERT INTO roles
 			(id, name)
 			VALUES
-			(1, 'Standard')
+			(2, 'Standard')
 		"""
 	]
 
@@ -131,8 +131,22 @@ def seed_admin_user():
 		INSERT INTO users
 			(id, role_id, username, password, first_name, middle_name, last_name, email_address, date_of_birth, points)
 			VALUES
-			(0, 0, 'administrator', '%s', 'first', 'middle', 'last', 'test@email.com', TO_DATE('01 Jan 1945', 'DD Mon YYYY'), 0)
+			(1, 1, 'administrator', '%s', 'first', 'middle', 'last', 'test@email.com', TO_DATE('01 Jan 1945', 'DD Mon YYYY'), 0)
 		""" % (encrypted_password)
+	]
+
+	if(execute_commands(commands)):
+		return True
+
+	return False
+
+def restart_users_sequence():
+
+	""" Restart the user sequence at 2 since we just created Admin with 1 """
+	commands = [
+		"""
+		ALTER SEQUENCE users_id_seq RESTART WITH 2;
+		"""
 	]
 
 	if(execute_commands(commands)):
@@ -145,6 +159,8 @@ if __name__ == '__main__':
 	if(create_tables()):
 		print("Tables created. Seeding roles and admin user...")
 		if(seed_roles() and seed_admin_user()):
-			print("Roles and admin user seeded.")
+			print("Roles and admin user seeded. Updating users id sequence...")
+			if(restart_users_sequence()):
+				print("Updated users sequence successfully.")
 	else:
 		print("Failed.")

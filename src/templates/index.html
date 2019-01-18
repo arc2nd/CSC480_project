@@ -9,8 +9,10 @@
 			Name: {{chore.name}} | Points: {{chore.points}} | Due date: {{chore.due_date}}
 			{% if chore.assigned_to != None %}
 				 | Assigned to: {{ user_full_name(chore.assigned_to) }}<br>
+				 | <a href="{{ url_for('chore_reassign', chore_id=chore.id) }}">Reassign</a><br>
 			{% else %}
 				 | <i>Unassigned</i><br>
+				 <a href="{{ url_for('chore_reassign', chore_id=chore.id) }}">Assign</a><br>
 			{% endif %}
 		{% endfor %}
 

@@ -15,7 +15,8 @@
 		<p>
 			Actions:<br>
 			{% if is_admin  %}
-				<a href="{{ url_for('chore_remove', chore_id=chore.id) }}">Delete</a>
+				<a href="{{ url_for('chore_remove', chore_id=chore.id) }}">Delete</a><br>
+				<a href="{{ url_for('chore_reassign', chore_id=chore.id) }}">Reassign</a><br>
 			{% endif %} 
 		</p>
 	{% endif %}
