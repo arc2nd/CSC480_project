@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	{% if chore %}
+		<p>
+			ID: {{chore.id}}<br>
+			Name: {{chore.name}}<br>
+			Description: {{chore.description}}<br>
+			Due date: {{chore.due_date}}<br>
+			Assigned to: {{user_full_name(chore.assigned_to)}}<br>
+			Points: {{chore.points}}<br>
+		</p>
+
+		<p>
+			Actions:<br>
+			{% if is_admin  %}
+				<a href="{{ url_for('chore_remove', chore_id=chore.id) }}">Delete</a>
+			{% endif %} 
+		</p>
+	{% endif %}
+
+{% endblock %}
