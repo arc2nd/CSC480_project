@@ -63,7 +63,12 @@ def create_tables():
 		)
 		""",
 		"""
-		CREATE TYPE recurrence_options AS ENUM ('daily', 'weekly');
+		CREATE TABLE recurrences
+		(
+			id SERIAL PRIMARY KEY,
+			frequency_name VARCHAR(255) NOT NULL,
+			frequency_days INT NOT NULL
+		)
 		""",
 		"""
 		CREATE TABLE chores
@@ -75,7 +80,7 @@ def create_tables():
 			description VARCHAR(255),
 			points INT NOT NULL,
 			complete BOOL NOT NULL,
-			recurrence recurrence_options
+			recurrence_id INT REFERENCES recurrences(id)
 		)
 		""",
 		"""
@@ -103,12 +108,7 @@ def seed_roles():
 		INSERT INTO roles
 			(id, name)
 			VALUES
-			(1, 'Administrator')
-		""",
-		"""
-		INSERT INTO roles
-			(id, name)
-			VALUES
+			(1, 'Administrator'),
 			(2, 'Standard')
 		"""
 	]
@@ -140,6 +140,24 @@ def seed_admin_user():
 
 	return False
 
+def seed_recurrences():
+	""" Seed the none, daily, weekly recurrences """
+	commands = [
+		"""
+		INSERT INTO recurrences
+			(id, frequency_name, frequency_days)
+			VALUES
+			(0, 'does not repeat', 0),
+			(1, 'daily', 1),
+			(2, 'weekly', 7)
+		"""
+	]
+
+	if(execute_commands(commands)):
+		return True
+
+	return False
+
 def restart_users_sequence():
 
 	""" Restart the user sequence at 2 since we just created Admin with 1 """
@@ -158,8 +176,8 @@ if __name__ == '__main__':
 	
 	if(create_tables()):
 		print("Tables created. Seeding roles and admin user...")
-		if(seed_roles() and seed_admin_user()):
-			print("Roles and admin user seeded. Updating users id sequence...")
+		if(seed_roles() and seed_admin_user() and seed_recurrences()):
+			print("Roles, admin user, and recurrences seeded. Updating users id sequence...")
 			if(restart_users_sequence()):
 				print("Updated users sequence successfully.")
 	else:
