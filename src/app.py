@@ -64,6 +64,16 @@ class ChoreAddForm(FlaskForm):
     assigned_to = SelectField('Assign To:', coerce=int, validators=[validators.optional()])
     recurrence_id = SelectField('Recurrence:', coerce=int, validators=[validators.optional()])
 
+# Chore Edit Form
+class ChoreEditForm(FlaskForm):
+    name = TextField('Chore Name:', validators=[validators.required()])
+    description = TextField('Description:', validators=[validators.required()])
+    due_date = DateField('Due Date:', format='%Y-%m-%d',
+                         validators=[validators.optional()])
+    points = IntegerField('Points:', validators=[validators.required()])
+    assigned_to = SelectField('Assign To:', coerce=int, validators=[validators.optional()])
+    recurrence_id = SelectField('Recurrence:', coerce=int, validators=[validators.optional()])
+
 # Chore Reassign Form
 class ChoreReassignForm(FlaskForm):
     reassign_to = SelectField('Reassign to:', coerce=int, validators=[validators.optional()])
@@ -338,11 +348,10 @@ def chore_add():
 
     # Default values
     users_list = [(0, 'Unassigned')]
-    recurrences_list = [(0, 'does not repeat')]
 
     # Values from DB
     users_list += [(i.id, i.full_name) for i in users]
-    recurrences_list += [(i.id, i.frequency_name) for i in recurrences]
+    recurrences_list = [(i.id, i.frequency_name) for i in recurrences]
 
     if request.method == "GET":
         form = ChoreAddForm()
@@ -543,25 +552,48 @@ def chore_edit(chore_id=None):
     errors=None
     old_chore = Chore.Chore.GetById(chore_id)
 
+    users = User.User.GetAll()
+    recurrences = Recurrence.Recurrence.GetAll()
+
+    # Add a "None" value to the list so it can be set as unassigned (claimable).
+    users_list = [(0, 'Unassigned')]
+
+    # Values from DB
+    users_list += [(i.id, i.full_name) for i in users]
+    recurrences_list = [(i.id, i.frequency_name) for i in recurrences]
+
     if request.method == "GET":
-        form = ChoreAddForm()
-        assigned_to_user = User.User.GetById(old_chore.assigned_to).username
+        form = ChoreEditForm()
+
+        form.assigned_to.choices = users_list
+        form.recurrence_id.choices = recurrences_list
+
+        form.assigned_to.default = old_chore.assigned_to
+        form.recurrence_id.default = old_chore.recurrence_id
+
         form.name.data = old_chore.name
         form.description.data = old_chore.description
         form.points.data = old_chore.points
         form.due_date.data = old_chore.due_date
-        form.assigned_to.data = assigned_to_user
+        form.recurrence_id.data = old_chore.recurrence_id
+        form.assigned_to.data = old_chore.assigned_to
 
     if request.method == "POST":
-        form = ChoreAddForm(request.form)
+        form = ChoreEditForm(request.form)
         old_chore = Chore.Chore.GetById(chore_id)
         _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
+
+        form.assigned_to.choices = users_list
+        form.recurrence_id.choices = recurrences_list
+
+        form.assigned_to.default = old_chore.assigned_to
+        form.recurrence_id.default = old_chore.recurrence_id
 
         if form.validate():
             _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
             _log(1, VERBOSITY, 'form validated')
 
-            assignTo = User.User.GetByUsername(form.assigned_to.data)
+            assignTo = User.User.GetById(form.assigned_to.data)
 
             if assignTo:
                 form.assigned_to.data = assignTo.id
