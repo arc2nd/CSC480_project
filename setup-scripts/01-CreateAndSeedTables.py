@@ -147,6 +147,7 @@ def seed_recurrences():
 		INSERT INTO recurrences
 			(id, frequency_name, frequency_days)
 			VALUES
+			(0, 'does not repeat', 0),
 			(1, 'daily', 1),
 			(2, 'weekly', 7)
 		"""
