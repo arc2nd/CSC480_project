@@ -64,6 +64,10 @@ class ChoreAddForm(FlaskForm):
     assigned_to = TextField('Assigned To:', validators=[validators.optional()])
     #recurrence = SelectField('Recurrence:', choices = [('once', 'Once'), ('weekly', 'Weekly'), ('daily', 'Daily')])
 
+# Chore Reassign Form
+class ChoreReassignForm(FlaskForm):
+    reassign_to = SelectField('Reassign to:', coerce=int, validators=[validators.required()])
+
 # Reward Add Form
 class RewardAddForm(FlaskForm):
     name = TextField('Reward Name:', validators=[validators.required()])
@@ -399,6 +403,55 @@ def chore_complete(chore_id=None):
         _log(1, VERBOSITY, 'user attempt to complete another user\'s chore')
         flash('Warning: You cannot complete another user\'s chore', category='warning')
     return redirect(url_for('chore'))
+
+# chore reassign
+@app.route('/chore/reassign/<int:chore_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def chore_reassign(chore_id=None):
+    _log(1, VERBOSITY, 'chore/reassign')
+    errors = None
+    
+    chore = Chore.Chore.GetById(chore_id)
+    users = User.User.GetAll()
+
+    # Grab a user_id/full_name tuple for the form
+    users_list = [(i.id, i.full_name) for i in users]
+
+    if chore:
+        if request.method == "GET":
+            form = ChoreReassignForm()
+            form.reassign_to.choices = users_list
+
+            return render_template('chore_reassign.html', form=form, errors=errors, chore=chore, title="Reassign {}".format(chore.name))
+
+        elif request.method == "POST":
+            form = ChoreReassignForm(request.form)
+            form.reassign_to.choices = users_list
+
+            if form.validate():
+                _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
+                _log(1, VERBOSITY, 'form validated')
+
+                user = User.User.GetById(form.reassign_to.data)
+
+                if chore.AssignTo(user):
+                    _log(1, VERBOSITY, 'reassigned chore to: {}'.format(user))
+                    flash('Success: Chore reassigned', category='success')
+
+                return (redirect(url_for('chore_reassign', chore_id=chore.id)))
+            
+            else:
+                _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+                flash('Error: Chore not reassigned', category='danger')
+                errors = form.errors
+
+            return render_template('chore_reassign.html', form=form, errors=errors, chore=chore, title="Reassign {}".format(chore.name))
+    
+    else:
+        _log(1, VERBOSITY, 'attempt to reassign a chore that doesn\'t exist')
+        flash('Warning: Could not find that chore', category='warning')
+        return redirect(url_for('chore'))
 
 # chore remove
 @app.route('/chore/remove/<int:chore_id>', methods=['GET'])
