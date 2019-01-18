@@ -502,6 +502,24 @@ def reward_remove(reward_id=None):
         flash('Warning: Could not find that reward', category='warning')
     return redirect(url_for('reward'))
 
+# reward view
+@app.route('/reward/view/<int:reward_id>', methods=['GET'])
+@login_required
+@admin_required
+def reward_view(reward_id=None):
+    _log(1, VERBOSITY, 'reward/view')
+    
+    reward = Reward.Reward.GetById(reward_id)
+
+    if not reward:
+        _log(1, VERBOSITY, 'error finding reward')
+        flash('Warning: Could not find that reward', category='danger')
+        return redirect(url_for('reward'))
+
+    _log(1, VERBOSITY, 'reward found')
+
+    return render_template('reward_view.html', reward=reward, title="Viewing {}".format(reward.name))
+
 
 # Test Routes
 

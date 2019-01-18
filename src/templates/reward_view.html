@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	{% if reward %}
+		<p>
+			ID: {{reward.id}}<br>
+			Name: {{reward.name}}<br>
+			Description {{reward.description}}
+			Points: {{reward.points}}<br>
+		</p>
+
+		<p>
+			Actions:<br>
+			{% if is_admin %}
+				<a href="{{ url_for('reward_remove', reward_id=reward.id) }}">Delete</a>
+			{% endif %} 
+		</p>
+	{% endif %}
+
+{% endblock %}
