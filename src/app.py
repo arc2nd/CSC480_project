@@ -61,7 +61,7 @@ class ChoreAddForm(FlaskForm):
     due_date = DateField('Due Date:', format='%Y-%m-%d',
                          validators=[validators.optional()])
     points = IntegerField('Points:', validators=[validators.required()])
-    assigned_to = TextField('Assigned To:', validators=[validators.optional()])
+    assigned_to = SelectField('Assign To:', coerce=int, validators=[validators.optional()])
     #recurrence = SelectField('Recurrence:', choices = [('once', 'Once'), ('weekly', 'Weekly'), ('daily', 'Daily')])
 
 # Chore Reassign Form
@@ -324,22 +324,42 @@ def chore_add():
     _log(1, VERBOSITY, 'chore/add')
     errors = None
 
+    users = User.User.GetAll()
+
+    # Add a "None" value to the list so it can be created as unassigned
+    users_list = [(0, 'Unassigned')]
+
+    # Grab a user_id/full_name tuple for the form
+    users_list += [(i.id, i.full_name) for i in users]
+
     if request.method == "GET":
         form = ChoreAddForm()
+        form.assigned_to.choices = users_list
 
     if request.method == "POST":
         form = ChoreAddForm(request.form)
+        form.assigned_to.choices = users_list
+
         _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
 
         if form.validate():
             _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
             _log(1, VERBOSITY, 'form validated')
 
-            assignTo = User.User.GetByUsername(form.assigned_to.data)
+            # Check for unassigned
+            if form.assigned_to.data != 0:
+                assignTo = User.User.GetById(form.assigned_to.data)
 
-            if assignTo:
-                form.assigned_to.data = assignTo.id
+                if assignTo:
+                    form.assigned_to.data = assignTo.id
+                else:
+                    _log(1, VERBOSITY, 'user was not found, assigning to none')
+                    flash('Warning: User was not found. Chore is not assigned.', category='warning')
+                    form.assigned_to.data = None
+            
             else:
+                _log(1, VERBOSITY, 'user left chore unassigned')
+                flash('Warning: Chore was left unassigned.', category='warning')
                 form.assigned_to.data = None
 
             newChore = Chore.Chore(form.name.data)
