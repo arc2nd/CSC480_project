@@ -27,6 +27,20 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.username
 
+    # Properties
+    @property
+    def full_name(self):
+        name = None
+        name = self.first_name
+
+        if self.middle_name != None:
+            name += ' ' + self.middle_name
+
+        if self.last_name != None:
+            name += ' ' + self.last_name
+
+        return name
+
     # Create operations
     @staticmethod
     def Add(user):
@@ -92,19 +106,6 @@ class User(db.Model):
         password_to_encrypt = bcrypt.hashpw(password_to_encrypt, bcrypt.gensalt(12)).decode('utf-8')
         
         return password_to_encrypt
-
-    def GetFullName(self):
-        """ Returns a users full name in 'first middle last' format """
-
-        name = self.first_name
-
-        if self.middle_name != None:
-            name += ' ' + self.middle_name
-
-        if self.last_name != None:
-            name += ' ' + self.last_name
-
-        return name
 
     def VerifyPassword(self, password_to_test=None):
         """ Verifies that an entered password is correct """

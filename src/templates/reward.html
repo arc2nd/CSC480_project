@@ -9,6 +9,7 @@
 				 | <a href="{{ url_for('reward_remove', reward_id=reward.id) }}">Delete</a>
 			{% endif %}
 			 | <a href="{{ url_for('reward_claim', reward_id=reward.id) }}">Claim</a>
+			 | <a href="{{ url_for('reward_view', reward_id=reward.id) }}">View reward details</a>
 		</p>
 	{% endfor %}
 

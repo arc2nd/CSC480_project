@@ -92,14 +92,16 @@ def admin_role_id():
     return dict(admin_role_id=app.config['ADMIN_ROLE_ID'])
 
 @app.context_processor
-def user_utility():
-    def full_name(user_id):
-        """ Return the full name of a user given the user_id """
-        user = User.User.GetById(user_id)
-        full_name = user.GetFullName()
-        return full_name
+def my_utility_processor():
 
-    return dict(full_name=full_name)
+    def user_full_name(user_id):
+        user = User.User.GetById(user_id)
+        if user:
+            return user.full_name
+        return 'Unassigned'
+            
+
+    return dict(user_full_name=user_full_name)
 
 
 # Route decorators
