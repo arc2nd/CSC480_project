@@ -63,6 +63,14 @@ class Chore(db.Model):
 
         return True
 
+    def Unassign(self):
+        """ Unassign this chore so that it is claimable """
+        chore = Chore.GetById(self.id)
+        chore.assigned_to = None
+        db.session.commit()
+
+        return True
+
     def MarkCompleted(self):
         """ Mark a chore as completed """
         

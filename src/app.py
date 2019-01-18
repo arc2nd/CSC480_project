@@ -66,7 +66,7 @@ class ChoreAddForm(FlaskForm):
 
 # Chore Reassign Form
 class ChoreReassignForm(FlaskForm):
-    reassign_to = SelectField('Reassign to:', coerce=int, validators=[validators.required()])
+    reassign_to = SelectField('Reassign to:', coerce=int, validators=[validators.optional()])
 
 # Reward Add Form
 class RewardAddForm(FlaskForm):
@@ -435,8 +435,11 @@ def chore_reassign(chore_id=None):
     chore = Chore.Chore.GetById(chore_id)
     users = User.User.GetAll()
 
+    # Add a "None" value to the list so it can be set as unassigned (claimable).
+    users_list = [(0, 'Unassigned')]
+
     # Grab a user_id/full_name tuple for the form
-    users_list = [(i.id, i.full_name) for i in users]
+    users_list += [(i.id, i.full_name) for i in users]
 
     if chore:
         if request.method == "GET":
@@ -453,11 +456,18 @@ def chore_reassign(chore_id=None):
                 _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
                 _log(1, VERBOSITY, 'form validated')
 
-                user = User.User.GetById(form.reassign_to.data)
+                # check for unassigned
+                if form.reassign_to.data != 0:
+                    user = User.User.GetById(form.reassign_to.data)
 
-                if chore.AssignTo(user):
-                    _log(1, VERBOSITY, 'reassigned chore to: {}'.format(user))
-                    flash('Success: Chore reassigned', category='success')
+                    if chore.AssignTo(user):
+                        _log(1, VERBOSITY, 'reassigned chore to: {}'.format(user))
+                        flash('Success: Chore reassigned', category='success')
+                
+                else:
+                    if chore.Unassign():
+                        _log(1, VERBOSITY, 'chore unassigned')
+                        flash('Success: Chore unassigned', category='success')
 
                 return (redirect(url_for('chore_reassign', chore_id=chore.id)))
             
