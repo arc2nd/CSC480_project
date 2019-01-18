@@ -419,6 +419,24 @@ def chore_remove(chore_id=None):
         flash('Warning: Could not find that chore', category='warning')
     return redirect(url_for('chore'))
 
+# chore view
+@app.route('/chore/view/<int:chore_id>', methods=['GET'])
+@login_required
+@admin_required
+def chore_view(chore_id=None):
+    _log(1, VERBOSITY, 'chore/view')
+    
+    chore = Chore.Chore.GetById(chore_id)
+
+    if not chore:
+        _log(1, VERBOSITY, 'error finding chore')
+        flash('Warning: Could not find that chore', category='danger')
+        return redirect(url_for('chore'))
+
+    _log(1, VERBOSITY, 'chore found')
+
+    return render_template('chore_view.html', chore=chore, title="Viewing {}".format(chore.name))
+
 
 # Reward Routes
 
