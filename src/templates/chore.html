@@ -11,6 +11,7 @@
             {% if chore.assigned_to == session['user_id'] and not chore.complete %}
                 | <a href="{{ url_for('chore_complete', chore_id = chore.id) }}">Complete</a>
             {% endif %}
+                | <a href="{{ url_for('chore_view', chore_id=chore.id) }}">View chore details</a>
             {% if is_admin %}
                 | <a href="{{ url_for('chore_remove', chore_id = chore.id) }}">Delete</a>
             {% endif %}
