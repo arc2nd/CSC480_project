@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+	{% if user %}
+		<p>
+			ID: {{user.id}}<br>
+			Role ID: {{user.role_id}}<br>
+			Username: {{user.username}}<br>
+			Email: {{user.email_address}}<br>
+			First Name: {{user.first_name}}<br>
+			Middle Name: {{user.middle_name}}<br>
+			Last Name: {{user.last_name}}<br>
+			Date of Birth: {{user.date_of_birth}}<br>
+			Points: {{user.points}}<br>
+		</p>
+
+		<p>
+			Actions:<br>
+			{% if is_admin and user.role != admin_role_id %}
+				<a href="{{ url_for('user_remove', user_id=user.id) }}">Delete</a>
+			{% endif %} 
+		</p>
+	{% endif %}
+
+{% endblock %}
