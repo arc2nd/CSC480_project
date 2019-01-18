@@ -6,7 +6,12 @@
 
 		<h2>Chores</h2>
 		{% for chore in chores %}
-			Name: {{chore.name}} | Points: {{chore.points}} | Due date: {{chore.due_date}} | Assigned to: {{ full_name(chore.assigned_to) }}<br>
+			Name: {{chore.name}} | Points: {{chore.points}} | Due date: {{chore.due_date}}
+			{% if chore.assigned_to != None %}
+				 | Assigned to: {{ user_full_name(chore.assigned_to) }}<br>
+			{% else %}
+				 | <i>Unassigned</i><br>
+			{% endif %}
 		{% endfor %}
 
 	{% else %}

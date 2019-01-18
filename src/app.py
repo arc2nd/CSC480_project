@@ -92,14 +92,16 @@ def admin_role_id():
     return dict(admin_role_id=app.config['ADMIN_ROLE_ID'])
 
 @app.context_processor
-def user_utility():
-    def full_name(user_id):
-        """ Return the full name of a user given the user_id """
-        user = User.User.GetById(user_id)
-        full_name = user.GetFullName()
-        return full_name
+def my_utility_processor():
 
-    return dict(full_name=full_name)
+    def user_full_name(user_id):
+        user = User.User.GetById(user_id)
+        if user:
+            return user.full_name
+        return 'Unassigned'
+            
+
+    return dict(user_full_name=user_full_name)
 
 
 # Route decorators
@@ -501,6 +503,24 @@ def reward_remove(reward_id=None):
         _log(1, VERBOSITY, 'error finding reward')
         flash('Warning: Could not find that reward', category='warning')
     return redirect(url_for('reward'))
+
+# reward view
+@app.route('/reward/view/<int:reward_id>', methods=['GET'])
+@login_required
+@admin_required
+def reward_view(reward_id=None):
+    _log(1, VERBOSITY, 'reward/view')
+    
+    reward = Reward.Reward.GetById(reward_id)
+
+    if not reward:
+        _log(1, VERBOSITY, 'error finding reward')
+        flash('Warning: Could not find that reward', category='danger')
+        return redirect(url_for('reward'))
+
+    _log(1, VERBOSITY, 'reward found')
+
+    return render_template('reward_view.html', reward=reward, title="Viewing {}".format(reward.name))
 
 
 # Test Routes
