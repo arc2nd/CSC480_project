@@ -52,3 +52,14 @@ class Reward(db.Model):
         return True
 
     # Utility operations
+    @staticmethod
+    def Claim(reward, user):
+        """ Claim a reward """
+        if user.points >= reward.points:
+            user.points -= reward.points
+
+            db.session.commit()
+
+            return True
+        
+        return False

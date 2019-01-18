@@ -91,6 +91,16 @@ def admin_role_id():
     """ Return the admin role id """
     return dict(admin_role_id=app.config['ADMIN_ROLE_ID'])
 
+@app.context_processor
+def user_utility():
+    def full_name(user_id):
+        """ Return the full name of a user given the user_id """
+        user = User.User.GetById(user_id)
+        full_name = user.GetFullName()
+        return full_name
+
+    return dict(full_name=full_name)
+
 
 # Route decorators
 
@@ -127,7 +137,7 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Ensures the user is admin, and forwards to the splash if not
+# Ensures the user is admin, and forwards to the index if not
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -138,7 +148,7 @@ def admin_required(f):
         else:
             _log(1, VERBOSITY, 'attempt by a non-admin to access an admin page')
             flash('Error: You must be an administrator to access this page', category='danger')
-            return splash()
+            return index()
     return decorated_function
 
 # Default route
@@ -147,7 +157,14 @@ def admin_required(f):
 @app.route('/index', methods=['GET'])
 @login_required
 def index():
-    return render_template('index.html', title="Home")
+    user = User.User.GetById(session['user_id'])
+    
+    if user.role_id == app.config['ADMIN_ROLE_ID']:
+        chores = Chore.Chore.GetAll()
+    else:
+        chores = Chore.Chore.GetByUser(user, False)
+    
+    return render_template('index.html', title="Dashboard", chores=chores, user=user)
 
 # Splash page
 @app.route('/splash', methods=['GET'])
@@ -232,7 +249,7 @@ def user_add():
             User.User.Add(newUser)
 
             _log(1, VERBOSITY, 'added user {}'.format(newUser))
-            flash('Succes: User added', category='success')
+            flash('Success: User added', category='success')
 
             return (redirect(url_for('user')))
 
@@ -445,6 +462,26 @@ def reward_add():
         
     return render_template('reward_add.html', form=form, errors=errors)
 
+# reward claim
+@app.route('/reward/claim/<int:reward_id>', methods=['GET'])
+@login_required
+def reward_claim(reward_id=None):
+    _log(1, VERBOSITY, 'reward/claim')
+
+    reward = Reward.Reward.GetById(reward_id)
+    user = User.User.GetById(session['user_id'])
+
+    if reward:
+        if Reward.Reward.Claim(reward, user):
+            _log(1, VERBOSITY, 'claimed reward successfully')
+            flash('Success: Reward \"{}\" claimed for {} points'.format(reward.name, reward.points), category='success')
+        else:
+            _log(1, VERBOSITY, 'error claiming reward')
+            flash('Error: Reward not claimed. Do you have enough points?', category='danger')
+    else:
+        _log(1, VERBOSITY, 'error finding reward')
+        flash('Warning: Could not find that reward', category='warning')
+    return redirect(url_for('reward'))
 
 # reward remove 
 @app.route('/reward/remove/<int:reward_id>', methods=['GET'])

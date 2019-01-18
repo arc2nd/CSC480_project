@@ -74,7 +74,7 @@ def create_tables():
 			name VARCHAR(255),
 			description VARCHAR(255),
 			points INT NOT NULL,
-			complete BOOL,
+			complete BOOL NOT NULL,
 			recurrence recurrence_options
 		)
 		""",
