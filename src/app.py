@@ -335,7 +335,7 @@ def chore_add():
             _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
             _log(1, VERBOSITY, 'form validated')
 
-            assignTo = User.User.GetById(form.assigned_to.data)
+            assignTo = User.User.GetByUsername(form.assigned_to.data)
 
             if assignTo:
                 form.assigned_to.data = assignTo.id
