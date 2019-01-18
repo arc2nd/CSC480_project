@@ -282,6 +282,23 @@ def user_remove(user_id=None):
         flash('Warning: Could not find that user', category='danger')
     return redirect(url_for('user'))
 
+# user view
+@app.route('/user/view/<int:user_id>', methods=['GET'])
+@login_required
+@admin_required
+def user_view(user_id=None):
+    _log(1, VERBOSITY, 'user/view')
+    
+    user = User.User.GetById(user_id)
+
+    if not user:
+        _log(1, VERBOSITY, 'error finding user')
+        flash('Warning: Could not find that user', category='danger')
+        return redirect(url_for('user'))
+
+    _log(1, VERBOSITY, 'user found')
+
+    return render_template('user_view.html', user=user, title="Viewing {}".format(user.username))
 
 # Chore routes
 
