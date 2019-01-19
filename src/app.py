@@ -189,20 +189,20 @@ def index():
     else:
         chores = Chore.Chore.GetByUser(user, False)
     
-    return render_template('index.html', title="Dashboard", chores=chores, user=user)
+    return render_template('index.html', title='Dashboard', chores=chores, user=user)
 
 # Splash page
 @app.route('/splash', methods=['GET'])
 def splash():
     form = UserAddForm()
-    return render_template('splash.html', form=form, title="Welcome to Chore Explore!")
+    return render_template('splash.html', form=form, title='Welcome to Chore Explore')
 
 # Admin functions route
 @app.route('/admin', methods=['GET'])
 @login_required
 @admin_required
 def admin():
-    return render_template('admin.html', title="Admin Functions")
+    return render_template('admin.html', title='Administrative Actions')
 
 
 # User routes
@@ -213,7 +213,7 @@ def admin():
 @admin_required
 def user():
     users = User.User.GetAll()
-    return render_template('user.html', users=users, title="Users")
+    return render_template('user.html', users=users, title='All Users')
 
 # user login
 @app.route('/user/login', methods=['GET', 'POST'])
@@ -240,7 +240,7 @@ def user_login():
         return index()
     else:
         form = UserAddForm()
-        return render_template('user_login.html', form=form, title="Log in")
+        return render_template('user_login.html', form=form, title='Log in')
 
 # user logout
 @app.route('/user/logout', methods=['GET'])
@@ -260,10 +260,10 @@ def user_add():
     _log(1, VERBOSITY, 'user/add')
     errors = None
 
-    if request.method == "GET":
+    if request.method == 'GET':
         form = UserAddForm()
 
-    elif request.method == "POST":
+    elif request.method == 'POST':
         form = UserAddForm(request.form)
 
         if form.validate():
@@ -271,7 +271,7 @@ def user_add():
             newUser = User.User()
             form.populate_obj(newUser)
 
-            User.User.Add(newUser)
+            newUser.Add()
 
             _log(1, VERBOSITY, 'added user {}'.format(newUser))
             flash('Success: User added', category='success')
@@ -282,7 +282,7 @@ def user_add():
             flash('Error: User not added', category='error')
             errors = form.errors
 
-    return render_template('user_add.html', form=form, errors=errors, title="Add a user")
+    return render_template('user_add.html', form=form, errors=errors, title='Add a User')
 
 
 # user remove
@@ -296,7 +296,7 @@ def user_remove(user_id=None):
             _log(1, VERBOSITY, 'user attempt to remove own account')
             flash('Error: You may not remove your own account', category='danger')
         else:
-            if user.Remove(user):
+            if User.User.Remove(user):
                 _log(1, VERBOSITY, 'user removed successfully')
                 flash('Success: User removed', category='success')
             else:
@@ -323,7 +323,7 @@ def user_view(user_id=None):
 
     _log(1, VERBOSITY, 'user found')
 
-    return render_template('user_view.html', user=user, title="Viewing {}".format(user.username))
+    return render_template('user_view.html', user=user, title='Viewing User: {}'.format(user.username))
 
 # Chore routes
 
@@ -333,7 +333,7 @@ def user_view(user_id=None):
 def chore():
     chores = Chore.Chore.GetAll()
 
-    return render_template('chore.html', chores=chores, title="Chores")
+    return render_template('chore.html', chores=chores, title='All Chores')
 
 # chore add
 @app.route('/chore/add', methods=['GET', 'POST'])
@@ -353,12 +353,12 @@ def chore_add():
     users_list += [(i.id, i.full_name) for i in users]
     recurrences_list = [(i.id, i.frequency_name) for i in recurrences]
 
-    if request.method == "GET":
+    if request.method == 'GET':
         form = ChoreAddForm()
         form.assigned_to.choices = users_list
         form.recurrence_id.choices = recurrences_list
 
-    if request.method == "POST":
+    if request.method == 'POST':
         form = ChoreAddForm(request.form)
         form.assigned_to.choices = users_list
         form.recurrence_id.choices = recurrences_list
@@ -388,7 +388,7 @@ def chore_add():
             newChore = Chore.Chore(form.name.data)
             form.populate_obj(newChore)
 
-            Chore.Chore.Add(newChore)
+            newChore.Add()
 
             _log(1, VERBOSITY, 'added chore: {}'.format(newChore))
             flash('Success: Chore added', category='success')
@@ -400,7 +400,7 @@ def chore_add():
             flash('Error: Chore not added', category='danger')
             errors = form.errors
 
-    return render_template('chore_add.html', form=form, errors=errors, title="Add a chore")
+    return render_template('chore_add.html', form=form, errors=errors, title='Add a Chore')
 
 # chore claim
 @app.route('/chore/claim/<int:chore_id>', methods=['GET'])
@@ -458,20 +458,22 @@ def chore_reassign(chore_id=None):
     chore = Chore.Chore.GetById(chore_id)
     users = User.User.GetAll()
 
-    # Add a "None" value to the list so it can be set as unassigned (claimable).
+    # Add a 'None' value to the list so it can be set as unassigned (claimable).
     users_list = [(0, 'Unassigned')]
 
     # Grab a user_id/full_name tuple for the form
     users_list += [(i.id, i.full_name) for i in users]
 
     if chore:
-        if request.method == "GET":
+        if request.method == 'GET':
             form = ChoreReassignForm()
             form.reassign_to.choices = users_list
+            form.reassign_to.default = chore.assigned_to
+            form.reassign_to.data = chore.assigned_to
 
-            return render_template('chore_reassign.html', form=form, errors=errors, chore=chore, title="Reassign {}".format(chore.name))
+            return render_template('chore_reassign.html', form=form, errors=errors, chore=chore, title='Reassign {}'.format(chore.name))
 
-        elif request.method == "POST":
+        elif request.method == 'POST':
             form = ChoreReassignForm(request.form)
             form.reassign_to.choices = users_list
 
@@ -499,7 +501,7 @@ def chore_reassign(chore_id=None):
                 flash('Error: Chore not reassigned', category='danger')
                 errors = form.errors
 
-            return render_template('chore_reassign.html', form=form, errors=errors, chore=chore, title="Reassign {}".format(chore.name))
+            return render_template('chore_reassign.html', form=form, errors=errors, chore=chore, title='Reassign {}'.format(chore.name))
     
     else:
         _log(1, VERBOSITY, 'attempt to reassign a chore that doesn\'t exist')
@@ -514,7 +516,7 @@ def chore_remove(chore_id=None):
     _log(1, VERBOSITY, 'chore/remove')
     chore = Chore.Chore.GetById(chore_id)
     if chore:
-        if chore.Remove(chore):
+        if Chore.Chore.Remove(chore):
             _log(1, VERBOSITY, 'chore removed successfully')
             flash('Success: Chore removed', category='success')
         else:
@@ -541,7 +543,7 @@ def chore_view(chore_id=None):
 
     _log(1, VERBOSITY, 'chore found')
 
-    return render_template('chore_view.html', chore=chore, title="Viewing {}".format(chore.name))
+    return render_template('chore_view.html', chore=chore, title='Viewing Chore: {}'.format(chore.name))
 
 
 # chore edit
@@ -555,14 +557,14 @@ def chore_edit(chore_id=None):
     users = User.User.GetAll()
     recurrences = Recurrence.Recurrence.GetAll()
 
-    # Add a "None" value to the list so it can be set as unassigned (claimable).
+    # Add a 'None' value to the list so it can be set as unassigned (claimable).
     users_list = [(0, 'Unassigned')]
 
     # Values from DB
     users_list += [(i.id, i.full_name) for i in users]
     recurrences_list = [(i.id, i.frequency_name) for i in recurrences]
 
-    if request.method == "GET":
+    if request.method == 'GET':
         form = ChoreEditForm()
 
         form.assigned_to.choices = users_list
@@ -578,7 +580,7 @@ def chore_edit(chore_id=None):
         form.recurrence_id.data = old_chore.recurrence_id
         form.assigned_to.data = old_chore.assigned_to
 
-    if request.method == "POST":
+    if request.method == 'POST':
         form = ChoreEditForm(request.form)
         old_chore = Chore.Chore.GetById(chore_id)
         _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
@@ -613,7 +615,7 @@ def chore_edit(chore_id=None):
             flash('Error: Chore not added', category='danger')
             errors = form.errors
 
-    return render_template('chore_edit.html', form=form, errors=errors, chore=old_chore, title="Edit a chore")
+    return render_template('chore_edit.html', form=form, errors=errors, chore=old_chore, title='Edit Chore: {}'.format(old_chore.name))
 
 # Reward Routes
 
@@ -623,7 +625,7 @@ def chore_edit(chore_id=None):
 def reward():
     _log(1, VERBOSITY, 'reward/')
     rewards = Reward.Reward.GetAll()
-    return render_template('reward.html', rewards=rewards, title="Rewards")
+    return render_template('reward.html', rewards=rewards, title='All Rewards')
 
 # reward add
 @app.route('/reward/add', methods=['GET', 'POST'])
@@ -633,10 +635,10 @@ def reward_add():
     _log(1, VERBOSITY, 'reward/add')
     errors = None
 
-    if request.method == "GET":
+    if request.method == 'GET':
         form = RewardAddForm()
 
-    if request.method == "POST":
+    if request.method == 'POST':
         form = RewardAddForm(request.form)
         _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
 
@@ -646,7 +648,7 @@ def reward_add():
             newReward = Reward.Reward(form.name.data)
             form.populate_obj(newReward)
 
-            Reward.Reward.Add(newReward)
+            newReward.Add()
             _log(1, VERBOSITY, 'reward added: {}'.format(newReward))
             flash('Success: Reward added', category='success')
 
@@ -657,7 +659,7 @@ def reward_add():
             flash('Error: Reward not added', category='danger')
             errors = form.errors
         
-    return render_template('reward_add.html', form=form, errors=errors)
+    return render_template('reward_add.html', form=form, errors=errors, title='Add a reward')
 
 # reward claim
 @app.route('/reward/claim/<int:reward_id>', methods=['GET'])
@@ -671,7 +673,7 @@ def reward_claim(reward_id=None):
     if reward:
         if Reward.Reward.Claim(reward, user):
             _log(1, VERBOSITY, 'claimed reward successfully')
-            flash('Success: Reward \"{}\" claimed for {} points'.format(reward.name, reward.points), category='success')
+            flash('Success: Reward \'{}\' claimed for {} points'.format(reward.name, reward.points), category='success')
         else:
             _log(1, VERBOSITY, 'error claiming reward')
             flash('Error: Reward not claimed. Do you have enough points?', category='danger')
@@ -688,7 +690,7 @@ def reward_remove(reward_id=None):
     _log(1, VERBOSITY, 'reward/remove')
     reward = Reward.Reward.GetById(reward_id)
     if reward:
-        if reward.Remove(reward):
+        if Reward.Reward.Remove(reward):
             _log(1, VERBOSITY, 'removed reward successfully')
             flash('Success: Reward removed', category='success')
         else:
@@ -715,7 +717,7 @@ def reward_view(reward_id=None):
 
     _log(1, VERBOSITY, 'reward found')
 
-    return render_template('reward_view.html', reward=reward, title="Viewing {}".format(reward.name))
+    return render_template('reward_view.html', reward=reward, title='Viewing Reward: {}'.format(reward.name))
 
 
 # Test Routes
@@ -725,14 +727,14 @@ def test_chore():
     # Chore tests
 
     # Constructor
-    chore = Chore.Chore("test1")
+    chore = Chore.Chore('test1')
 
     # Assignments
-    chore.description = "test1"
+    chore.description = 'test1'
     chore.points = 1
 
     # Create
-    Chore.Chore.Add(chore)
+    chore.Add()
 
     # Read
     singleChore = Chore.Chore.GetById(chore.id)
@@ -759,15 +761,15 @@ def test_user():
     user = User.User()
 
     # Assignments
-    user.username = "test4"
+    user.username = 'test4'
     user.points = 1
-    user.password = "testpassword"
-    user.email_address = "test4@email.address"
-    user.first_name = "test"
+    user.password = 'testpassword'
+    user.email_address = 'test4@email.address'
+    user.first_name = 'test'
     user.date_of_birth = '1945-02-02'
 
     # Create
-    User.User.Add(user)
+    user.Add()
 
     # Read
     singleUserById = User.User.GetById(user.id)
@@ -775,11 +777,11 @@ def test_user():
     allUsers = User.User.GetAll()
 
     # Update
-    updatedSuccessfully = singleUserById.UpdatePassword("newpass", "newpass", "testpassword")
+    updatedSuccessfully = singleUserById.UpdatePassword('newpass', 'newpass', 'testpassword')
 
     # Utility
-    isPasswordCorrect = singleUserById.VerifyPassword("newpass")
-    password = User.User.EncryptPassword("encryptThis")
+    isPasswordCorrect = singleUserById.VerifyPassword('newpass')
+    password = User.User.EncryptPassword('encryptThis')
 
     # Delete
     User.User.Remove(user)
@@ -791,15 +793,15 @@ def test_reward():
     # Reward tests
 
     # Constructor
-    reward = Reward.Reward("test1")
+    reward = Reward.Reward('test1')
 
     # Assignments
-    reward.name = "test"
-    reward.description = "test1"
+    reward.name = 'test'
+    reward.description = 'test1'
     reward.points = 1
 
     # Create
-    Reward.Reward.Add(reward)
+    reward.Add()
 
     # Read
     singleReward = Reward.Reward.GetById(reward.id)
@@ -819,13 +821,13 @@ def test_role():
     # Role tests
 
     # Constructor
-    role = Role.Role("test1")
+    role = Role.Role('test1')
 
     # Assignments
-    role.name = "test"
+    role.name = 'test'
 
     # Create
-    Role.Role.Add(role)
+    role.Add()
 
     # Read
     singleRole = Role.Role.GetById(role.id)

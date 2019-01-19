@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+
 from datetime import datetime
 from app import db
+from BaseMixin import BaseMixin
 
 
-class Reward(db.Model):
+class Reward(BaseMixin, db.Model):
     __tablename__ = 'rewards'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -18,38 +20,12 @@ class Reward(db.Model):
         return '<Reward  %r>' % self.name
 
     # Create operations
-    def Add(reward):
-        """ Add a reward """
-
-        db.session.add(reward)
-        db.session.commit()
-
-        return True
 
     # Read operations
-    @staticmethod
-    def GetById(reward_id):
-        """ Return a single reward by ID """
-
-        return Reward.query.filter_by(id=reward_id).first()
-
-    @staticmethod
-    def GetAll():
-        """ Return all rewards """
-
-        return Reward.query.all()
 
     # Update operations
 
     # Delete operations
-    @staticmethod
-    def Remove(reward):
-        """ Remove a reward """
-
-        db.session.delete(reward)
-        db.session.commit()
-
-        return True
 
     # Utility operations
     @staticmethod

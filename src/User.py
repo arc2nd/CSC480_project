@@ -1,12 +1,12 @@
 #!/usr/bin/env python
+
 from datetime import datetime
 from app import db
 import bcrypt
+from BaseMixin import BaseMixin
 
-from Log import _log
-VERBOSITY = 1
 
-class User(db.Model):
+class User(BaseMixin, db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -42,40 +42,27 @@ class User(db.Model):
         return name
 
     # Create operations
-    @staticmethod
-    def Add(user):
+    def Add(self):
         """ Add a user """
 
         # encrypt the password
-        user.password = User.EncryptPassword(user.password)
+        self.password = User.EncryptPassword(self.password)
 
         # Default to standard role, start with 0 points
-        user.role_id = 1
-        user.points = 0
+        self.role_id = 1
+        self.points = 0
 
-        db.session.add(user)
+        db.session.add(self)
         db.session.commit()
 
         return True
 
     # Read operations
     @staticmethod
-    def GetById(user_id):
-        """ Return a single user by ID """
-
-        return User.query.filter_by(id=user_id).first()
-    
-    @staticmethod
     def GetByUsername(username):
         """ Return a user by username """
         
         return User.query.filter_by(username=username).first()
-
-    @staticmethod
-    def GetAll():
-        """ Return all users """
-
-        return User.query.all()
 
     # Update operations
     def UpdatePassword(self, new_password=None, new_password_verify=None, old_password=None):
@@ -89,14 +76,6 @@ class User(db.Model):
         return False
 
     # Delete operations
-    @staticmethod
-    def Remove(user):
-        """ Remove a user """
-
-        db.session.delete(user)
-        db.session.commit()
-
-        return True
 
     # Utility operations
     @staticmethod
