@@ -90,6 +90,16 @@ class RewardEditForm(FlaskForm):
     description = TextField('Description:', validators=[validators.required()])
     points = IntegerField('Points:', validators=[validators.required()])
 
+# User Edit Form
+class UserEditForm(FlaskForm):
+    username = TextField('Username:', validators=[validators.required()])
+    password = PasswordField('Password:', validators=[validators.optional()])
+    email_address = TextField('Email:', validators=[validators.required()])
+    first_name = TextField('First Name:', validators=[validators.required()])
+    middle_name = TextField('Middle Name:', validators=[validators.optional()])
+    last_name = TextField('Last Name:', validators=[validators.optional()])
+    date_of_birth = DateField(
+        'Birth date:', format='%Y-%m-%d', validators=[validators.required()])
 
 # User Login Form
 class UserLoginForm(FlaskForm):
@@ -331,6 +341,55 @@ def user_view(user_id=None):
     _log(1, VERBOSITY, 'user found')
 
     return render_template('user_view.html', user=user, title='Viewing User: {}'.format(user.username))
+
+# user edit
+@app.route('/user/edit/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+def user_edit(user_id=None):
+    errors=None
+    old_user = User.User.GetById(user_id)
+
+    # Check for user editing self (allowed) or admin editing anyone (also allowed)
+    if old_user.id == session['user_id'] or session['role_id'] == app.config['ADMIN_ROLE_ID']:
+        if request.method == 'GET':
+            form = UserEditForm()
+
+            form.username = old_user.username
+            form.password = None
+            form.email_address = old_user.email_address
+            form.first_name = old_user.first_name
+            form.middle_name = old_user.middle_name
+            form.last_name = old_user.last_name
+            form.date_of_birth = old_user.date_of_birth
+
+        if request.method == 'POST':
+            form = UserEditForm(request.form)
+            old_user = User.User.GetById(user_id)
+            _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
+
+            if form.validate():
+                _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
+                _log(1, VERBOSITY, 'form validated')
+
+                form.populate_obj(old_user)
+                old_user.UpdateData()
+
+                _log(1, VERBOSITY, 'edited user: {}'.format(old_user.username))
+                flash('Success: User edited', category='success')
+
+                return (redirect(url_for('users')))
+
+            else:
+                _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+                flash('Error: User not edited', category='danger')
+                errors = form.errors
+
+        return render_template('user_edit.html', form=form, errors=errors, user=old_user, title='Edit User: {}'.format(old_user.username))
+
+    else:
+        _log(1, VERBOSITY, 'user attempted to edit an account without permission')
+        flash('Error: You may not edit other user accounts unless you are an administrator', category='danger')
+        return redirect(url_for('user'))
 
 # Chore routes
 
