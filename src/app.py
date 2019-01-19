@@ -90,7 +90,6 @@ class RewardEditForm(FlaskForm):
     description = TextField('Description:', validators=[validators.required()])
     points = IntegerField('Points:', validators=[validators.required()])
 
-
 # User Login Form
 class UserLoginForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
@@ -121,7 +120,6 @@ def user_utility():
             return user.full_name
         return 'Unassigned'
             
-
     return dict(user_full_name=user_full_name)
 
 @app.context_processor
@@ -136,8 +134,8 @@ def chore_utility():
 
 # Route decorators
 
-# Ensures the user is logged in, or forwards to login form if not
 def login_required(f):
+    """ Ensure the user is logged in, send to login if not"""
     """Things to do to check and make sure a user is logged in
        1. check if session has a logged_in key, if not, send to splash page
        2. compare the current time to the last logged_in timestamp
@@ -169,8 +167,8 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-# Ensures the user is admin, and forwards to the index if not
 def admin_required(f):
+    """ Ensures the user is admin, and forwards to the index if not """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         _log(1, VERBOSITY, 'admin check')
@@ -183,8 +181,10 @@ def admin_required(f):
             return index()
     return decorated_function
 
-# Default route
 
+# Routes
+
+# Default route
 @app.route('/', methods=['GET'])
 @app.route('/index', methods=['GET'])
 @login_required
