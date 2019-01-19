@@ -1,9 +1,10 @@
 import psycopg2
 import sys
 import bcrypt
+import os
 
-table_creation_succeeded = True
-user_creation_succeeded = True
+admin_role_id = 1
+standard_role_id = 2
 
 conn_string = "host='localhost' dbname='ChoreExplore' user='cxp' password='choresarereallyfun'"
 
@@ -131,8 +132,8 @@ def seed_admin_user():
 		INSERT INTO users
 			(id, role_id, username, password, first_name, middle_name, last_name, email_address, date_of_birth, points)
 			VALUES
-			(1, 1, 'administrator', '%s', 'first', 'middle', 'last', 'test@email.com', TO_DATE('01 Jan 1945', 'DD Mon YYYY'), 0)
-		""" % (encrypted_password)
+			(1, {0}, 'administrator', '{1}', 'first', 'middle', 'last', 'test@email.com', TO_DATE('01 Jan 1945', 'DD Mon YYYY'), 0)
+		""".format(admin_role_id, (encrypted_password))
 	]
 
 	if(execute_commands(commands)):

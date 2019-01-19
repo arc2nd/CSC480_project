@@ -12,7 +12,8 @@ def get_now():
 
 def get_creds(path, crypt=False):
     ret_dict = { 
-                "ADMIN_ROLE_ID": 0,
+                "ADMIN_ROLE_ID": 1,
+                "STANDARD_ROLE_ID": 2,
                 "SECRET_KEY": "I am a secret key", 
                 "CSRF_ENABLED": True, 
                 "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 

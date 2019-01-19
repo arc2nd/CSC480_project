@@ -26,6 +26,7 @@ app = Flask(__name__, static_url_path='/static')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS']
 app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI']
 app.config['ADMIN_ROLE_ID'] = CREDS['ADMIN_ROLE_ID']
+app.config['STANDARD_ROLE_ID'] = CREDS['STANDARD_ROLE_ID']
 
 db = SQLAlchemy(app)
 
@@ -349,6 +350,9 @@ def user_edit(user_id=None):
     errors=None
     old_user = User.User.GetById(user_id)
 
+    loggedInUserId = session['user_id']
+    loggedInUserRoleId = session['role_id']
+
     # Check for user editing self (allowed) or admin editing anyone (also allowed)
     if old_user.id == session['user_id'] or session['role_id'] == app.config['ADMIN_ROLE_ID']:
         if request.method == 'GET':
@@ -377,7 +381,7 @@ def user_edit(user_id=None):
                 _log(1, VERBOSITY, 'edited user: {}'.format(old_user.username))
                 flash('Success: User edited', category='success')
 
-                return (redirect(url_for('user')))
+                return (redirect(url_for('index')))
 
             else:
                 _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
@@ -389,7 +393,7 @@ def user_edit(user_id=None):
     else:
         _log(1, VERBOSITY, 'user attempted to edit an account without permission')
         flash('Error: You may not edit other user accounts unless you are an administrator', category='danger')
-        return redirect(url_for('user'))
+        return redirect(url_for('index'))
 
 # Chore routes
 
