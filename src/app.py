@@ -354,13 +354,13 @@ def user_edit(user_id=None):
         if request.method == 'GET':
             form = UserEditForm()
 
-            form.username = old_user.username
-            form.password = None
-            form.email_address = old_user.email_address
-            form.first_name = old_user.first_name
-            form.middle_name = old_user.middle_name
-            form.last_name = old_user.last_name
-            form.date_of_birth = old_user.date_of_birth
+            form.username.data = old_user.username
+            form.password.data = None
+            form.email_address.data = old_user.email_address
+            form.first_name.data = old_user.first_name
+            form.middle_name.data = old_user.middle_name
+            form.last_name.data = old_user.last_name
+            form.date_of_birth.data = old_user.date_of_birth
 
         if request.method == 'POST':
             form = UserEditForm(request.form)
@@ -377,7 +377,7 @@ def user_edit(user_id=None):
                 _log(1, VERBOSITY, 'edited user: {}'.format(old_user.username))
                 flash('Success: User edited', category='success')
 
-                return (redirect(url_for('users')))
+                return (redirect(url_for('user')))
 
             else:
                 _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))

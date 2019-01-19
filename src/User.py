@@ -80,6 +80,9 @@ class User(BaseMixin, db.Model):
         # If we aren't updating the password, make sure it doesn't change
         if self.password == None:
             self.password = self.GetHashedPassword()
+        # Otherwise, encrypt the new one
+        else:
+            self.password = User.EncryptPassword(self.password)
 
         db.session.commit()
         return True
@@ -106,8 +109,6 @@ class User(BaseMixin, db.Model):
     def GetHashedPassword(self):
         """ Get a hashed password from the db """
         return User.query.filter_by(id=self.id).first().password
-
-
 
     def AddPoints(self, points):
         """ Add a chore's points to the user account """
