@@ -468,6 +468,8 @@ def chore_reassign(chore_id=None):
         if request.method == "GET":
             form = ChoreReassignForm()
             form.reassign_to.choices = users_list
+            form.reassign_to.default = chore.assigned_to
+            form.reassign_to.data = chore.assigned_to
 
             return render_template('chore_reassign.html', form=form, errors=errors, chore=chore, title="Reassign {}".format(chore.name))
 
