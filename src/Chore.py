@@ -2,9 +2,11 @@
 
 from datetime import datetime
 from app import db
+from BaseMixin import BaseMixin
 
 
-class Chore(db.Model):
+class Chore(BaseMixin, db.Model):
+    pass
     __tablename__ = 'chores'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -23,36 +25,22 @@ class Chore(db.Model):
         return '<Chore  %r>' % self.name
 
     # Create operations
-    @staticmethod
-    def Add(chore):
+    def Add(self):
         """ Add a chore """
-        
-        """ Default to false """
-        chore.complete = False
 
-        db.session.add(chore)
+        """ Default to incomplete """
+        self.complete = False
+
+        db.session.add(self)
         db.session.commit()
-
         return True
 
     # Read operations
-    @staticmethod
-    def GetById(chore_id):
-        """ Return a single chore by ID """
-
-        return Chore.query.filter_by(id=chore_id).first()
-
     @staticmethod
     def GetByUser(user, completed):
         """ Return all chores assigned to a single user """
 
         return Chore.query.filter_by(assigned_to=user.id,complete=completed).all()
-
-    @staticmethod
-    def GetAll():
-        """ Return all chores """
-
-        return Chore.query.all()
 
     # Update operations
     def AssignTo(self, user):
@@ -80,18 +68,7 @@ class Chore(db.Model):
 
         return True
 
-    def UpdateData(self):
-        db.session.commit()
-
     # Delete operations
-    @staticmethod
-    def Remove(chore):
-        """ Remove a chore """
-
-        db.session.delete(chore)
-        db.session.commit()
-
-        return True
 
     # Utility operations
     def IsOverdue(self):

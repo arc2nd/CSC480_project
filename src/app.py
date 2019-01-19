@@ -271,7 +271,7 @@ def user_add():
             newUser = User.User()
             form.populate_obj(newUser)
 
-            User.User.Add(newUser)
+            newUser.Add()
 
             _log(1, VERBOSITY, 'added user {}'.format(newUser))
             flash('Success: User added', category='success')
@@ -296,7 +296,7 @@ def user_remove(user_id=None):
             _log(1, VERBOSITY, 'user attempt to remove own account')
             flash('Error: You may not remove your own account', category='danger')
         else:
-            if user.Remove(user):
+            if User.User.Remove(user):
                 _log(1, VERBOSITY, 'user removed successfully')
                 flash('Success: User removed', category='success')
             else:
@@ -388,7 +388,7 @@ def chore_add():
             newChore = Chore.Chore(form.name.data)
             form.populate_obj(newChore)
 
-            Chore.Chore.Add(newChore)
+            newChore.Add()
 
             _log(1, VERBOSITY, 'added chore: {}'.format(newChore))
             flash('Success: Chore added', category='success')
@@ -514,7 +514,7 @@ def chore_remove(chore_id=None):
     _log(1, VERBOSITY, 'chore/remove')
     chore = Chore.Chore.GetById(chore_id)
     if chore:
-        if chore.Remove(chore):
+        if Chore.Chore.Remove(chore):
             _log(1, VERBOSITY, 'chore removed successfully')
             flash('Success: Chore removed', category='success')
         else:
@@ -646,7 +646,7 @@ def reward_add():
             newReward = Reward.Reward(form.name.data)
             form.populate_obj(newReward)
 
-            Reward.Reward.Add(newReward)
+            newReward.Add()
             _log(1, VERBOSITY, 'reward added: {}'.format(newReward))
             flash('Success: Reward added', category='success')
 
@@ -688,7 +688,7 @@ def reward_remove(reward_id=None):
     _log(1, VERBOSITY, 'reward/remove')
     reward = Reward.Reward.GetById(reward_id)
     if reward:
-        if reward.Remove(reward):
+        if Reward.Reward.Remove(reward):
             _log(1, VERBOSITY, 'removed reward successfully')
             flash('Success: Reward removed', category='success')
         else:
@@ -732,7 +732,7 @@ def test_chore():
     chore.points = 1
 
     # Create
-    Chore.Chore.Add(chore)
+    chore.Add()
 
     # Read
     singleChore = Chore.Chore.GetById(chore.id)
@@ -767,7 +767,7 @@ def test_user():
     user.date_of_birth = '1945-02-02'
 
     # Create
-    User.User.Add(user)
+    user.Add()
 
     # Read
     singleUserById = User.User.GetById(user.id)
@@ -799,7 +799,7 @@ def test_reward():
     reward.points = 1
 
     # Create
-    Reward.Reward.Add(reward)
+    reward.Add()
 
     # Read
     singleReward = Reward.Reward.GetById(reward.id)
@@ -825,7 +825,7 @@ def test_role():
     role.name = "test"
 
     # Create
-    Role.Role.Add(role)
+    role.Add()
 
     # Read
     singleRole = Role.Role.GetById(role.id)
