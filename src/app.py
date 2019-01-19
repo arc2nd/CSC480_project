@@ -84,6 +84,13 @@ class RewardAddForm(FlaskForm):
     description = TextField('Description:', validators=[validators.required()])
     points = IntegerField('Points:', validators=[validators.required()])
 
+# Reward Edit Form
+class RewardEditForm(FlaskForm):
+    name = TextField('Reward Name:', validators=[validators.required()])
+    description = TextField('Description:', validators=[validators.required()])
+    points = IntegerField('Points:', validators=[validators.required()])
+
+
 # User Login Form
 class UserLoginForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
@@ -719,6 +726,45 @@ def reward_view(reward_id=None):
 
     return render_template('reward_view.html', reward=reward, title='Viewing Reward: {}'.format(reward.name))
 
+
+# reward edit
+@app.route('/reward/edit/<int:reward_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def reward_edit(reward_id=None):
+    errors=None
+    old_reward = Reward.Reward.GetById(reward_id)
+
+    if request.method == 'GET':
+        form = RewardEditForm()
+
+        form.name.data = old_reward.name
+        form.description.data = old_reward.description
+        form.points.data = old_reward.points
+
+    if request.method == 'POST':
+        form = RewardEditForm(request.form)
+        old_reward = Reward.Reward.GetById(reward_id)
+        _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
+
+        if form.validate():
+            _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
+            _log(1, VERBOSITY, 'form validated')
+
+            form.populate_obj(old_reward)
+            old_reward.UpdateData()
+
+            _log(1, VERBOSITY, 'edited reward: {}'.format(old_reward.name))
+            flash('Success: Reward edited', category='success')
+
+            return (redirect(url_for('reward')))
+
+        else:
+            _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+            flash('Error: Reward not added', category='danger')
+            errors = form.errors
+
+    return render_template('reward_edit.html', form=form, errors=errors, reward=old_reward, title='Edit Reward: {}'.format(old_reward.name))
 
 # Test Routes
 

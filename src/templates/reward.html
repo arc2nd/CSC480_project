@@ -6,6 +6,7 @@
 		<p>
 			{{reward.name}}
 			{% if is_admin %}
+                 | <a href="{{ url_for('reward_edit', reward_id=reward.id) }}">Edit</a>
 				 | <a href="{{ url_for('reward_remove', reward_id=reward.id) }}">Delete</a>
 			{% endif %}
 			 | <a href="{{ url_for('reward_claim', reward_id=reward.id) }}">Claim</a>
