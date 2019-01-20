@@ -11,6 +11,7 @@
         <div class="alert alert-info">
             If you edit your own account, you will need to log in again
         </div>
+        <br>
     {% endif %}
 
     <form action="{{ url_for('user_edit', user_id=user.id) }}" method="post">
