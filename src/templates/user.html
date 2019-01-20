@@ -9,6 +9,7 @@
 			| <b><a href="{{ url_for('user_view', user_id=user.id) }}">View user details</a></b>
 			{% if is_admin and user.role != admin_role_id %}
 				| <a href="{{ url_for('user_remove', user_id=user.id) }}">Delete</a>
+				| <a href="{{ url_for('user_edit', user_id=user.id) }}">Edit</a>
 			{% endif %} 
 		</p>
 	{% endfor %}
