@@ -1,5 +1,6 @@
 {
 	"ADMIN_ROLE_ID": 1,
+	"STANDARD_ROLE_ID": 2,
 	"SECRET_KEY": "I am a secret key",
 	"CSRF_ENABLED": true,
 	"SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore",

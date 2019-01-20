@@ -158,3 +158,9 @@ h1.splash-header {
 	background: linear-gradient(to bottom, rgba(234,234,234,1) 8%,rgba(175,175,175,1) 95%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaeaea', endColorstr='#afafaf',GradientType=0 ); /* IE6-9 */
 }
+
+/* Forms */
+.neutral-feedback {
+	color: tint($body-color, 30%);
+	font-size: .8rem;
+}

@@ -3,8 +3,8 @@
 from datetime import datetime
 from app import db
 import bcrypt
+from app import app
 from BaseMixin import BaseMixin
-
 
 class User(BaseMixin, db.Model):
     __tablename__ = 'users'
@@ -49,7 +49,7 @@ class User(BaseMixin, db.Model):
         self.password = User.EncryptPassword(self.password)
 
         # Default to standard role, start with 0 points
-        self.role_id = 1
+        self.role_id = app.config["STANDARD_ROLE_ID"]
         self.points = 0
 
         db.session.add(self)
@@ -94,7 +94,10 @@ class User(BaseMixin, db.Model):
         else:
             return False
 
-    # Add Points
+    def GetHashedPassword(self):
+        """ Get a hashed password from the db """
+        return User.query.filter_by(id=self.id).first().password
+
     def AddPoints(self, points):
         """ Add a chore's points to the user account """
         self.points += points
