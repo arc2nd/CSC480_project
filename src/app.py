@@ -102,6 +102,10 @@ class UserEditForm(FlaskForm):
     date_of_birth = DateField(
         'Birth date:', format='%Y-%m-%d', validators=[validators.required()])
 
+# User Edit Admin Form
+class UserEditAdminForm(UserEditForm):
+    role_id = SelectField("Role:", coerce=int, validators=[validators.required()])
+
 # User Login Form
 class UserLoginForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
@@ -350,13 +354,22 @@ def user_edit(user_id=None):
     errors=None
     old_user = User.User.GetById(user_id)
 
-    loggedInUserId = session['user_id']
-    loggedInUserRoleId = session['role_id']
-
     # Check for user editing self (allowed) or admin editing anyone (also allowed)
     if old_user.id == session['user_id'] or session['role_id'] == app.config['ADMIN_ROLE_ID']:
         if request.method == 'GET':
-            form = UserEditForm()
+            
+            # Only admin can edit roles
+            if(session['role_id'] == app.config['ADMIN_ROLE_ID']):
+                form = UserEditAdminForm()
+
+                roles = Role.Role.GetAll()
+                roles_list = [(i.id, i.name) for i in roles]
+                form.role_id.choices = roles_list
+                form.role_id.default = old_user.role_id
+                form.role_id.data = old_user.role_id
+
+            else:
+                form = UserEditForm()
 
             form.username.data = old_user.username
             form.password.data = None
@@ -367,7 +380,15 @@ def user_edit(user_id=None):
             form.date_of_birth.data = old_user.date_of_birth
 
         if request.method == 'POST':
-            form = UserEditForm(request.form)
+            if(session['role_id'] == app.config['ADMIN_ROLE_ID']):
+                form = UserEditAdminForm()
+
+                roles = Role.Role.GetAll()
+                roles_list = [(i.id, i.name) for i in roles]
+                form.role_id.choices = roles_list
+            else:
+                form = UserEditForm()
+                
             old_user = User.User.GetById(user_id)
             _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
 

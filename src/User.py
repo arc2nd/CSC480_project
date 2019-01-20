@@ -78,7 +78,7 @@ class User(BaseMixin, db.Model):
     def UpdateData(self):
         """ Update a user """
         # If we aren't updating the password, make sure it doesn't change
-        if self.password == None:
+        if not self.password:
             self.password = self.GetHashedPassword()
         # Otherwise, encrypt the new one
         else:
