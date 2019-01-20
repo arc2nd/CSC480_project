@@ -94,7 +94,9 @@ class RewardEditForm(FlaskForm):
 # User Edit Form
 class UserEditForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
-    password = PasswordField('Password:', validators=[validators.optional()])
+    old_password = PasswordField('Old Password:', validators=[validators.optional()])
+    new_password = PasswordField('New Password:', validators=[validators.optional()])
+    new_password_verify = PasswordField('Verify New Password:', validators=[validators.optional()])
     email_address = TextField('Email:', validators=[validators.required()])
     first_name = TextField('First Name:', validators=[validators.required()])
     middle_name = TextField('Middle Name:', validators=[validators.optional()])
@@ -372,7 +374,9 @@ def user_edit(user_id=None):
                 form = UserEditForm()
 
             form.username.data = old_user.username
-            form.password.data = None
+            form.old_password.data = None
+            form.new_password.data = None
+            form.new_password_verify.data = None
             form.email_address.data = old_user.email_address
             form.first_name.data = old_user.first_name
             form.middle_name.data = old_user.middle_name
@@ -397,12 +401,41 @@ def user_edit(user_id=None):
                 _log(1, VERBOSITY, 'form validated')
 
                 form.populate_obj(old_user)
-                old_user.UpdateData()
+                old_password = form.old_password.data
+                new_password = form.new_password.data
+                new_password_verify = form.new_password_verify.data
+                
+                # If user is updating their password
+                if(old_password and new_password and new_password_verify):
+                    _log(1, VERBOSITY, 'user updating password')
+                    if(old_user.VerifyPassword(old_password)):
+                        _log(1, VERBOSITY, 'old password verified')
+                        if(old_user.UpdatePassword(new_password, new_password_verify, old_password)):
+                            _log(1, VERBOSITY, 'password updated')
+                        else:
+                            _log(1, VERBOSITY, 'could not update password')
+                            flash("Error: Password not updated, check that your old password was correct, and that your new password is the same in both fields", category="danger")
+                            return render_template('user_edit.html', form=form, errors=errors, user=old_user, title='Edit User: {}'.format(old_user.username))
+                    else:
+                        _log(1, VERBOSITY, 'could not verify old password')
+                        flash("Error: Could not verify your old password", category="danger")
+
+                # Not updating password, just update the other data
+                else:
+                    old_user.UpdateData()
 
                 _log(1, VERBOSITY, 'edited user: {}'.format(old_user.username))
-                flash('Success: User edited', category='success')
 
-                return (redirect(url_for('index')))
+                # Log the user out if they just edited their own account. This is to reset
+                # their session, force them to log in with their new password, etc
+                if old_user.id == session['user_id']:
+                    _log(1, VERBOSITY, 'user edited their own account, logging out')
+                    session.clear()
+                    flash('Notice: You edited your own account and must log in again', category='info')
+                    return redirect(url_for('splash'))
+                else:
+                    flash('Success: User edited', category='success')
+                    return redirect(url_for('index'))
 
             else:
                 _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))

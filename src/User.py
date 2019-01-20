@@ -75,18 +75,6 @@ class User(BaseMixin, db.Model):
                 return True
         return False
 
-    def UpdateData(self):
-        """ Update a user """
-        # If we aren't updating the password, make sure it doesn't change
-        if not self.password:
-            self.password = self.GetHashedPassword()
-        # Otherwise, encrypt the new one
-        else:
-            self.password = User.EncryptPassword(self.password)
-
-        db.session.commit()
-        return True
-
     # Delete operations
 
     # Utility operations

@@ -7,6 +7,12 @@
         {% endfor %}
     {% endif %}
 
+    {% if user.id == session['user_id'] %}
+        <div class="alert alert-info">
+            If you edit your own account, you will need to log in again
+        </div>
+    {% endif %}
+
     <form action="{{ url_for('user_edit', user_id=user.id) }}" method="post">
         {{ form.hidden_tag() }}
         <div class="form-row">
@@ -19,12 +25,28 @@
         </div>
         <div class="form-row">
             <div class="form-group col-md-6">
-                {{ form.password.label }}
+                {{ form.old_password.label }}
                 <br>
                 <span class="neutral-feedback">Note: Only enter a password if you want to change it</span>
             </div>
             <div class="form-group col-md-6">
-                {{ form.password(class_="form-control mb-2 mr-sm-2") }}
+                {{ form.old_password(class_="form-control mb-2 mr-sm-2") }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.new_password.label }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.new_password(class_="form-control mb-2 mr-sm-2") }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                {{ form.new_password_verify.label }}
+            </div>
+            <div class="form-group col-md-6">
+                {{ form.new_password_verify(class_="form-control mb-2 mr-sm-2") }}
             </div>
         </div>
         <div class="form-row">

@@ -15,15 +15,20 @@
 <main class="flex-fill">
 	<div class="container text-center">
 		<h1 class="splash-header">Welcome to Chore Explore</h1>
-		<br>
-		<p>Something cool here.</p>
-		<br><br>
 	</div>
 	<div class="container">
 		<div class="row justify-content-center">
 			<div class="col-6">
 				<h2>Log in to get started.</h2>
 				<br>
+				{% with messages = get_flashed_messages(with_categories=true) %}
+				{% if messages %}
+				{% for category, message in messages %}
+				<div class="alert alert-{{ category }}">{{ message }}</div>
+				{% endfor %}
+				<br>
+				{% endif %}
+				{% endwith %}
 				<div class="card">
 					<div class="card-body">
 						{% if session['logged_in'] %}
