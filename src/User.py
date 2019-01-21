@@ -65,6 +65,16 @@ class User(BaseMixin, db.Model):
         return User.query.filter_by(username=username).first()
 
     # Update operations
+    
+    def ResetPassword(self, new_password=None, new_password_verify=None):
+        """ Updates a user's password without old password verification """
+        if new_password == new_password_verify:
+            new_password = User.EncryptPassword(new_password)
+            self.password = new_password
+            db.session.commit()
+            return True
+        return False
+
     def UpdatePassword(self, new_password=None, new_password_verify=None, old_password=None):
         """ Updates a user's password """
         if new_password == new_password_verify:

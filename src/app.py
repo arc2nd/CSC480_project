@@ -79,6 +79,11 @@ class ChoreEditForm(FlaskForm):
 class ChoreReassignForm(FlaskForm):
     reassign_to = SelectField('Reassign to:', coerce=int, validators=[validators.optional()])
 
+# Password Reset Form
+class PasswordResetForm(FlaskForm):
+    new_password = PasswordField('New Password:', validators=[validators.required()])
+    new_password_verify = PasswordField('Verify New Password:', validators=[validators.required()])
+
 # Reward Add Form
 class RewardAddForm(FlaskForm):
     name = TextField('Reward Name:', validators=[validators.required()])
@@ -91,8 +96,21 @@ class RewardEditForm(FlaskForm):
     description = TextField('Description:', validators=[validators.required()])
     points = IntegerField('Points:', validators=[validators.required()])
 
-# User Edit Form
-class UserEditForm(FlaskForm):
+# User Edit Admin Form Other
+class UserEditOtherAdminForm(FlaskForm):
+    username = TextField('Username:', validators=[validators.required()])
+    new_password = PasswordField('New Password:', validators=[validators.optional()])
+    new_password_verify = PasswordField('Verify New Password:', validators=[validators.optional()])
+    email_address = TextField('Email:', validators=[validators.required()])
+    first_name = TextField('First Name:', validators=[validators.required()])
+    middle_name = TextField('Middle Name:', validators=[validators.optional()])
+    last_name = TextField('Last Name:', validators=[validators.optional()])
+    date_of_birth = DateField(
+        'Birth date:', format='%Y-%m-%d', validators=[validators.required()])
+    role_id = SelectField("Role:", coerce=int, validators=[validators.required()])
+
+# User Edit Form Self
+class UserEditSelfForm(FlaskForm):
     username = TextField('Username:', validators=[validators.required()])
     old_password = PasswordField('Old Password:', validators=[validators.optional()])
     new_password = PasswordField('New Password:', validators=[validators.optional()])
@@ -104,8 +122,8 @@ class UserEditForm(FlaskForm):
     date_of_birth = DateField(
         'Birth date:', format='%Y-%m-%d', validators=[validators.required()])
 
-# User Edit Admin Form
-class UserEditAdminForm(UserEditForm):
+# User Edit Admin Form Self
+class UserEditSelfAdminForm(UserEditSelfForm):
     role_id = SelectField("Role:", coerce=int, validators=[validators.required()])
 
 # User Login Form
@@ -373,9 +391,9 @@ def user_edit(user_id=None):
     if old_user.id == session['user_id'] or session['role_id'] == app.config['ADMIN_ROLE_ID']:
         if request.method == 'GET':
             
-            # Only admin can edit roles
-            if(session['role_id'] == app.config['ADMIN_ROLE_ID']):
-                form = UserEditAdminForm()
+            # Admin editing own account
+            if(session['role_id'] == app.config['ADMIN_ROLE_ID'] and session['user_id'] == old_user.id):
+                form = UserEditSelfAdminForm()
 
                 roles = Role.Role.GetAll()
                 roles_list = [(i.id, i.name) for i in roles]
@@ -383,11 +401,22 @@ def user_edit(user_id=None):
                 form.role_id.default = old_user.role_id
                 form.role_id.data = old_user.role_id
 
+            # Admin editing another account
+            elif(session['role_id'] == app.config['ADMIN_ROLE_ID'] and session['user_id'] != old_user.id):
+                form = UserEditOtherAdminForm()
+
+                roles = Role.Role.GetAll()
+                roles_list = [(i.id, i.name) for i in roles]
+                form.role_id.choices = roles_list
+                form.role_id.default = old_user.role_id
+                form.role_id.data = old_user.role_id
+
+            # User editing own account
             else:
-                form = UserEditForm()
+                form = UserEditSelfForm()
+                form.old_password.data = None
 
             form.username.data = old_user.username
-            form.old_password.data = None
             form.new_password.data = None
             form.new_password_verify.data = None
             form.email_address.data = old_user.email_address
@@ -397,29 +426,41 @@ def user_edit(user_id=None):
             form.date_of_birth.data = old_user.date_of_birth
 
         if request.method == 'POST':
-            if(session['role_id'] == app.config['ADMIN_ROLE_ID']):
-                form = UserEditAdminForm()
+            # Admin editing own account
+            if(session['role_id'] == app.config['ADMIN_ROLE_ID'] and session['user_id'] == old_user.id):
+                form = UserEditSelfAdminForm()
 
                 roles = Role.Role.GetAll()
                 roles_list = [(i.id, i.name) for i in roles]
                 form.role_id.choices = roles_list
+                old_password = form.old_password.data
+
+            # Admin editing another user
+            elif(session['role_id'] == app.config['ADMIN_ROLE_ID'] and session['user_id'] != old_user.id):
+                form = UserEditOtherAdminForm()
+
+                roles = Role.Role.GetAll()
+                roles_list = [(i.id, i.name) for i in roles]
+                form.role_id.choices = roles_list
+
+            # Standard user editing own account
             else:
-                form = UserEditForm()
+                form = UserEditSelfForm()
+
+                old_password = form.old_password.data
                 
-            old_user = User.User.GetById(user_id)
-            _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
 
             if form.validate():
                 _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
                 _log(1, VERBOSITY, 'form validated')
 
                 form.populate_obj(old_user)
-                old_password = form.old_password.data
+
                 new_password = form.new_password.data
                 new_password_verify = form.new_password_verify.data
                 
                 # If user is updating their password
-                if(old_password and new_password and new_password_verify):
+                if(new_password and new_password_verify and old_password):
                     _log(1, VERBOSITY, 'user updating password')
                     if(old_user.VerifyPassword(old_password)):
                         _log(1, VERBOSITY, 'old password verified')
@@ -461,6 +502,39 @@ def user_edit(user_id=None):
         _log(1, VERBOSITY, 'user attempted to edit an account without permission')
         flash('Error: You may not edit other user accounts unless you are an administrator', category='danger')
         return redirect(url_for('index'))
+
+# user reset password
+@app.route('/user/reset-password/<int:user_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def user_reset_password(user_id=None):
+
+    user = User.User.GetById(user_id)
+
+    if(request.method == 'GET'):
+        form = PasswordResetForm()
+        return render_template('user_reset_password.html', form=form, user=user, title='Reset Password for {}'.format(user.username))
+    
+    if(request.method == 'POST'):
+        form = PasswordResetForm()
+
+        new_password = request.form['new_password']
+        new_password_verify = request.form['new_password_verify']
+
+        if(new_password == new_password_verify):
+            if(user):
+                if(user.ResetPassword(new_password, new_password_verify)):
+                    flash('Success: Password has been updated', category='success')
+                    return redirect(url_for('user'))
+                else:
+                    flash('Error: Could not reset password', category='danger')
+                    return render_template('user_reset_password.html', form=form, user=user, title='Reset Password for {}'.format(user.username))
+            else:
+                flash('Error: That user does not exist', category='danger')
+        else:
+            flash('Error: The passwords entered did not match', category='danger')
+            return render_template('user_reset_password.html', form=form, user=user, title='Reset Password for {}'.format(user.username))
+
 
 # Chore routes
 

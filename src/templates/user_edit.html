@@ -24,6 +24,7 @@
                 {{ form.username(class_="form-control mb-2 mr-sm-2") }}
             </div>
         </div>
+        {% if user.id == session['user_id'] %}
         <div class="form-row">
             <div class="form-group col-md-6">
                 {{ form.old_password.label }}
@@ -50,6 +51,8 @@
                 {{ form.new_password_verify(class_="form-control mb-2 mr-sm-2") }}
             </div>
         </div>
+        {% endif %}
+        {% if form.role_id %}
         <div class="form-row">
             <div class="form-group col-md-6">
                 {{ form.role_id.label }}
@@ -58,6 +61,7 @@
                 {{ form.role_id(class_="form-control mb-2 mr-sm-2") }}
             </div>
         </div>
+        {% endif %}
         <div class="form-row">
             <div class="form-group col-md-6">
                 {{ form.email_address.label }}
