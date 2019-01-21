@@ -130,6 +130,18 @@ def admin_role_id():
     return dict(admin_role_id=app.config['ADMIN_ROLE_ID'])
 
 @app.context_processor
+def role_utility():
+    """ Return the name of a role given its id"""
+    def role_name(role_id):
+        role = Role.Role.GetById(role_id)
+        if role:
+            return role.name
+        else:
+            return 'No role found matching that id'
+            
+    return dict(role_name=role_name)
+
+@app.context_processor
 def user_utility():
     """ Return the full name of a user given his/her id"""
     def user_full_name(user_id):
