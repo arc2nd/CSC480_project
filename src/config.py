@@ -18,6 +18,7 @@ def get_creds(path, crypt=False):
                 "CSRF_ENABLED": True, 
                 "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 
                 "SQLALCHEMY_TRACK_MODIFICATIONS": False, 
+                "APPLICATION_VERSION": "1.0.0",
                 "WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
                }
     if crypt:

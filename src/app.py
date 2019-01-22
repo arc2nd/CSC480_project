@@ -27,6 +27,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICAT
 app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI']
 app.config['ADMIN_ROLE_ID'] = CREDS['ADMIN_ROLE_ID']
 app.config['STANDARD_ROLE_ID'] = CREDS['STANDARD_ROLE_ID']
+app.config['APPLICATION_VERSION'] = CREDS['APPLICATION_VERSION']
 
 db = SQLAlchemy(app)
 
@@ -146,6 +147,11 @@ def is_admin():
 def admin_role_id():
     """ Return the admin role id """
     return dict(admin_role_id=app.config['ADMIN_ROLE_ID'])
+
+@app.context_processor
+def application_version():
+    """ Return the application version number """
+    return dict(application_version=app.config['APPLICATION_VERSION'])
 
 @app.context_processor
 def role_utility():
