@@ -1,42 +1,52 @@
-# Intro to my Flask webapp process:
+# Pre-requisities
 
-1. Generic pre-reqs:
-	1. Install python: https://www.python.org/downloads/
-	1. Install pip: https://pip.pypa.io/en/stable/installing/
-	1. Install virtualenv: https://virtualenv.pypa.io/en/latest/installation/
-		- `pip install virtualenv`
+## Python
+
+### Environment setup
+1. Install python: https://www.python.org/downloads/
+1. Install pip: https://pip.pypa.io/en/stable/installing/
+1. Install virtualenv: https://virtualenv.pypa.io/en/latest/installation/
+	1. `pip install virtualenv`
 1. Windows-specific pre-reqs:
 	1. Install VS C++ build tools: https://visualstudio.microsoft.com/thank-you-downloading-visual-studio/?sku=BuildTools&rel=15
 
+### Virtual Environment
 1. build a virtualenv for your project
 	- `cd <project path>`
 	- `virtualenv venv`
 	- Linux: `source venv/bin/activate`
 	- Windows: `venv/Scripts/activate`
-1. Install requirements:
+1. Install application requirements in your virtual environment:
 	- `pip install -r requirements.txt`
-1. run temp server:
+1. Run the application (make sure you run this from the project directory):
 	- `python src/app.py`
 
-Point your web browser to `localhost:5000`
+Point your web browser to `http://localhost:5000`
 
-# Database setup
+## Database setup
 1. Install PostgresSQL (https://www.postgresql.org/download/)
-	- Use an admin username/password that we can all agree on during the setup procedure.
+	- Use an admin username/password that you will remember later.
 	- This is different based on your OS, just make sure you don't deviate from the defaults.
-1. Set your database URL environmental variable by running this at the command prompt/shell:
-	* Linux: `export DATABASE_URL="postgresql://cxp:choresarereallyfun@localhost/ChoreExplore"`
-	* Windows (cmd): `setx DATABASE_URL "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore"`
-	* *Note: that cxp and choresarereallyfun are just sample username/password values*
-	* *Note: ChoreExplore is the database name, and this is case-sensitive*
+1. Create the "ChoreExplore" Database
+	- You can do this using PGAdmin (should have been installed if you ran the Windows installer), or using the command line tool.
+	- Create a user account 'cxp' with the password 'choresarereallyfun'
+		- This is hard-coded for now into our config, will change this in production
+	- Make 'cxp' the owner of the ChoreExplore database
+1. Run the python setup scripts
+	- From the project directory, run:
+		1. `python .\setup-scripts\XX-CleanDatabase.py`
+		2. `python .\setup-scripts\01-CreateAndSeedTables.py`
+	- You should run these two commands every time you check out a new branch - things may have changed.
 
-# Building the frontend
 
-Pre-reqs:
+## Building the frontend
+
+### Pre-reqs:
 1. Install Node (https://nodejs.org/en/download/)
 1. Instal Gulp (`npm install gulp -g`  from the command line)
 1. Install Yarn (https://yarnpkg.com/en/docs/install)
 
+### Build it
 Open your terminal, execute the following in the root folder:
 1. `yarn` (Downloads all frontend/development dependencies)
 1. `gulp fonts` (Copies fontawesome fonts over to static/fonts)
