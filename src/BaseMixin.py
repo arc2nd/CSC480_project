@@ -33,10 +33,3 @@ class BaseMixin(object):
         db.session.delete(cls)
         db.session.commit()
         return True
-
-    @staticmethod
-    def Exists(obj_id):
-        """ See if object exists """
-        if(cls.query.filter_by(id=obj_id).first() != None):
-            return True
-        return False
