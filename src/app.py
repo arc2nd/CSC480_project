@@ -55,6 +55,7 @@ def internal_error(error):
     flash('Error: The server encountered an internal error', category='danger')
     return render_template('error.html', title='Error 500'), 500
 
+
 # Forms
 
 # Cross site protection
@@ -352,7 +353,7 @@ def user_add():
                 newUser.Add()
             except ErrorHandler.ErrorHandler as error:
                 flash('Error {0}: {1}'.format(error.status_code, error.message), category='danger')
-                return render_template('error.html', title='Error {}'.format(error.status_code))
+                return render_template('user_add.html', form=form, errors=errors, title='Add a User')
 
             _log(1, VERBOSITY, 'added user {}'.format(newUser))
             flash('Success: User added', category='success')
@@ -385,7 +386,7 @@ def user_remove(user_id=None):
                 flash('Error: User not removed', category='danger')
     else:
         _log(1, VERBOSITY, 'error finding user')
-        flash('Warning: Could not find that user', category='danger')
+        flash('Warning: Could not find that user', category='warning')
     return redirect(url_for('user'))
 
 # user view
@@ -399,7 +400,7 @@ def user_view(user_id=None):
 
     if not user:
         _log(1, VERBOSITY, 'error finding user')
-        flash('Warning: Could not find that user', category='danger')
+        flash('Warning: Could not find that user', category='warning')
         return redirect(url_for('user'))
 
     _log(1, VERBOSITY, 'user found')
@@ -775,7 +776,7 @@ def chore_view(chore_id=None):
 
     if not chore:
         _log(1, VERBOSITY, 'error finding chore')
-        flash('Warning: Could not find that chore', category='danger')
+        flash('Warning: Could not find that chore', category='warning')
         return redirect(url_for('chore'))
 
     _log(1, VERBOSITY, 'chore found')
@@ -949,7 +950,7 @@ def reward_view(reward_id=None):
 
     if not reward:
         _log(1, VERBOSITY, 'error finding reward')
-        flash('Warning: Could not find that reward', category='danger')
+        flash('Warning: Could not find that reward', category='warning')
         return redirect(url_for('reward'))
 
     _log(1, VERBOSITY, 'reward found')
