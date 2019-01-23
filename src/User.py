@@ -5,6 +5,8 @@ from app import db
 import bcrypt
 from app import app
 from BaseMixin import BaseMixin
+import Role
+import ErrorHandler
 
 class User(BaseMixin, db.Model):
     __tablename__ = 'users'
@@ -45,6 +47,17 @@ class User(BaseMixin, db.Model):
     def Add(self):
         """ Add a user """
 
+        if(User.GetByUsername(self.username) != None):
+            raise ErrorHandler.ErrorHandler(message="user with that username already exists", status_code=400)
+
+        allUsers = User.GetAll()
+        for user in allUsers:
+            if user.email_address == self.email_address:
+                raise ErrorHandler.ErrorHandler(message="user with that email address already exists", status_code=400)
+
+        if(not self.first_name or not self.password or not self.username):
+            raise ErrorHandler.ErrorHandler(message="one or more required fields are missing", status_code=400)
+
         # encrypt the password
         self.password = User.EncryptPassword(self.password)
 
@@ -61,19 +74,26 @@ class User(BaseMixin, db.Model):
     @staticmethod
     def GetByUsername(username):
         """ Return a user by username """
-        
-        return User.query.filter_by(username=username).first()
+        user = User.query.filter_by(username=username).first()
+
+        return user
 
     # Update operations
     
     def ResetPassword(self, new_password=None, new_password_verify=None):
         """ Updates a user's password without old password verification """
+
+        if(not new_password or not new_password_verify):
+            raise ErrorHandler.ErrorHandler(message="password or password verification was empty", status_code=400)
+
         if new_password == new_password_verify:
             new_password = User.EncryptPassword(new_password)
             self.password = new_password
             db.session.commit()
             return True
-        return False
+        else:
+            raise ErrorHandler.ErrorHandler(message="passwords do not match", status_code=400)
+        
 
     def UpdatePassword(self, new_password=None, new_password_verify=None, old_password=None):
         """ Updates a user's password """
@@ -83,7 +103,10 @@ class User(BaseMixin, db.Model):
                 self.password = new_password
                 db.session.commit()
                 return True
-        return False
+            else:
+                raise ErrorHandler.ErrorHandler(message="old password does not match stored password", status_code=400)
+        else:
+            raise ErrorHandler.ErrorHandler(message="passwords do not match", status_code=400)
 
     # Delete operations
 
@@ -91,6 +114,9 @@ class User(BaseMixin, db.Model):
     @staticmethod
     def EncryptPassword(password_to_encrypt):
         """ Encode, encrypt, and return the hashed password"""
+        if(not password_to_encrypt):
+            raise ErrorHandler.ErrorHandler(message="password cannot be empty", status_code=400)
+            
         password_to_encrypt = password_to_encrypt.encode('utf-8')
         password_to_encrypt = bcrypt.hashpw(password_to_encrypt, bcrypt.gensalt(12)).decode('utf-8')
         

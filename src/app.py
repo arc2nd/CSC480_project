@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Flask, render_template, Response, redirect, url_for, request, session, abort, flash, send_from_directory
+from flask import Flask, render_template, Response, redirect, url_for, request, session, abort, flash, send_from_directory, jsonify
 from wtforms import TextField, PasswordField, StringField, SubmitField, SelectField, validators
 from wtforms.fields.html5 import DateField, IntegerField
 from flask_wtf import FlaskForm, CSRFProtect
@@ -8,6 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from datetime import datetime, timedelta
 from Log import _log
+import ErrorHandler
 
 import bcrypt
 import os
@@ -19,9 +20,8 @@ import config
 CREDS = config.get_creds('envs.json', crypt=False)
 _log(6, 1, CREDS)
 
-
 # Static files path
-app = Flask(__name__, static_url_path='/static')
+app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS']
 app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI']
@@ -37,6 +37,23 @@ import Reward, Role, User, Chore, Recurrence
 # set some globals
 VERBOSITY = 1
 WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY']
+
+# Error handlers
+@app.errorhandler(400)
+def bad_request(error):
+    flash('Error: There was a problem with your request', category='danger')
+    return render_template('error.html', title='Error 400'), 400
+
+@app.errorhandler(404)
+def page_not_found(error):
+    flash('Error: The file you are trying to access does not exist', category='danger')
+    return render_template('error.html', title='Error 404'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    flash('Error: The server encountered an internal error', category='danger')
+    return render_template('error.html', title='Error 500'), 500
 
 
 # Forms
@@ -332,7 +349,11 @@ def user_add():
             newUser = User.User()
             form.populate_obj(newUser)
 
-            newUser.Add()
+            try:
+                newUser.Add()
+            except ErrorHandler.ErrorHandler as error:
+                flash('Error {0}: {1}'.format(error.status_code, error.message), category='danger')
+                return render_template('user_add.html', form=form, errors=errors, title='Add a User')
 
             _log(1, VERBOSITY, 'added user {}'.format(newUser))
             flash('Success: User added', category='success')
@@ -365,7 +386,7 @@ def user_remove(user_id=None):
                 flash('Error: User not removed', category='danger')
     else:
         _log(1, VERBOSITY, 'error finding user')
-        flash('Warning: Could not find that user', category='danger')
+        flash('Warning: Could not find that user', category='warning')
     return redirect(url_for('user'))
 
 # user view
@@ -379,7 +400,7 @@ def user_view(user_id=None):
 
     if not user:
         _log(1, VERBOSITY, 'error finding user')
-        flash('Warning: Could not find that user', category='danger')
+        flash('Warning: Could not find that user', category='warning')
         return redirect(url_for('user'))
 
     _log(1, VERBOSITY, 'user found')
@@ -755,7 +776,7 @@ def chore_view(chore_id=None):
 
     if not chore:
         _log(1, VERBOSITY, 'error finding chore')
-        flash('Warning: Could not find that chore', category='danger')
+        flash('Warning: Could not find that chore', category='warning')
         return redirect(url_for('chore'))
 
     _log(1, VERBOSITY, 'chore found')
@@ -929,7 +950,7 @@ def reward_view(reward_id=None):
 
     if not reward:
         _log(1, VERBOSITY, 'error finding reward')
-        flash('Warning: Could not find that reward', category='danger')
+        flash('Warning: Could not find that reward', category='warning')
         return redirect(url_for('reward'))
 
     _log(1, VERBOSITY, 'reward found')
@@ -1100,4 +1121,6 @@ def test_role():
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
+    app.register_error_handler(404, page_not_found)
+    app.register_error_handler(500, internal_error)
     app.run()
