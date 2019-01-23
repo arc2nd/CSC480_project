@@ -20,9 +20,8 @@ import config
 CREDS = config.get_creds('envs.json', crypt=False)
 _log(6, 1, CREDS)
 
-
 # Static files path
-app = Flask(__name__, static_url_path='/static')
+app = Flask(__name__)
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS']
 app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI']
@@ -40,8 +39,13 @@ VERBOSITY = 1
 WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY']
 
 # Error handlers
+@app.errorhandler(400)
+def bad_request(error):
+    flash('Error: There was a problem with your request', category='danger')
+    return render_template('error.html', title='Error 400'), 400
+
 @app.errorhandler(404)
-def missing_resource_error(error):
+def page_not_found(error):
     flash('Error: The file you are trying to access does not exist', category='danger')
     return render_template('error.html', title='Error 404'), 404
 
@@ -49,7 +53,7 @@ def missing_resource_error(error):
 def internal_error(error):
     db.session.rollback()
     flash('Error: The server encountered an internal error', category='danger')
-    return render_template('error.html', title= 'Error 500'), 500
+    return render_template('error.html', title='Error 500'), 500
 
 # Forms
 
@@ -348,7 +352,7 @@ def user_add():
                 newUser.Add()
             except ErrorHandler.ErrorHandler as error:
                 flash('Error {0}: {1}'.format(error.status_code, error.message), category='danger')
-                return (render_template('user_add.html', form=form, errors=errors, title='Add a User'))
+                return render_template('error.html', title='Error {}'.format(error.status_code))
 
             _log(1, VERBOSITY, 'added user {}'.format(newUser))
             flash('Success: User added', category='success')
@@ -1116,4 +1120,6 @@ def test_role():
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
+    app.register_error_handler(404, page_not_found)
+    app.register_error_handler(500, internal_error)
     app.run()
