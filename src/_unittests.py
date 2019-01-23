@@ -6,6 +6,7 @@ import config
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
+# Some repetitive code, is there anyway to import this?
 CREDS = config.get_creds('envs.json', crypt=False)
 
 app = Flask(__name__, static_url_path='/static')
