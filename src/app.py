@@ -786,7 +786,6 @@ def chore_remove(chore_id=None):
 # chore view
 @app.route('/chore/view/<int:chore_id>', methods=['GET'])
 @login_required
-@admin_required
 def chore_view(chore_id=None):
     log_path()
     
@@ -957,7 +956,6 @@ def reward_remove(reward_id=None):
 # reward view
 @app.route('/reward/view/<int:reward_id>', methods=['GET'])
 @login_required
-@admin_required
 def reward_view(reward_id=None):
     log_path()
     
