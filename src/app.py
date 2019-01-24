@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm, CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from functools import wraps
 from datetime import datetime, timedelta
-from Log import _log
+from Log import Log, LogType
 import ErrorHandler
 
 import bcrypt
@@ -17,17 +17,19 @@ import traceback
 
 import config
 
+
+_log = Log()
+
 CREDS = config.get_creds('envs.json', crypt=False)
-_log(6, 1, CREDS)
 
 # Static files path
 app = Flask(__name__)
 
+app.config['ADMIN_ROLE_ID'] = CREDS['ADMIN_ROLE_ID']
+app.config['APPLICATION_VERSION'] = CREDS['APPLICATION_VERSION']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS']
 app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI']
-app.config['ADMIN_ROLE_ID'] = CREDS['ADMIN_ROLE_ID']
 app.config['STANDARD_ROLE_ID'] = CREDS['STANDARD_ROLE_ID']
-app.config['APPLICATION_VERSION'] = CREDS['APPLICATION_VERSION']
 
 db = SQLAlchemy(app)
 
@@ -42,18 +44,24 @@ WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY']
 @app.errorhandler(400)
 def bad_request(error):
     flash('Error: There was a problem with your request', category='danger')
+    _log.log('400 error encountered. URL: {0}, IP: {1}'.format(request.url, request.remote_addr), LogType.ERROR)
     return render_template('error.html', title='Error 400'), 400
 
 @app.errorhandler(404)
 def page_not_found(error):
     flash('Error: The file you are trying to access does not exist', category='danger')
+    _log.log('404 error encountered. {0}, IP: {1}'.format(request.url, request.remote_addr), LogType.ERROR)
     return render_template('error.html', title='Error 404'), 404
 
 @app.errorhandler(500)
 def internal_error(error):
     db.session.rollback()
     flash('Error: The server encountered an internal error', category='danger')
+    _log.log('500 error encountered. {0}, IP: {1}'.format(request.url, request.remote_addr), LogType.ERROR)
     return render_template('error.html', title='Error 500'), 500
+
+def log_path():
+    _log.log('Path: {0}'.format(request.path), LogType.INFO)
 
 
 # Forms
@@ -214,7 +222,7 @@ def login_required(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        _log(1, VERBOSITY, 'login check')
+        _log.log('login check', LogType.INFO)
         # check to see if we're logged in
         if 'logged_in' not in session:
             return splash()
@@ -225,10 +233,8 @@ def login_required(f):
             if 'timeout' in session:
                 now = config.get_now()
                 delta = session['timeout'] * 60
-                _log(6, VERBOSITY, 'now: {}\ndelta: {}\nelapsed: {}'.format(
-                    now, delta, now - session['logged_in']))
                 if now - session['logged_in'] > delta:
-                    _log(1, VERBOSITY, 'session timed out')
+                    _log.log('session timed out', LogType.INFO)
                     session.clear()
                     return redirect(url_for('user_login'))
                 else:
@@ -242,12 +248,12 @@ def admin_required(f):
     """ Ensures the user is admin, and forwards to the index if not """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        _log(1, VERBOSITY, 'admin check')
+        _log.log('admin check', LogType.INFO)
         if session['role_id'] == app.config['ADMIN_ROLE_ID']:
-            _log(1, VERBOSITY, 'user is admin')
+            _log.log('user is admin', LogType.INFO)
             return f(*args, **kwargs)
         else:
-            _log(1, VERBOSITY, 'attempt by a non-admin to access an admin page')
+            _log.log('attempt by a non-admin to access an admin page', LogType.WARN)
             flash('Error: You must be an administrator to access this page', category='danger')
             return index()
     return decorated_function
@@ -260,6 +266,7 @@ def admin_required(f):
 @app.route('/index', methods=['GET'])
 @login_required
 def index():
+    log_path()
     user = User.User.GetById(session['user_id'])
     
     if user.role_id == app.config['ADMIN_ROLE_ID']:
@@ -272,6 +279,7 @@ def index():
 # Splash page
 @app.route('/splash', methods=['GET'])
 def splash():
+    log_path()
     form = UserAddForm()
     return render_template('splash.html', form=form, title='Welcome to Chore Explore')
 
@@ -280,6 +288,7 @@ def splash():
 @login_required
 @admin_required
 def admin():
+    log_path()
     return render_template('admin.html', title='Administrative Actions')
 
 
@@ -290,12 +299,14 @@ def admin():
 @login_required
 @admin_required
 def user():
+    log_path()
     users = User.User.GetAll()
     return render_template('user.html', users=users, title='All Users')
 
 # user login
 @app.route('/user/login', methods=['GET', 'POST'])
 def user_login():
+    log_path()
     if(request.method == 'POST'):
 
         POST_USERNAME = str(request.form['username'])
@@ -309,10 +320,10 @@ def user_login():
             session['username'] = result.username
             session['role_id'] = result.role_id
             session['timeout'] = 10
-            _log(1, VERBOSITY, 'logged in')
+            _log.log('logged in', LogType.INFO)
             flash('Success: You are now logged in', category='success')
         else:
-            _log(1, VERBOSITY, 'bad credentials')
+            _log.log('bad credentials', LogType.WARN)
             flash('Warning: Username and/or password were incorrect', category='warning')
 
         return index()
@@ -324,9 +335,10 @@ def user_login():
 @app.route('/user/logout', methods=['GET'])
 @login_required
 def user_logout():
+    log_path()
     if session.get('logged_in'):
         session.clear()
-        _log(1, VERBOSITY, 'user logged out')
+        _log.log('user logged out', LogType.INFO)
 
     return splash()
 
@@ -335,7 +347,7 @@ def user_logout():
 @login_required
 @admin_required
 def user_add():
-    _log(1, VERBOSITY, 'user/add')
+    log_path()
     errors = None
 
     if request.method == 'GET':
@@ -345,7 +357,7 @@ def user_add():
         form = UserAddForm(request.form)
 
         if form.validate():
-            _log(1, VERBOSITY, 'form validated')
+            _log.log('form validated', LogType.INFO)
             newUser = User.User()
             form.populate_obj(newUser)
 
@@ -355,7 +367,7 @@ def user_add():
                 flash('Error {0}: {1}'.format(error.status_code, error.message), category='danger')
                 return render_template('user_add.html', form=form, errors=errors, title='Add a User')
 
-            _log(1, VERBOSITY, 'added user {}'.format(newUser))
+            _log.log('added user {}'.format(newUser), LogType.INFO)
             flash('Success: User added', category='success')
 
             return (redirect(url_for('user')))
@@ -372,20 +384,21 @@ def user_add():
 @login_required
 @admin_required
 def user_remove(user_id=None):
+    log_path()
     user = User.User.GetById(user_id)
     if user:
         if user.id == session['user_id']:
-            _log(1, VERBOSITY, 'user attempt to remove own account')
+            _log.log('user attempt to remove own account', LogType.WARN)
             flash('Error: You may not remove your own account', category='danger')
         else:
             if User.User.Remove(user):
-                _log(1, VERBOSITY, 'user removed successfully')
+                _log.log('user removed successfully', LogType.INFO)
                 flash('Success: User removed', category='success')
             else:
-                _log(1, VERBOSITY, 'error removing user')
+                _log.log('error removing user', LogType.ERROR)
                 flash('Error: User not removed', category='danger')
     else:
-        _log(1, VERBOSITY, 'error finding user')
+        _log.log('could not find user', LogType.WARN)
         flash('Warning: Could not find that user', category='warning')
     return redirect(url_for('user'))
 
@@ -394,16 +407,14 @@ def user_remove(user_id=None):
 @login_required
 @admin_required
 def user_view(user_id=None):
-    _log(1, VERBOSITY, 'user/view')
+    log_path()
     
     user = User.User.GetById(user_id)
 
     if not user:
-        _log(1, VERBOSITY, 'error finding user')
+        _log.log('could not find user', LogType.WARN)
         flash('Warning: Could not find that user', category='warning')
         return redirect(url_for('user'))
-
-    _log(1, VERBOSITY, 'user found')
 
     return render_template('user_view.html', user=user, title='Viewing User: {}'.format(user.username))
 
@@ -411,6 +422,7 @@ def user_view(user_id=None):
 @app.route('/user/edit/<int:user_id>', methods=['GET', 'POST'])
 @login_required
 def user_edit(user_id=None):
+    log_path()
     errors=None
     old_user = User.User.GetById(user_id)
 
@@ -420,6 +432,7 @@ def user_edit(user_id=None):
             
             # Admin editing own account
             if(session['role_id'] == app.config['ADMIN_ROLE_ID'] and session['user_id'] == old_user.id):
+                _log.log("admin editing own account", LogType.INFO)
                 form = UserEditSelfAdminForm()
 
                 roles = Role.Role.GetAll()
@@ -430,6 +443,7 @@ def user_edit(user_id=None):
 
             # Admin editing another account
             elif(session['role_id'] == app.config['ADMIN_ROLE_ID'] and session['user_id'] != old_user.id):
+                _log.log("admin editing another account", LogType.INFO)
                 form = UserEditOtherAdminForm()
 
                 roles = Role.Role.GetAll()
@@ -440,6 +454,7 @@ def user_edit(user_id=None):
 
             # User editing own account
             else:
+                _log.log("user editing own account", LogType.INFO)
                 form = UserEditSelfForm()
                 form.old_password.data = None
 
@@ -455,6 +470,7 @@ def user_edit(user_id=None):
         if request.method == 'POST':
             # Admin editing own account
             if(session['role_id'] == app.config['ADMIN_ROLE_ID'] and session['user_id'] == old_user.id):
+                _log.log("admin editing own account", LogType.INFO)
                 form = UserEditSelfAdminForm()
 
                 roles = Role.Role.GetAll()
@@ -464,6 +480,7 @@ def user_edit(user_id=None):
 
             # Admin editing another user
             elif(session['role_id'] == app.config['ADMIN_ROLE_ID'] and session['user_id'] != old_user.id):
+                _log.log("admin editing another account", LogType.INFO)
                 form = UserEditOtherAdminForm()
 
                 roles = Role.Role.GetAll()
@@ -472,14 +489,14 @@ def user_edit(user_id=None):
 
             # Standard user editing own account
             else:
+                _log.log("user editing own account", LogType.INFO)
                 form = UserEditSelfForm()
 
                 old_password = form.old_password.data
                 
 
             if form.validate():
-                _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
-                _log(1, VERBOSITY, 'form validated')
+                _log.log('form validated', LogType.INFO)
 
                 form.populate_obj(old_user)
 
@@ -488,29 +505,28 @@ def user_edit(user_id=None):
                 
                 # If user is updating their password
                 if(new_password and new_password_verify and old_password):
-                    _log(1, VERBOSITY, 'user updating password')
+                    _log.log('user updating password', LogType.INFO)
                     if(old_user.VerifyPassword(old_password)):
-                        _log(1, VERBOSITY, 'old password verified')
+                        _log.log('old password verified', LogType.INFO)
                         if(old_user.UpdatePassword(new_password, new_password_verify, old_password)):
-                            _log(1, VERBOSITY, 'password updated')
+                            _log.log('password updated', LogType.INFO)
                         else:
-                            _log(1, VERBOSITY, 'could not update password')
+                            _log.log('could not update password', LogType.ERROR)
                             flash("Error: Password not updated, check that your old password was correct, and that your new password is the same in both fields", category="danger")
                             return render_template('user_edit.html', form=form, errors=errors, user=old_user, title='Edit User: {}'.format(old_user.username))
                     else:
-                        _log(1, VERBOSITY, 'could not verify old password')
+                        _log.log('could not verify old password', LogType.WARN)
                         flash("Error: Could not verify your old password", category="danger")
 
                 # Not updating password, just update the other data
                 else:
                     old_user.UpdateData()
-
-                _log(1, VERBOSITY, 'edited user: {}'.format(old_user.username))
+                    _log.log('edited user: {}'.format(old_user.username), LogType.INFO)
 
                 # Log the user out if they just edited their own account. This is to reset
                 # their session, force them to log in with their new password, etc
                 if old_user.id == session['user_id']:
-                    _log(1, VERBOSITY, 'user edited their own account, logging out')
+                    _log.log('user edited their own account, logging out', LogType.INFO)
                     session.clear()
                     flash('Notice: You edited your own account and must log in again', category='info')
                     return redirect(url_for('splash'))
@@ -519,14 +535,14 @@ def user_edit(user_id=None):
                     return redirect(url_for('index'))
 
             else:
-                _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+                _log.log('form did not validate: {}'.format(form.errors), LogType.WARN)
                 flash('Error: User not edited', category='danger')
                 errors = form.errors
 
         return render_template('user_edit.html', form=form, errors=errors, user=old_user, title='Edit User: {}'.format(old_user.username))
 
     else:
-        _log(1, VERBOSITY, 'user attempted to edit an account without permission')
+        _log.log('user attempted to edit an account without permission', LogType.WARN)
         flash('Error: You may not edit other user accounts unless you are an administrator', category='danger')
         return redirect(url_for('index'))
 
@@ -535,7 +551,7 @@ def user_edit(user_id=None):
 @login_required
 @admin_required
 def user_reset_password(user_id=None):
-
+    log_path()
     user = User.User.GetById(user_id)
 
     if(request.method == 'GET'):
@@ -549,17 +565,23 @@ def user_reset_password(user_id=None):
         new_password_verify = request.form['new_password_verify']
 
         if(new_password == new_password_verify):
+            _log.log("passwords match", LogType.INFO)
             if(user):
+                _log.log("user found", LogType.INFO)
                 if(user.ResetPassword(new_password, new_password_verify)):
                     flash('Success: Password has been updated', category='success')
+                    _log.log("password updated", LogType.INFO)
                     return redirect(url_for('user'))
                 else:
                     flash('Error: Could not reset password', category='danger')
+                    _log.log("error updating password", LogType.ERROR)
                     return render_template('user_reset_password.html', form=form, user=user, title='Reset Password for {}'.format(user.username))
             else:
+                _log.log("user does not exist", LogType.WARN)
                 flash('Error: That user does not exist', category='danger')
         else:
             flash('Error: The passwords entered did not match', category='danger')
+            _log.log("user entered mismatched passwords", LogType.WARN)
             return render_template('user_reset_password.html', form=form, user=user, title='Reset Password for {}'.format(user.username))
 
 
@@ -569,6 +591,7 @@ def user_reset_password(user_id=None):
 @app.route('/chore', methods=['GET'])
 @login_required
 def chore():
+    log_path()
     chores = Chore.Chore.GetAll()
 
     return render_template('chore.html', chores=chores, title='All Chores')
@@ -578,7 +601,7 @@ def chore():
 @login_required
 @admin_required
 def chore_add():
-    _log(1, VERBOSITY, 'chore/add')
+    log_path()
     errors = None
 
     users = User.User.GetAll()
@@ -601,11 +624,8 @@ def chore_add():
         form.assigned_to.choices = users_list
         form.recurrence_id.choices = recurrences_list
 
-        _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
-
         if form.validate():
-            _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
-            _log(1, VERBOSITY, 'form validated')
+            _log.log('form validated', LogType.INFO)
 
             # Check for unassigned
             if form.assigned_to.data != 0:
@@ -614,12 +634,12 @@ def chore_add():
                 if assignTo:
                     form.assigned_to.data = assignTo.id
                 else:
-                    _log(1, VERBOSITY, 'user was not found, assigning to none')
+                    _log.log('user was not found, assigning to none', LogType.WARN)
                     flash('Warning: User was not found. Chore is not assigned.', category='warning')
                     form.assigned_to.data = None
             
             else:
-                _log(1, VERBOSITY, 'user left chore unassigned')
+                _log.log('user left chore unassigned', LogType.INFO)
                 flash('Warning: Chore was left unassigned.', category='warning')
                 form.assigned_to.data = None
 
@@ -628,13 +648,13 @@ def chore_add():
 
             newChore.Add()
 
-            _log(1, VERBOSITY, 'added chore: {}'.format(newChore))
+            _log.log('added chore: {}'.format(newChore), LogType.INFO)
             flash('Success: Chore added', category='success')
 
             return (redirect(url_for('chore')))
         
         else:
-            _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+            _log.log('form has errors: {}'.format(form.errors), LogType.WARN)
             flash('Error: Chore not added', category='danger')
             errors = form.errors
 
@@ -644,8 +664,7 @@ def chore_add():
 @app.route('/chore/claim/<int:chore_id>', methods=['GET'])
 @login_required
 def chore_claim(chore_id=None):
-    _log(1, VERBOSITY, 'chore/claim')
-
+    log_path()
     user_id = session['user_id']
 
     user = User.User.GetById(user_id)
@@ -653,13 +672,13 @@ def chore_claim(chore_id=None):
 
     if user and chore and chore.assigned_to == None:
         if chore.AssignTo(user):
-            _log(1, VERBOSITY, 'chore assigned successfully')
+            _log.log('chore assigned successfully', LogType.INFO)
             flash('Success: Chore claimed', category='success')
         else:
-            _log(1, VERBOSITY, 'error assigning chore')
+            _log.log('error assigning chore', LogType.ERROR)
             flash('Error: Chore not claimed', category='danger')
     else:
-        _log(1, VERBOSITY, 'chore already claimed')
+        _log.log('attempt to claim a chore that is already claimed', LogType.WARN)
         flash('Warning: Chore is already claimed', category='warning')
 
     return redirect(url_for('chore'))
@@ -669,19 +688,19 @@ def chore_claim(chore_id=None):
 @app.route('/chore/complete/<int:chore_id>', methods=['GET'])
 @login_required
 def chore_complete(chore_id=None):
-    _log(1, VERBOSITY, 'chore/complete')
+    log_path()
     user = User.User.GetById(session['user_id'])
     chore = Chore.Chore.GetById(chore_id)
-    _log(1, VERBOSITY, chore.assigned_to)
+    _log.log(chore.assigned_to, LogType.INFO)
     if user and chore and chore.assigned_to == user.id:
         if chore.MarkCompleted() and user.AddPoints(chore.points):
-                _log(1, VERBOSITY, 'chore completed successfully')
+                _log.log('chore completed successfully', LogType.INFO)
                 flash('Success: Chore completed', category='success')
         else:
-            _log(1, VERBOSITY, 'error marking chore complete')
+            _log.log('error marking chore complete', LogType.ERROR)
             flash('Error: Chore not completed', category='danger')
     else:
-        _log(1, VERBOSITY, 'user attempt to complete another user\'s chore')
+        _log.log('user attempt to complete another user\'s chore', LogType.WARN)
         flash('Warning: You cannot complete another user\'s chore', category='warning')
     return redirect(url_for('chore'))
 
@@ -690,7 +709,7 @@ def chore_complete(chore_id=None):
 @login_required
 @admin_required
 def chore_reassign(chore_id=None):
-    _log(1, VERBOSITY, 'chore/reassign')
+    log_path()
     errors = None
     
     chore = Chore.Chore.GetById(chore_id)
@@ -716,33 +735,32 @@ def chore_reassign(chore_id=None):
             form.reassign_to.choices = users_list
 
             if form.validate():
-                _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
-                _log(1, VERBOSITY, 'form validated')
+                _log.log('form validated', LogType.INFO)
 
                 # check for unassigned
                 if form.reassign_to.data != 0:
                     user = User.User.GetById(form.reassign_to.data)
 
                     if chore.AssignTo(user):
-                        _log(1, VERBOSITY, 'reassigned chore to: {}'.format(user))
+                        _log.log('reassigned chore to: {}'.format(user), LogType.INFO)
                         flash('Success: Chore reassigned', category='success')
                 
                 else:
                     if chore.Unassign():
-                        _log(1, VERBOSITY, 'chore unassigned')
+                        _log.log('chore unassigned', LogType.INFO)
                         flash('Success: Chore unassigned', category='success')
 
                 return (redirect(url_for('chore_reassign', chore_id=chore.id)))
             
             else:
-                _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+                _log.log('form has errors: {}'.format(form.errors), LogType.WARN)
                 flash('Error: Chore not reassigned', category='danger')
                 errors = form.errors
 
             return render_template('chore_reassign.html', form=form, errors=errors, chore=chore, title='Reassign {}'.format(chore.name))
     
     else:
-        _log(1, VERBOSITY, 'attempt to reassign a chore that doesn\'t exist')
+        _log.log('attempt to reassign a chore that doesn\'t exist', LogType.WARN)
         flash('Warning: Could not find that chore', category='warning')
         return redirect(url_for('chore'))
 
@@ -751,17 +769,17 @@ def chore_reassign(chore_id=None):
 @login_required
 @admin_required
 def chore_remove(chore_id=None):
-    _log(1, VERBOSITY, 'chore/remove')
+    log_path()
     chore = Chore.Chore.GetById(chore_id)
     if chore:
         if Chore.Chore.Remove(chore):
-            _log(1, VERBOSITY, 'chore removed successfully')
+            _log.log('chore removed successfully', LogType.INFO)
             flash('Success: Chore removed', category='success')
         else:
-            _log(1, VERBOSITY, 'error removing chore')
+            _log.log('error removing chore', LogType.ERROR)
             flash('Error: Chore not removed', category='danger')
     else:
-        _log(1, VERBOSITY, 'error finding chore')
+        _log.log('error finding chore', LogType.WARN)
         flash('Warning: Could not find that chore', category='warning')
     return redirect(url_for('chore'))
 
@@ -770,16 +788,16 @@ def chore_remove(chore_id=None):
 @login_required
 @admin_required
 def chore_view(chore_id=None):
-    _log(1, VERBOSITY, 'chore/view')
+    log_path()
     
     chore = Chore.Chore.GetById(chore_id)
 
     if not chore:
-        _log(1, VERBOSITY, 'error finding chore')
+        _log.log('error finding chore', LogType.WARN)
         flash('Warning: Could not find that chore', category='warning')
         return redirect(url_for('chore'))
 
-    _log(1, VERBOSITY, 'chore found')
+    _log.log('chore found', LogType.INFO)
 
     return render_template('chore_view.html', chore=chore, title='Viewing Chore: {}'.format(chore.name))
 
@@ -789,6 +807,7 @@ def chore_view(chore_id=None):
 @login_required
 @admin_required
 def chore_edit(chore_id=None):
+    log_path()
     errors=None
     old_chore = Chore.Chore.GetById(chore_id)
 
@@ -821,7 +840,6 @@ def chore_edit(chore_id=None):
     if request.method == 'POST':
         form = ChoreEditForm(request.form)
         old_chore = Chore.Chore.GetById(chore_id)
-        _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
 
         form.assigned_to.choices = users_list
         form.recurrence_id.choices = recurrences_list
@@ -830,8 +848,7 @@ def chore_edit(chore_id=None):
         form.recurrence_id.default = old_chore.recurrence_id
 
         if form.validate():
-            _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
-            _log(1, VERBOSITY, 'form validated')
+            _log.log('form validated', LogType.INFO)
 
             assignTo = User.User.GetById(form.assigned_to.data)
 
@@ -843,13 +860,13 @@ def chore_edit(chore_id=None):
             form.populate_obj(old_chore)
             old_chore.UpdateData()
 
-            _log(1, VERBOSITY, 'edited chore: {}'.format(old_chore.name))
+            _log.log('edited chore: {}'.format(old_chore.name), LogType.INFO)
             flash('Success: Chore edited', category='success')
 
             return (redirect(url_for('chore')))
 
         else:
-            _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+            _log.log('form has errors: {}'.format(form.errors), LogType.WARN)
             flash('Error: Chore not added', category='danger')
             errors = form.errors
 
@@ -861,7 +878,7 @@ def chore_edit(chore_id=None):
 @app.route('/reward', methods=['GET'])
 @login_required
 def reward():
-    _log(1, VERBOSITY, 'reward/')
+    log_path()
     rewards = Reward.Reward.GetAll()
     return render_template('reward.html', rewards=rewards, title='All Rewards')
 
@@ -870,7 +887,7 @@ def reward():
 @login_required
 @admin_required
 def reward_add():
-    _log(1, VERBOSITY, 'reward/add')
+    log_path()
     errors = None
 
     if request.method == 'GET':
@@ -878,22 +895,20 @@ def reward_add():
 
     if request.method == 'POST':
         form = RewardAddForm(request.form)
-        _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
 
         if form.validate():
-            _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
-            _log(1, VERBOSITY, 'form validated')
+            _log.log('form validated', LogType.INFO)
             newReward = Reward.Reward(form.name.data)
             form.populate_obj(newReward)
 
             newReward.Add()
-            _log(1, VERBOSITY, 'reward added: {}'.format(newReward))
+            _log.log('reward added: {}'.format(newReward), LogType.INFO)
             flash('Success: Reward added', category='success')
 
             return (redirect(url_for('reward')))
 
         else:
-            _log(1, VERBOSITY, 'error adding reward: {}'.format(form.errors))
+            _log.log('form has errors: {}'.format(form.errors), LogType.WARN)
             flash('Error: Reward not added', category='danger')
             errors = form.errors
         
@@ -903,20 +918,20 @@ def reward_add():
 @app.route('/reward/claim/<int:reward_id>', methods=['GET'])
 @login_required
 def reward_claim(reward_id=None):
-    _log(1, VERBOSITY, 'reward/claim')
+    log_path()
 
     reward = Reward.Reward.GetById(reward_id)
     user = User.User.GetById(session['user_id'])
 
     if reward:
         if Reward.Reward.Claim(reward, user):
-            _log(1, VERBOSITY, 'claimed reward successfully')
+            _log.log('claimed reward successfully', LogType.INFO)
             flash('Success: Reward \'{}\' claimed for {} points'.format(reward.name, reward.points), category='success')
         else:
-            _log(1, VERBOSITY, 'error claiming reward')
+            _log.log('error claiming reward', LogType.WARN)
             flash('Error: Reward not claimed. Do you have enough points?', category='danger')
     else:
-        _log(1, VERBOSITY, 'error finding reward')
+        _log.log('error finding reward', LogType.WARN)
         flash('Warning: Could not find that reward', category='warning')
     return redirect(url_for('reward'))
 
@@ -925,17 +940,17 @@ def reward_claim(reward_id=None):
 @login_required
 @admin_required
 def reward_remove(reward_id=None):
-    _log(1, VERBOSITY, 'reward/remove')
+    log_path()
     reward = Reward.Reward.GetById(reward_id)
     if reward:
         if Reward.Reward.Remove(reward):
-            _log(1, VERBOSITY, 'removed reward successfully')
+            _log.log('removed reward successfully', LogType.INFO)
             flash('Success: Reward removed', category='success')
         else:
-            _log(1, VERBOSITY, 'error removing reward')
+            _log.log('error removing reward', LogType.ERROR)
             flash('Error: Reward not removed', category='danger')
     else:
-        _log(1, VERBOSITY, 'error finding reward')
+        _log.log('error finding reward', LogType.WARN)
         flash('Warning: Could not find that reward', category='warning')
     return redirect(url_for('reward'))
 
@@ -944,16 +959,16 @@ def reward_remove(reward_id=None):
 @login_required
 @admin_required
 def reward_view(reward_id=None):
-    _log(1, VERBOSITY, 'reward/view')
+    log_path()
     
     reward = Reward.Reward.GetById(reward_id)
 
     if not reward:
-        _log(1, VERBOSITY, 'error finding reward')
+        _log.log('could not find reward', LogType.WARN)
         flash('Warning: Could not find that reward', category='warning')
         return redirect(url_for('reward'))
 
-    _log(1, VERBOSITY, 'reward found')
+    _log.log('reward found', LogType.INFO)
 
     return render_template('reward_view.html', reward=reward, title='Viewing Reward: {}'.format(reward.name))
 
@@ -963,6 +978,7 @@ def reward_view(reward_id=None):
 @login_required
 @admin_required
 def reward_edit(reward_id=None):
+    log_path()
     errors=None
     old_reward = Reward.Reward.GetById(reward_id)
 
@@ -976,148 +992,24 @@ def reward_edit(reward_id=None):
     if request.method == 'POST':
         form = RewardEditForm(request.form)
         old_reward = Reward.Reward.GetById(reward_id)
-        _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
 
         if form.validate():
-            _log(1, VERBOSITY, 'form errors: {}'.format(form.errors))
-            _log(1, VERBOSITY, 'form validated')
+            _log.log('form validated', LogType.INFO)
 
             form.populate_obj(old_reward)
             old_reward.UpdateData()
 
-            _log(1, VERBOSITY, 'edited reward: {}'.format(old_reward.name))
+            _log.log('edited reward: {}'.format(old_reward.name), LogType.INFO)
             flash('Success: Reward edited', category='success')
 
             return (redirect(url_for('reward')))
 
         else:
-            _log(1, VERBOSITY, 'form has errors: {}'.format(form.errors))
+            _log.log('form has errors: {}'.format(form.errors), LogType.WARN)
             flash('Error: Reward not added', category='danger')
             errors = form.errors
 
     return render_template('reward_edit.html', form=form, errors=errors, reward=old_reward, title='Edit Reward: {}'.format(old_reward.name))
-
-# Test Routes
-
-@app.route('/test/chore', methods=['GET'])
-def test_chore():
-    # Chore tests
-
-    # Constructor
-    chore = Chore.Chore('test1')
-
-    # Assignments
-    chore.description = 'test1'
-    chore.points = 1
-
-    # Create
-    chore.Add()
-
-    # Read
-    singleChore = Chore.Chore.GetById(chore.id)
-    allChores = Chore.Chore.GetAll()
-
-    # Update
-    user = User.User.GetById(0)
-
-    chore.AssignTo(user)
-
-    # Utility
-    checkOverdue = chore.IsOverdue()
-
-    # Delete
-    Chore.Chore.Remove(chore)
-
-    return redirect(url_for('index'))
-
-@app.route('/test/user', methods=['GET'])
-def test_user():
-    # User tests
-
-    # Constructor
-    user = User.User()
-
-    # Assignments
-    user.username = 'test4'
-    user.points = 1
-    user.password = 'testpassword'
-    user.email_address = 'test4@email.address'
-    user.first_name = 'test'
-    user.date_of_birth = '1945-02-02'
-
-    # Create
-    user.Add()
-
-    # Read
-    singleUserById = User.User.GetById(user.id)
-    singleUserByUsername = User.User.GetByUsername(user.username)
-    allUsers = User.User.GetAll()
-
-    # Update
-    updatedSuccessfully = singleUserById.UpdatePassword('newpass', 'newpass', 'testpassword')
-
-    # Utility
-    isPasswordCorrect = singleUserById.VerifyPassword('newpass')
-    password = User.User.EncryptPassword('encryptThis')
-
-    # Delete
-    User.User.Remove(user)
-
-    return redirect(url_for('index'))
-
-@app.route('/test/reward', methods=['GET'])
-def test_reward():
-    # Reward tests
-
-    # Constructor
-    reward = Reward.Reward('test1')
-
-    # Assignments
-    reward.name = 'test'
-    reward.description = 'test1'
-    reward.points = 1
-
-    # Create
-    reward.Add()
-
-    # Read
-    singleReward = Reward.Reward.GetById(reward.id)
-    allRewards = Reward.Reward.GetAll()
-
-    # Update
-
-    # Utility
-
-    # Delete
-    Reward.Reward.Remove(reward)
-
-    return redirect(url_for('index'))
-
-@app.route('/test/role', methods=['GET'])
-def test_role():
-    # Role tests
-
-    # Constructor
-    role = Role.Role('test1')
-
-    # Assignments
-    role.name = 'test'
-
-    # Create
-    role.Add()
-
-    # Read
-    singleRole = Role.Role.GetById(role.id)
-    allRoles = Role.Role.GetAll()
-
-    # Update
-
-    # Utility
-
-    # Delete
-    Role.Role.Remove(role)
-
-    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     app.secret_key = os.urandom(12)
