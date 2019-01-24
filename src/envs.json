@@ -1,10 +1,10 @@
 {
+	"APPLICATION_VERSION": "1.1.0",
 	"ADMIN_ROLE_ID": 1,
-	"STANDARD_ROLE_ID": 2,
-	"SECRET_KEY": "I am a secret key",
 	"CSRF_ENABLED": true,
+	"SECRET_KEY": "I am a secret key",
 	"SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore",
 	"SQLALCHEMY_TRACK_MODIFICATIONS": false,
-	"WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production",
-	"APPLICATION_VERSION": "1.1.0"
+	"STANDARD_ROLE_ID": 2,
+	"WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
 }

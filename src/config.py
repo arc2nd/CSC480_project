@@ -13,12 +13,12 @@ def get_now():
 def get_creds(path, crypt=False):
     ret_dict = { 
                 "ADMIN_ROLE_ID": 1,
+                "APPLICATION_VERSION": "1.1.0",
+                "CSRF_ENABLED": True, 
                 "STANDARD_ROLE_ID": 2,
                 "SECRET_KEY": "I am a secret key", 
-                "CSRF_ENABLED": True, 
                 "SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore", 
                 "SQLALCHEMY_TRACK_MODIFICATIONS": False, 
-                "APPLICATION_VERSION": "1.1.0",
                 "WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
                }
     if crypt:
