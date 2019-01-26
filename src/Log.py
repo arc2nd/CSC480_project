@@ -12,7 +12,7 @@ class LogType(Enum):
 
 class Log():
     logFile = '.log'
-    logPath = '.\\src\\logs\\'
+    logPath = os.path.normpath('./src/logs')
 
     def __init__(self, log_file = logFile, log_path = logPath):
         self.logFile = log_file
