@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from app import db
 from BaseMixin import BaseMixin
+from Recurrence import Recurrence
 
 
 class Chore(BaseMixin, db.Model):
@@ -35,12 +36,35 @@ class Chore(BaseMixin, db.Model):
         db.session.commit()
         return True
 
+    @staticmethod
+    def CreateRecurrence(chore):
+        recurrence = Recurrence.GetById(chore.recurrence_id)
+
+        newChore = Chore(chore.name)
+        newChore.assigned_to = chore.assigned_to
+        newChore.due_date = chore.due_date + timedelta(days=recurrence.frequency_days)
+        newChore.description = chore.description
+        newChore.points = chore.points
+        newChore.complete = False
+        newChore.recurrence_id = chore.recurrence_id
+
+        newChore.Add()
+        return True
+
     # Read operations
     @staticmethod
     def GetByUser(user, completed):
         """ Return all chores assigned to a single user """
 
         return Chore.query.filter_by(assigned_to=user.id,complete=completed).all()
+    
+    @staticmethod
+    def GetAll(include_completed=None):
+        if(include_completed == None):
+            return Chore.query.filter_by(complete=False).all()
+        else:
+            return Chore.query.filter_by(complete=include_completed).all()
+
 
     # Update operations
     def AssignTo(self, user):
@@ -63,7 +87,13 @@ class Chore(BaseMixin, db.Model):
         """ Mark a chore as completed """
         
         chore = Chore.GetById(self.id)
+
+        # If the chore repeats
+        if(chore.recurrence_id != 0):
+            Chore.CreateRecurrence(chore)
+
         chore.complete = True
+        
         db.session.commit()
 
         return True
