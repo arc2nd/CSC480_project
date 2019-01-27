@@ -1,0 +1,6 @@
+<html>
+    <head></head>
+        <body>
+            <p>Your chore, %CHORE_NAME%, is overdue</p>
+        </body>
+</html>
