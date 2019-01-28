@@ -7,7 +7,7 @@ import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-basedir = os.path.dirname(os.path.realpath(__file__))
+basedir = os.path.dirname(os.path.realpath(__file__)) 
 
 
 def check_due():
