@@ -107,7 +107,7 @@ class Chore(BaseMixin, db.Model):
         if self.due_date == None:
             return False
 
-        now = datetime.now()
+        now = datetime.now().date()
 
         if now >= self.due_date:
             return True
