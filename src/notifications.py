@@ -3,9 +3,11 @@
 import Chore
 import User
 import smtplib
+import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+basedir = os.path.dirname(os.path.realpath(__file__))
 
 
 def check_due():
@@ -17,8 +19,8 @@ def check_due():
     return overdue_list
 
 def send_reminder(chore=None):
-    reminder_text_path = 'reminder_text.txt'
-    reminder_html_path = 'reminder_html.txt'
+    reminder_text_path = os.path.join(basedir, 'reminder_text.txt')
+    reminder_html_path = os.path.join(basedir, 'reminder_html.txt')
     if chore:
         # get the assigned user, if none, send to the admin
         if chore.assigned_to:
