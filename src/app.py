@@ -5,6 +5,7 @@ from wtforms import TextField, PasswordField, StringField, SubmitField, SelectFi
 from wtforms.fields.html5 import DateField, IntegerField
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
+from flask_moment import Moment
 from functools import wraps
 from datetime import datetime, timedelta
 from Log import Log, LogType
@@ -22,8 +23,9 @@ _log = Log()
 
 CREDS = config.get_creds('envs.json', crypt=False)
 
-# Static files path
 app = Flask(__name__)
+
+moment = Moment(app)
 
 app.config['ADMIN_ROLE_ID'] = CREDS['ADMIN_ROLE_ID']
 app.config['APPLICATION_VERSION'] = CREDS['APPLICATION_VERSION']
@@ -210,7 +212,6 @@ def chore_utility():
 
     return dict(chore_recurrence_name=chore_recurrence_name)
 
-
 # Route decorators
 
 def login_required(f):
@@ -274,7 +275,7 @@ def index():
     else:
         chores = Chore.Chore.GetByUser(user, False)
     
-    return render_template('index.html', title='Dashboard', chores=chores, user=user)
+    return render_template('index.html', title='Dashboard', chores=chores, user=user, now=datetime.now().date())
 
 # Splash page
 @app.route('/splash', methods=['GET'])
