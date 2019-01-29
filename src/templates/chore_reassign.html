@@ -7,7 +7,6 @@
 {% endfor %}
 {% endif %}
 
-<h2>Reassign {{chore.name}}</h2>
 {% if chore.assigned_to %}
 <p>Currently assigned to: {{user_full_name(chore.assigned_to)}}</p>
 {% else %}
