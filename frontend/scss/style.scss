@@ -159,6 +159,17 @@ h1.splash-header {
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#eaeaea', endColorstr='#afafaf',GradientType=0 ); /* IE6-9 */
 }
 
+/* Dashboard */
+
+	/* Chore Cards */
+	.chore-card {
+		// background: url('../images/chalkboard_bg.png') repeat;
+		// border: 4px solid #53341e;
+		// color: #ffffff;
+		// font-family: 'Coming Soon';
+		padding: 1rem;
+	}
+
 /* Forms */
 .neutral-feedback {
 	color: tint($body-color, 30%);

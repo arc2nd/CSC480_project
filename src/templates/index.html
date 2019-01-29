@@ -1,41 +1,78 @@
 {% extends "base.html" %}
 
 {% block content %}
-
 	{% if is_admin %} 
-
 		<h2>Chores</h2>
-		{% for chore in chores %}
-			Name: {{chore.name}} | Points: {{chore.points}} | Due date: {{chore.due_date}}
-			{% if chore.assigned_to != None %}
-				 | Assigned to: {{ user_full_name(chore.assigned_to) }}<br>
-				 | <a href="{{ url_for('chore_reassign', chore_id=chore.id) }}">Reassign</a><br>
-			{% else %}
-				 | <i>Unassigned</i><br>
-				 <a href="{{ url_for('chore_reassign', chore_id=chore.id) }}">Assign</a><br>
-			{% endif %}
-		{% endfor %}
-
+		<div class="container">
+		<div class="row">
+			{% for chore in chores %}
+				<div class="col-lg-4 col-md-6 col-sm-12 chore-card">
+					<h3>{{chore.name}}<br><span class="badge badge-success">{{chore.points}} points</h3>
+					<p>Due <i class="fa fa-fw fa-calendar"></i> {{chore.due_date}}</p>
+					<p>{{chore.description}}</p>
+					<p>Assigned to {{ user_full_name(chore.assigned_to) }}</p>
+					<p>
+					{% if chore.assigned_to != None %}
+						<a class="btn btn-block btn-primary" href="{{ url_for('chore_reassign', chore_id=chore.id) }}">
+							<i class="fa fa-fw fa-exchange"></i> Reassign
+						</a>
+					{% else %}
+						<a class="btn btn-block btn-primary" href="{{ url_for('chore_reassign', chore_id=chore.id) }}">
+							<i class="fa fa-fw fa-thumb-tack"></i> Assign
+						</a>
+					{% endif %}
+				</div>
+			{% endfor %}
+		</div>
+		</div>
 	{% else %}
-
 		<h2>My Chores</h2>
-		{% for chore in chores %}
-			Name: {{chore.name}} | Points: {{chore.points}} | Due date: {{chore.due_date}}<br>
-		{% endfor %}
-
+		<div class="container">
+		<div class="row">
+			{% for chore in chores %}
+				<div class="col-lg-4 col-md-6 col-sm-12 chore-card">
+					<h3>{{chore.name}}<br><span class="badge badge-success">{{chore.points}} points</h3>
+					<p>Due <i class="fa fa-fw fa-calendar"></i> {{chore.due_date}}</p>
+					<p>{{chore.description}}</p>
+					<p>
+					<a class="btn btn-block btn-success" href="{{ url_for('chore_complete', chore_id=chore.id) }}">
+						<i class="fa fa-fw fa-check"></i> Complete
+					</a>
+					</p>
+				</div>
+			{% endfor %}
+		</div>
+		</div>
 	{% endif %}
-		
-		<br><br>
-		<h2>My Reward Points</h2>
-		I currently have {{user.points}} points to spend on <a href="{{ url_for('reward') }}">rewards</a>
+	<br>
 
-		<br><br>
-		<h2>My Account</h2>
-		Username: {{user.username}}<br>
-		Name: {{user_full_name(user.id)}}<br>
-		Email Address: {{user.email_address}}<br>
-		Role: {{role_name(user.role_id)}}<br>
-		Date of Birth: {{user.date_of_birth}}<br>
-		<p><a href="{{url_for('user_edit', user_id=user.id)}}">Edit my account</a></p>
+	<h2>My Reward Points</h2>
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				You currently have <b>{{user.points}} points</b>. You can redeem your points on the <a href="{{ url_for('reward') }}">rewards page</a>.
+			</div>
+		</div>
+	</div>
+	<br>
+
+	<h2>My Account</h2>
+	<div class="container">
+		<div class="row">
+			<div class="col">
+				<p>
+					<b>Username:</b> {{user.username}}<br>
+					<b>Name:</b> {{user_full_name(user.id)}}<br>
+					<b>Email Address:</b> {{user.email_address}}<br>
+					<b>Role:</b> {{role_name(user.role_id)}}<br>
+					<b>Date of Birth:</b> {{user.date_of_birth}}
+				</p>
+				<br>
+				<p><a class="btn btn-primary" href="{{url_for('user_edit', user_id=user.id)}}">Edit my account</a></p>
+			</div>
+		</div>
+	</div>
+	<br>
+	
 
 {% endblock %}

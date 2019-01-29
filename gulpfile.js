@@ -22,6 +22,7 @@ var paths = {
 
 	js: preComp + "js/*.js",
 	css: preComp + "scss/*.scss",
+	img: preComp + "images/",
 
 	// All third party libraries CSS and JS should be added here
 	bootstrapCss: nodeModules + "bootstrap/dist/css/bootstrap.min.css",
@@ -39,6 +40,7 @@ var paths = {
 	output: {
 		css: webroot + "css/style.min.css",
 		fonts: webroot + "fonts/",
+		img: webroot + "images/",
 		js: webroot + "js/scripts.min.js"
 	}
 }
@@ -87,9 +89,15 @@ gulp.task("fonts", function () {
 		.pipe(gulp.dest(paths.output.fonts));
 });
 
+gulp.task("images", function () {
+	return gulp.src(paths.img + "**")
+		.pipe(gulp.dest(paths.output.img));
+});
+
 // Default (watch) task, watches for changes to any JS or CSS file and minifies on save
 gulp.task("default", function () {
 	gulp.watch([paths.js], ["clean:js", "min:js"]);
 	gulp.watch([paths.css], ["clean:css", "min:css"]);
 	gulp.watch(paths.fontAwesomeFonts, ["fonts"]);
+	gulp.watch(paths.img, ["images"]);
 });
