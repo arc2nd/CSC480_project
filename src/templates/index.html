@@ -76,44 +76,24 @@
 	<h2>My Account</h2>
 	<div class="container">
 		<div class="row">
-			<div class="col-lg-2 col-md-6">
-				<b>Username:</b>
-			</div>
-			<div class="col font-weight-light">
-				{{user.username}}
-			</div>
+			<div class="col-lg-3 col-md-6">Username:</div>
+			<div class="col font-weight-light">{{user.username}}</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-2 col-md-6">
-				<b>Name:</b>
-			</div>
-			<div class="col font-weight-light">
-				{{user_full_name(user.id)}}
-			</div>
+			<div class="col-lg-3 col-md-6">Name:</div>
+			<div class="col font-weight-light">{{user_full_name(user.id)}}</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-2 col-md-6">
-				<b>Email Address:</b>
-			</div>
-			<div class="col font-weight-light">
-				{{user.email_address}}
-			</div>
+			<div class="col-lg-3 col-md-6">Email Address:</div>
+			<div class="col font-weight-light">{{user.email_address}}</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-2 col-md-6">
-				<b>Role:</b>
-			</div>
-			<div class="col font-weight-light">
-				{{role_name(user.role_id)}}
-			</div>
+			<div class="col-lg-3 col-md-6">Role:</div>
+			<div class="col font-weight-light">{{role_name(user.role_id)}}</div>
 		</div>
 		<div class="row">
-			<div class="col-lg-2 col-md-6">
-				<b>Date of Birth:</b>
-			</div>
-			<div class="col font-weight-light">
-				{{ moment(user.date_of_birth, local=True).format('LL') }}
-			</div>
+			<div class="col-lg-3 col-md-6">Date of Birth:</div>
+			<div class="col font-weight-light">{{ moment(user.date_of_birth, local=True).format('LL') }}</div>
 		</div>
 		<div class="row py-3">
 			<div class="col">
