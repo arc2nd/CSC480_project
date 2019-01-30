@@ -2,16 +2,34 @@
 
 {% block content %}
 
-	{% for reward in rewards %}
-		<p>
-			{{reward.name}}
-			{% if is_admin %}
-                 | <a href="{{ url_for('reward_edit', reward_id=reward.id) }}">Edit</a>
-				 | <a href="{{ url_for('reward_remove', reward_id=reward.id) }}">Delete</a>
-			{% endif %}
-			 | <a href="{{ url_for('reward_claim', reward_id=reward.id) }}">Claim</a>
-			 | <a href="{{ url_for('reward_view', reward_id=reward.id) }}">View reward details</a>
-		</p>
-	{% endfor %}
+<div class="container">
+	<div class="row">
+		{% for reward in rewards %}
+		<div class="col-lg-8 col-md-12 col-sm-12 my-3">
+			<div class="card" z="3">
+				<div class="card-header">
+					<h3>{{reward.name}}</h3>
+				</div>
+				<div class="card-body">
+					<p class="text-muted"><small>{{reward.points}} points</small></p>
+					<p>{{reward.description}}</p>
+					<p><a href="{{ url_for('reward_view', reward_id=reward.id) }}">View details</a></p>
+					<a class="btn btn-block btn-primary my-2" href="{{ url_for('reward_claim', reward_id=reward.id) }}">
+						<i class="fa fa-fw fa-star"></i> Claim
+					</a>
+					{% if is_admin %}
+					<div class="text-center">
+						<div class="btn-group btn-group-sm my-2" role="group">
+							<a class="btn btn-secondary" href="{{ url_for('reward_edit', reward_id=reward.id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
+							<a class="btn btn-danger" href="{{ url_for('reward_remove', reward_id=reward.id) }}"><i class="fa fa-fw fa-minus-circle"></i> Delete</a>
+						</div>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
 
 {% endblock %}
