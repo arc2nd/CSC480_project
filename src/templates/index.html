@@ -22,7 +22,7 @@
 						<p><small><span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i> overdue</span></small></p>
 					{% endif %}
 					<p>{{chore.description}}</p>
-					<p><small>Assigned to {{ user_full_name(chore.assigned_to) }}</small></p>
+					<p><small class="font-weight-light">Assigned to {{ user_full_name(chore.assigned_to) }}</small></p>
 					<p>
 					{% if chore.assigned_to != None %}
 						<a class="btn btn-block btn-primary" href="{{ url_for('chore_reassign', chore_id=chore.id) }}">
@@ -31,6 +31,11 @@
 					{% else %}
 						<a class="btn btn-block btn-primary" href="{{ url_for('chore_reassign', chore_id=chore.id) }}">
 							<i class="fa fa-fw fa-thumb-tack"></i> Assign
+						</a>
+					{% endif %}
+					{% if chore.assigned_to == session['user_id'] %}
+						<a class="btn btn-block btn-success" href="{{ url_for('chore_complete', chore_id=chore.id) }}">
+							<i class="fa fa-fw fa-check"></i> Complete
 						</a>
 					{% endif %}
 				</div>
@@ -71,15 +76,47 @@
 	<h2>My Account</h2>
 	<div class="container">
 		<div class="row">
+			<div class="col-lg-2 col-md-6">
+				<b>Username:</b>
+			</div>
+			<div class="col font-weight-light">
+				{{user.username}}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-2 col-md-6">
+				<b>Name:</b>
+			</div>
+			<div class="col font-weight-light">
+				{{user_full_name(user.id)}}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-2 col-md-6">
+				<b>Email Address:</b>
+			</div>
+			<div class="col font-weight-light">
+				{{user.email_address}}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-2 col-md-6">
+				<b>Role:</b>
+			</div>
+			<div class="col font-weight-light">
+				{{role_name(user.role_id)}}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-2 col-md-6">
+				<b>Date of Birth:</b>
+			</div>
+			<div class="col font-weight-light">
+				{{ moment(user.date_of_birth, local=True).format('LL') }}
+			</div>
+		</div>
+		<div class="row py-3">
 			<div class="col">
-				<p>
-					<b>Username:</b> {{user.username}}<br>
-					<b>Name:</b> {{user_full_name(user.id)}}<br>
-					<b>Email Address:</b> {{user.email_address}}<br>
-					<b>Role:</b> {{role_name(user.role_id)}}<br>
-					<b>Date of Birth:</b> {{user.date_of_birth}}
-				</p>
-				<br>
 				<p><a class="btn btn-primary" href="{{url_for('user_edit', user_id=user.id)}}">Edit my account</a></p>
 			</div>
 		</div>

@@ -199,7 +199,7 @@ def user_utility():
         user = User.User.GetById(user_id)
         if user:
             return user.full_name
-        return 'Unassigned'
+        return 'unassigned'
             
     return dict(user_full_name=user_full_name)
 
@@ -609,7 +609,7 @@ def chore_add():
     recurrences = Recurrence.Recurrence.GetAll()
 
     # Default values
-    users_list = [(0, 'Unassigned')]
+    users_list = [(0, 'unassigned')]
 
     # Values from DB
     users_list += [(i.id, i.full_name) for i in users]
@@ -717,7 +717,7 @@ def chore_reassign(chore_id=None):
     users = User.User.GetAll()
 
     # Add a 'None' value to the list so it can be set as unassigned (claimable).
-    users_list = [(0, 'Unassigned')]
+    users_list = [(0, 'unassigned')]
 
     # Grab a user_id/full_name tuple for the form
     users_list += [(i.id, i.full_name) for i in users]
@@ -815,7 +815,7 @@ def chore_edit(chore_id=None):
     recurrences = Recurrence.Recurrence.GetAll()
 
     # Add a 'None' value to the list so it can be set as unassigned (claimable).
-    users_list = [(0, 'Unassigned')]
+    users_list = [(0, 'unassigned')]
 
     # Values from DB
     users_list += [(i.id, i.full_name) for i in users]
