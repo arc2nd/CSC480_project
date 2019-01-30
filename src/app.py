@@ -595,7 +595,7 @@ def chore():
     log_path()
     chores = Chore.Chore.GetAll()
 
-    return render_template('chore.html', chores=chores, title='All Chores')
+    return render_template('chore.html', chores=chores, title='All Chores', now=datetime.now().date())
 
 # chore add
 @app.route('/chore/add', methods=['GET', 'POST'])

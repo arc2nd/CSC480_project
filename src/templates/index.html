@@ -23,21 +23,22 @@
 					{% endif %}
 					<p>{{chore.description}}</p>
 					<p><small class="font-weight-light">Assigned to {{ user_full_name(chore.assigned_to) }}</small></p>
-					<p>
+
 					{% if chore.assigned_to != None %}
-						<a class="btn btn-block btn-primary" href="{{ url_for('chore_reassign', chore_id=chore.id) }}">
+						<a class="btn btn-block btn-primary my-2" href="{{ url_for('chore_reassign', chore_id=chore.id) }}">
 							<i class="fa fa-fw fa-exchange"></i> Reassign
 						</a>
 					{% else %}
-						<a class="btn btn-block btn-primary" href="{{ url_for('chore_reassign', chore_id=chore.id) }}">
+						<a class="btn btn-block btn-primary my-2" href="{{ url_for('chore_reassign', chore_id=chore.id) }}">
 							<i class="fa fa-fw fa-thumb-tack"></i> Assign
 						</a>
 					{% endif %}
-					{% if chore.assigned_to == session['user_id'] %}
-						<a class="btn btn-block btn-success" href="{{ url_for('chore_complete', chore_id=chore.id) }}">
+					{% if chore.assigned_to == session['user_id'] and not chore.complete %}
+						<a class="btn btn-block btn-success my-2" href="{{ url_for('chore_complete', chore_id=chore.id) }}">
 							<i class="fa fa-fw fa-check"></i> Complete
 						</a>
 					{% endif %}
+
 				</div>
 			{% endfor %}
 		</div>
@@ -47,15 +48,27 @@
 		<div class="container">
 		<div class="row">
 			{% for chore in chores %}
-				<div class="col-lg-4 col-md-6 col-sm-12 chore-card">
+				<div class="col-lg-5 col-md-12 col-sm-12 m-3 chore-card" z="3">
 					<h3>{{chore.name}}<br><span class="badge badge-success">{{chore.points}} points</h3>
-					<p>Due <i class="fa fa-fw fa-calendar"></i> {{chore.due_date}} <span class="badge badge-secondary">{{chore_recurrence_name(chore.recurrence_id)}}</span></p>
-					<p>{{chore.description}}</p>
-					<p>
-					<a class="btn btn-block btn-success" href="{{ url_for('chore_complete', chore_id=chore.id) }}">
-						<i class="fa fa-fw fa-check"></i> Complete
-					</a>
+					<p class="text-muted">
+						<small>Due <i class="fa fa-fw fa-calendar"></i> {{ moment(chore.due_date, local=True).format('LL') }} 
+						<span class="badge badge-secondary">
+							{% if chore.recurrence_id != 0 %}
+								<i class="fa fa-fw fa-refresh"></i> 
+							{% endif %}
+							{{chore_recurrence_name(chore.recurrence_id)}}
+						</span>
+						</small>
 					</p>
+					{% if chore.due_date < now %}
+						<p><small><span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i> overdue</span></small></p>
+					{% endif %}
+					<p>{{chore.description}}</p>
+					{% if chore.assigned_to == session['user_id'] and not chore.complete %}
+						<a class="btn btn-block btn-success my-2" href="{{ url_for('chore_complete', chore_id=chore.id) }}">
+							<i class="fa fa-fw fa-check"></i> Complete
+						</a>
+					{% endif %}
 				</div>
 			{% endfor %}
 		</div>
@@ -97,9 +110,8 @@
 		</div>
 		<div class="row py-3">
 			<div class="col">
-				<p><a class="btn btn-primary" href="{{url_for('user_edit', user_id=user.id)}}">Edit my account</a></p>
+				<a class="btn btn-primary my-2" href="{{url_for('user_edit', user_id=user.id)}}">Edit my account</a>
 			</div>
 		</div>
 	</div>
-	<br>
 {% endblock %}

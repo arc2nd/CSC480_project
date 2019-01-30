@@ -16,8 +16,8 @@ $body-color:			#212121;
 $body-color-light:		#efefef;
 
 // Examples of overriding bootstrap variables:
-$brand-primary: #cc6900;
-// $brand-accent: ;
+$brand-primary: 		#cc6900;
+$brand-accent: 			#424242;
 // $link-color: $brand-primary;
 // $link-hover-color: ;
 
@@ -156,6 +156,14 @@ h1.splash-header {
 	@include button-outline-variant($brand-primary, #ffffff, lighten($brand-primary,2%), $brand-primary);
 }
 
+.btn-secondary {
+	@include button-variant($brand-accent, darken($brand-accent, 5%), darken($brand-accent, 7%), lighten($brand-accent,2%), lighten($brand-accent, 7%), darken($brand-accent,15%));
+}
+
+.btn-outline-secondary {
+	@include button-outline-variant($brand-accent, #ffffff, lighten($brand-accent,2%), $brand-accent);
+}
+
 /* Cards */
 .card {
 	background: rgb(234,234,234); /* Old browsers */
@@ -178,4 +186,12 @@ h1.splash-header {
 .neutral-feedback {
 	color: tint($body-color, 30%);
 	font-size: .8rem;
+}
+
+/* Utility */
+.chalkboard {
+	background: url("../images/chalkboard_bg.png") repeat;
+	border: 4px solid #916a0a;
+	color: #ffffff;
+	font-family: "Coming Soon";
 }
