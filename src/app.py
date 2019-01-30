@@ -799,7 +799,7 @@ def chore_view(chore_id=None):
 
     _log.log('chore found', LogType.INFO)
 
-    return render_template('chore_view.html', chore=chore, title='Viewing Chore: {}'.format(chore.name))
+    return render_template('chore_view.html', chore=chore, now=datetime.now().date(), title='Viewing Chore: {}'.format(chore.name))
 
 
 # chore edit

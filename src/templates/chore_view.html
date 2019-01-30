@@ -2,30 +2,64 @@
 
 {% block content %}
 
-	{% if chore %}
-		<p>
-			ID: {{chore.id}}<br>
-			Name: {{chore.name}}<br>
-			Description: {{chore.description}}<br>
-			Recurrence: {{chore_recurrence_name(chore.recurrence_id)}}<br>
-			Due date: {{chore.due_date}}<br>
-			Assigned to: {{user_full_name(chore.assigned_to)}}<br>
-			Points: {{chore.points}}<br>
-		</p>
+{% if chore %}
+	<div class="container">
+		<div class="row">
+			<div class="col-lg-3 col-md-6">Description:</div>
+			<div class="col font-weight-light">{{chore.description}}</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3 col-md-6">Recurrence:</div>
+			<div class="col font-weight-light">
+				<span class="badge badge-secondary">
+					{% if chore.recurrence_id != 0 %}
+						<i class="fa fa-fw fa-refresh"></i> 
+					{% endif %}
+					{{chore_recurrence_name(chore.recurrence_id)}}
+				</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3 col-md-6">Due date:</div>
+			<div class="col font-weight-light">
+				{{ moment(chore.due_date, local=True).format('LL') }} 
+				{% if chore.due_date < now %}
+				<span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i> overdue</span>
+				{% endif %}
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3 col-md-6">Assigned to:</div>
+			<div class="col font-weight-light">{{user_full_name(chore.assigned_to)}}</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-3 col-md-6">Points:</div>
+			<div class="col font-weight-light">{{chore.points}}</div>
+		</div>
+	</div>
 
-		<p>
-			Actions:<br>
-			{% if is_admin  %}
-				| <a href="{{ url_for('chore_remove', chore_id=chore.id) }}">Delete</a><br>
-				| <a href="{{ url_for('chore_reassign', chore_id=chore.id) }}">Reassign</a><br>
-			{% endif %}
-			{% if chore.assigned_to == None %}
-				| <a href="{{ url_for('chore_claim', chore_id=chore.id) }}">Claim</a><br>
-			{% endif %}
-			{% if chore.assigned_to == session['user_id'] and not chore.complete %}
-				| <a href="{{ url_for('chore_complete', chore_id=chore.id) }}">Complete</a><br>
-			{% endif %}
-		</p>
+	{% if is_admin %}
+	<div class="text-center">
+		<div class="btn-group btn-group-sm my-2" role="group">
+			<a class="btn btn-secondary" href="{{ url_for('chore_edit', chore_id=chore.id) }}"><i class="fa fa-fw fa-edit"></i>
+				Edit</a>
+			<a class="btn btn-danger" href="{{ url_for('chore_remove', chore_id = chore.id) }}"><i class="fa fa-fw fa-minus-circle"></i>
+				Delete</a>
+			<a class="btn btn-primary" href="{{ url_for('chore_reassign', chore_id = chore.id) }}"><i class="fa fa-fw fa-exchange"></i>
+				Reassign</a>
+		</div>
+		<div class="my-2">
+			<a class="btn btn-primary" href="{{ url_for('chore_claim', chore_id=chore.id) }}"><i class="fa fa-fw fa-flag"></i>
+				Claim</a>
+		</div>
+		{% if chore.assigned_to == session['user_id'] and not chore.complete %}
+		<div class="my-2">
+			<a class="btn btn-primary" href="{{ url_for('chore_complete', chore_id=chore.id) }}"><i class="fa fa-fw fa-check"></i>
+				Complete</a>
+		</div>
+		{% endif %}
+	</div>
 	{% endif %}
+{% endif %}
 
 {% endblock %}
