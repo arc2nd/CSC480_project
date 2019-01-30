@@ -9,7 +9,7 @@
 @import 'node_modules/font-awesome/scss/font-awesome';
 
 // Override Bootstrap options
-$body-bg:				#ffffff;
+$body-bg:				#fafafa;
 $light-bg:				#ffffff;
 $dark-bg:				#343a40;
 $body-color:			#212121;
@@ -154,7 +154,7 @@ h1.splash-header {
 }
 
 .btn-outline-primary {
-	@include button-outline-variant($brand-primary, #222222, lighten($brand-primary,2%), $brand-primary);
+	@include button-outline-variant($brand-primary, #ffffff, lighten($brand-primary,2%), $brand-primary);
 }
 
 /* Cards */
