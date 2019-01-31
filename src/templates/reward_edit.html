@@ -1,42 +1,42 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% if errors %}
-        {% for error in errors: %}
-            {{error}}<br>
-        {% endfor %}
-    {% endif %}
+{% if errors %}
+{% for error in errors: %}
+{{error}}<br>
+{% endfor %}
+{% endif %}
 
-    <form action="{{ url_for('reward_edit', reward_id=reward.id) }}" method="post">
-        {{ form.hidden_tag() }}
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                {{ form.name.label }}
-            </div>
-            <div class="form-group col-md-6">
-                {{ form.name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Get Froyo") }}
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                {{ form.description.label }}
-            </div>
-            <div class="form-group col-md-6">
-                {{ form.description(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Let's go get some frozen yogurt") }}
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                {{ form.points.label }}
-            </div>
-            <div class="form-group col-md-6">
-                {{ form.points(class_="form-control mb-2 mr-sm-2") }}
-            </div>
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-12 text-center">
-                <button class="btn btn-primary" type="submit">Edit Reward</button>
-            </div>
-        </div>
-    </form>
+<form action="{{ url_for('reward_edit', reward_id=reward.id) }}" method="post">
+	{{ form.hidden_tag() }}
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.name.label }}
+		</div>
+		<div class="form-group col-md-6">
+			{{ form.name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Get Froyo") }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.description.label }}
+		</div>
+		<div class="form-group col-md-6">
+			{{ form.description(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Let's go get some frozen yogurt") }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.points.label }}
+		</div>
+		<div class="form-group col-md-6">
+			{{ form.points(class_="form-control mb-2 mr-sm-2") }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-12 text-center">
+			<button class="btn btn-primary" type="submit"><i class="fa fa-fw fa-edit"></i> Edit Reward</button>
+		</div>
+	</div>
+</form>
 {% endblock %}

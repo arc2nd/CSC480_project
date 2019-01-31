@@ -7,7 +7,6 @@
 {% endfor %}
 {% endif %}
 
-<h2>Reassign {{chore.name}}</h2>
 {% if chore.assigned_to %}
 <p>Currently assigned to: {{user_full_name(chore.assigned_to)}}</p>
 {% else %}
@@ -26,7 +25,7 @@
 	</div>
 	<div class="form-row">
 		<div class="form-group col-md-12 text-center">
-			<button class="btn btn-primary" type="submit">Reassign Chore</button>
+			<button class="btn btn-primary" type="submit"><i class="fa fa-fw fa-exchange"></i>Reassign Chore</button>
 		</div>
 	</div>
 </form>

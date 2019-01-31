@@ -5,6 +5,7 @@ from wtforms import TextField, PasswordField, StringField, SubmitField, SelectFi
 from wtforms.fields.html5 import DateField, IntegerField
 from flask_wtf import FlaskForm, CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
+from flask_moment import Moment
 from functools import wraps
 from datetime import datetime, timedelta
 from Log import Log, LogType
@@ -22,8 +23,9 @@ _log = Log()
 
 CREDS = config.get_creds('envs.json', crypt=False)
 
-# Static files path
 app = Flask(__name__)
+
+moment = Moment(app)
 
 app.config['ADMIN_ROLE_ID'] = CREDS['ADMIN_ROLE_ID']
 app.config['APPLICATION_VERSION'] = CREDS['APPLICATION_VERSION']
@@ -197,7 +199,7 @@ def user_utility():
         user = User.User.GetById(user_id)
         if user:
             return user.full_name
-        return 'Unassigned'
+        return 'unassigned'
             
     return dict(user_full_name=user_full_name)
 
@@ -209,7 +211,6 @@ def chore_utility():
         return recurrence.frequency_name
 
     return dict(chore_recurrence_name=chore_recurrence_name)
-
 
 # Route decorators
 
@@ -274,7 +275,7 @@ def index():
     else:
         chores = Chore.Chore.GetByUser(user, False)
     
-    return render_template('index.html', title='Dashboard', chores=chores, user=user)
+    return render_template('index.html', title='Dashboard', chores=chores, user=user, now=datetime.now().date())
 
 # Splash page
 @app.route('/splash', methods=['GET'])
@@ -594,7 +595,7 @@ def chore():
     log_path()
     chores = Chore.Chore.GetAll()
 
-    return render_template('chore.html', chores=chores, title='All Chores')
+    return render_template('chore.html', chores=chores, title='All Chores', now=datetime.now().date())
 
 # chore add
 @app.route('/chore/add', methods=['GET', 'POST'])
@@ -608,7 +609,7 @@ def chore_add():
     recurrences = Recurrence.Recurrence.GetAll()
 
     # Default values
-    users_list = [(0, 'Unassigned')]
+    users_list = [(0, 'unassigned')]
 
     # Values from DB
     users_list += [(i.id, i.full_name) for i in users]
@@ -716,7 +717,7 @@ def chore_reassign(chore_id=None):
     users = User.User.GetAll()
 
     # Add a 'None' value to the list so it can be set as unassigned (claimable).
-    users_list = [(0, 'Unassigned')]
+    users_list = [(0, 'unassigned')]
 
     # Grab a user_id/full_name tuple for the form
     users_list += [(i.id, i.full_name) for i in users]
@@ -798,7 +799,7 @@ def chore_view(chore_id=None):
 
     _log.log('chore found', LogType.INFO)
 
-    return render_template('chore_view.html', chore=chore, title='Viewing Chore: {}'.format(chore.name))
+    return render_template('chore_view.html', chore=chore, now=datetime.now().date(), title='Viewing Chore: {}'.format(chore.name))
 
 
 # chore edit
@@ -814,7 +815,7 @@ def chore_edit(chore_id=None):
     recurrences = Recurrence.Recurrence.GetAll()
 
     # Add a 'None' value to the list so it can be set as unassigned (claimable).
-    users_list = [(0, 'Unassigned')]
+    users_list = [(0, 'unassigned')]
 
     # Values from DB
     users_list += [(i.id, i.full_name) for i in users]

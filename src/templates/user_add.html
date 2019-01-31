@@ -2,69 +2,69 @@
 
 {% block content %}
 
-	<form action="{{ url_for('user_add') }}" method="post">
-		{{ form.hidden_tag() }}
-		<div class="form-row">
-			<div class="form-group col-md-6">
-				{{ form.username.label }}
-			</div>
-			<div class="form-group col-md-6">
-				{{ form.username(class_="form-control mb-2 mr-sm-2",placeholder="e.g. ChoreDestroyer123") }}
-			</div>
+<form action="{{ url_for('user_add') }}" method="post">
+	{{ form.hidden_tag() }}
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.username.label }}
 		</div>
-		<div class="form-row">
-			<div class="form-group col-md-6">
-				{{ form.password.label }}
-			</div>
-			<div class="form-group col-md-6">
-				{{ form.password(class_="form-control mb-2 mr-sm-2") }}
-			</div>
+		<div class="form-group col-md-6">
+			{{ form.username(class_="form-control mb-2 mr-sm-2",placeholder="e.g. ChoreDestroyer123") }}
 		</div>
-		<div class="form-row">
-			<div class="form-group col-md-6">
-				{{ form.email_address.label }}
-			</div>
-			<div class="form-group col-md-6">
-				{{ form.email_address(class_="form-control mb-2 mr-sm-2",placeholder="e.g. ChoreDestroyer123@CleanHouse.com") }}
-			</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.password.label }}
 		</div>
-		<div class="form-row">
-			<div class="form-group col-md-6">
-				{{ form.first_name.label }}
-			</div>
-			<div class="form-group col-md-6">
-				{{ form.first_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Jane, John") }}
-			</div>
+		<div class="form-group col-md-6">
+			{{ form.password(class_="form-control mb-2 mr-sm-2") }}
 		</div>
-		<div class="form-row">		
-			<div class="form-group col-md-6">
-				{{ form.middle_name.label }}
-			</div>
-			<div class="form-group col-md-6">
-				{{ form.middle_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Alex, Erin") }}
-			</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.email_address.label }}
 		</div>
-		<div class="form-row">		
-			<div class="form-group col-md-6">
-				{{ form.last_name.label }}
-			</div>
-			<div class="form-group col-md-6">
-				{{ form.last_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Smith") }}
-			</div>
+		<div class="form-group col-md-6">
+			{{ form.email_address(class_="form-control mb-2 mr-sm-2",placeholder="e.g. ChoreDestroyer123@CleanHouse.com") }}
 		</div>
-		<div class="form-row">
-			<div class="form-group col-md-6">
-				{{ form.date_of_birth.label }}
-			</div>
-			<div class="form-group col-md-6">
-				{{ form.date_of_birth(class_="form-control mb-2 mr-sm-2") }}
-			</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.first_name.label }}
 		</div>
-		<div class="form-row">
-			<div class="form-group col-md-12 text-center">
-				<button class="btn btn-primary" type="submit">Add User</button>
-			</div>
+		<div class="form-group col-md-6">
+			{{ form.first_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Jane, John") }}
 		</div>
-	</form>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.middle_name.label }}
+		</div>
+		<div class="form-group col-md-6">
+			{{ form.middle_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Alex, Erin") }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.last_name.label }}
+		</div>
+		<div class="form-group col-md-6">
+			{{ form.last_name(class_="form-control mb-2 mr-sm-2",placeholder="e.g. Smith") }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-6">
+			{{ form.date_of_birth.label }}
+		</div>
+		<div class="form-group col-md-6">
+			{{ form.date_of_birth(class_="form-control mb-2 mr-sm-2") }}
+		</div>
+	</div>
+	<div class="form-row">
+		<div class="form-group col-md-12 text-center">
+			<button class="btn btn-primary" type="submit"><i class="fa fa-fw fa-plus"></i> Add User</button>
+		</div>
+	</div>
+</form>
 
 {% endblock %}
