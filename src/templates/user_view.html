@@ -2,25 +2,52 @@
 
 {% block content %}
 
-	{% if user %}
-		<p>
-			ID: {{user.id}}<br>
-			Role ID: {{user.role_id}}<br>
-			Username: {{user.username}}<br>
-			Email: {{user.email_address}}<br>
-			First Name: {{user.first_name}}<br>
-			Middle Name: {{user.middle_name}}<br>
-			Last Name: {{user.last_name}}<br>
-			Date of Birth: {{user.date_of_birth}}<br>
-			Points: {{user.points}}<br>
-		</p>
+{% if user %}
+<div class="container">
+	<div class="row">
+		<div class="col-lg-3 col-md-3 col-sm-3">Name:</div>
+		<div class="col-md-9 col-sm-9 font-weight-light">
+			<p>{{user_full_name(user.id)}}</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-3 col-md-3 col-sm-3">Role:</div>
+		<div class="col-md-9 col-sm-9 font-weight-light">
+			<p>{{role_name(user.role_id)}}</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-3 col-md-3 col-sm-3">Email:</div>
+		<div class="col-md-9 col-sm-9 font-weight-light">
+			<p>{{user.email_address}}</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-3 col-md-3 col-sm-3">Date of Birth:</div>
+		<div class="col-md-9 col-sm-9 font-weight-light">
+			<p>{{ moment(user.date_of_birth, local=True).format('LL') }}</p>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-lg-3 col-md-6 col-sm-3">Points:</div>
+		<div class="col-sm-9 font-weight-light">
+			<p>{{user.points}}</p>
+		</div>
+	</div>
+</div>
 
-		<p>
-			Actions:<br>
-			{% if is_admin and user.role != admin_role_id %}
-				<a href="{{ url_for('user_remove', user_id=user.id) }}">Delete</a>
-			{% endif %} 
-		</p>
+<div class="text-center">
+	{% if is_admin %}
+	<div class="btn-group btn-group-sm my-2" role="group">
+		<a class="btn btn-secondary" href="{{ url_for('user_edit', user_id=user.id) }}"><i class="fa fa-fw fa-edit"></i>
+			Edit</a>
+		<a class="btn btn-secondary" href="{{ url_for('user_reset_password', user_id=user.id) }}"><i class="fa fa-fw fa-key"></i>
+			Reset Password</a>
+		<a class="btn btn-danger" href="{{ url_for('user_remove', user_id = user.id) }}"><i class="fa fa-fw fa-minus-circle"></i>
+			Delete</a>
+	</div>
 	{% endif %}
+</div>
+{% endif %}
 
 {% endblock %}

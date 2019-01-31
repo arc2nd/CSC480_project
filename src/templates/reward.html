@@ -12,8 +12,10 @@
 				</div>
 				<div class="card-body">
 					<p class="text-muted"><small>{{reward.points}} points</small></p>
-					<p>{{reward.description}}</p>
-					<p><a href="{{ url_for('reward_view', reward_id=reward.id) }}">View details</a></p>
+					<p>{{reward.description}}</p>					
+					<a class="btn btn-block btn-primary my-2" href="{{ url_for('reward_view', reward_id=reward.id) }}">
+						<i class="fa fa-fw fa-info"></i> Details
+					</a>
 					<a class="btn btn-block btn-primary my-2" href="{{ url_for('reward_claim', reward_id=reward.id) }}">
 						<i class="fa fa-fw fa-star"></i> Claim
 					</a>
