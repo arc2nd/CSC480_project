@@ -12,28 +12,28 @@
 </head>
 
 <body class="d-flex flex-column splash">
-<main class="flex-fill">
-	<div class="container text-center">
-		<h1 class="splash-header">Welcome to Chore Explore</h1>
-	</div>
-	<div class="container">
-		<div class="row justify-content-center">
-			<div class="col-lg-6 col-md-8 col-sm-10">
-				<h2>Log in to get started.</h2>
-				<br>
-				{% with messages = get_flashed_messages(with_categories=true) %}
-				{% if messages %}
-				{% for category, message in messages %}
-				<div class="alert alert-{{ category }}">{{ message }}</div>
-				{% endfor %}
-				<br>
-				{% endif %}
-				{% endwith %}
-				<div class="card card-gradient">
-					<div class="card-body">
-						{% if session['logged_in'] %}
+	<main class="flex-fill">
+		<div class="container text-center">
+			<h1 class="splash-header">Welcome to Chore Explore</h1>
+		</div>
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="col-lg-6 col-md-8 col-sm-10">
+					<h2>Log in to get started.</h2>
+					<br>
+					{% with messages = get_flashed_messages(with_categories=true) %}
+					{% if messages %}
+					{% for category, message in messages %}
+					<div class="alert alert-{{ category }}">{{ message }}</div>
+					{% endfor %}
+					<br>
+					{% endif %}
+					{% endwith %}
+					<div class="card card-gradient">
+						<div class="card-body">
+							{% if session['logged_in'] %}
 							<p>You're already logged in. Maybe you meant to <a href="{{ url_for('index') }}">go to the home page</a>.</p>
-						{% else %}
+							{% else %}
 							<form action="{{ url_for('user_login')}}" method="post" name="login">
 								{{ form.hidden_tag() }}
 								{{ form.username.label(class_="sr-only") }}
@@ -42,19 +42,20 @@
 								{{ form.password(class_="form-control mb-2",placeholder="Password") }}<br>
 								<input class="btn btn-primary" type="submit" value="Log in">
 							</form>
-						{% endif %}
+							{% endif %}
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-</main>
+	</main>
 
-<footer class="footer splash-footer">
-	<div class="container text-center">&copy; Our Team Name v{{ application_version }}</div>
-</footer>
+	<footer class="footer splash-footer">
+		<div class="container text-center">&copy; Our Team Name v{{ application_version }}</div>
+	</footer>
 
-<script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
 
 </body>
+
 </html>

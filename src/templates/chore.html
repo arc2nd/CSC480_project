@@ -17,8 +17,7 @@
 					</span>
 				</small>
 			</p>
-				{% if chore.due_date < now %}
-				<p><small><span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i>overdue</span></small></p>
+			{% if chore.due_date < now %} <p><small><span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i>overdue</span></small></p>
 				{% endif %}
 
 				<p>{{chore.description}}</p>
@@ -41,9 +40,12 @@
 				{% if is_admin %}
 				<div class="text-center">
 					<div class="btn-group btn-group-sm my-2" role="group">
-						<a class="btn btn-secondary" href="{{ url_for('chore_edit', chore_id=chore.id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
-						<a class="btn btn-danger" href="{{ url_for('chore_remove', chore_id = chore.id) }}"><i class="fa fa-fw fa-minus-circle"></i> Delete</a>
-						<a class="btn btn-primary" href="{{ url_for('chore_reassign', chore_id = chore.id) }}"><i class="fa fa-fw fa-exchange"></i> Reassign</a>
+						<a class="btn btn-secondary" href="{{ url_for('chore_edit', chore_id=chore.id) }}"><i class="fa fa-fw fa-edit"></i>
+							Edit</a>
+						<a class="btn btn-danger" href="{{ url_for('chore_remove', chore_id = chore.id) }}"><i class="fa fa-fw fa-minus-circle"></i>
+							Delete</a>
+						<a class="btn btn-primary" href="{{ url_for('chore_reassign', chore_id = chore.id) }}"><i class="fa fa-fw fa-exchange"></i>
+							Reassign</a>
 					</div>
 				</div>
 				{% endif %}
