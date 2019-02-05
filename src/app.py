@@ -281,7 +281,7 @@ def index():
 @app.route('/splash', methods=['GET'])
 def splash():
     log_path()
-    form = UserAddForm()
+    form = UserLoginForm()
     return render_template('splash.html', form=form, title='Welcome to Chore Explore')
 
 # Admin functions route
@@ -1014,4 +1014,4 @@ if __name__ == '__main__':
     app.secret_key = os.urandom(12)
     app.register_error_handler(404, page_not_found)
     app.register_error_handler(500, internal_error)
-    app.run()
+    app.run(threaded=False)
