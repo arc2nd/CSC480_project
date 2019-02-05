@@ -89,7 +89,7 @@ class Chore(BaseMixin, db.Model):
         chore = Chore.GetById(self.id)
 
         # If the chore repeats
-        if(chore.recurrence_id != 0):
+        if chore.recurrence_id != 0:
             Chore.CreateRecurrence(chore)
 
         chore.complete = True
