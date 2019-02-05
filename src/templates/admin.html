@@ -49,9 +49,11 @@
 					<h2>Notifications</h2>
 				</div>
 				<div class="card-body">
-					<a class="btn btn-success btn-block" href="#"><i class="fa fa-fw fa-toggle-on" aria-hidden></i>
+					<a class="btn btn-success btn-block" href="{{ url_for('admin_notifications_toggle', setting='on') }}"><i class="fa fa-fw fa-toggle-on"
+						 aria-hidden></i>
 						Toggle on</a>
-					<a class="btn btn-danger btn-block" href="#"><i class="fa fa-fw fa-toggle-off" aria-hidden></i>
+					<a class="btn btn-danger btn-block" href="{{ url_for('admin_notifications_toggle', setting='off') }}"><i class="fa fa-fw fa-toggle-off"
+						 aria-hidden></i>
 						Toggle off</a>
 				</div>
 			</div>

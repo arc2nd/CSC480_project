@@ -32,11 +32,12 @@ app.config['APPLICATION_VERSION'] = CREDS['APPLICATION_VERSION']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = CREDS['SQLALCHEMY_TRACK_MODIFICATIONS']
 app.config['SQLALCHEMY_DATABASE_URI'] = CREDS['SQLALCHEMY_DATABASE_URI']
 app.config['STANDARD_ROLE_ID'] = CREDS['STANDARD_ROLE_ID']
+app.config['SYSTEM_VALUES_NOTIFICATIONS'] = CREDS['SYSTEM_VALUES_NOTIFICATIONS']
 
 db = SQLAlchemy(app)
 
 # Our models, import here after db has been instantiated
-import Reward, Role, User, Chore, Recurrence
+import Reward, Role, User, Chore, Recurrence, SystemValues
 
 # set some globals
 VERBOSITY = 1
@@ -284,12 +285,38 @@ def splash():
     form = UserAddForm()
     return render_template('splash.html', form=form, title='Welcome to Chore Explore')
 
+# Admin Routes
+
 # Admin functions route
 @app.route('/admin', methods=['GET'])
 @login_required
 @admin_required
 def admin():
     log_path()
+    return render_template('admin.html', title='Administrative Actions')
+
+# admin notifications toggle
+@app.route('/admin/notifications/toggle/<string:setting>', methods=['GET'])
+@login_required
+@admin_required
+def admin_notifications_toggle(setting=None):
+    log_path()
+    notifications_setting = (SystemValues.SystemValues.GetById(app.config['SYSTEM_VALUES_NOTIFICATIONS']))
+
+    if(setting.lower() == 'on'):
+        # Turn on
+        notifications_setting.value_bool = True
+        notifications_setting.UpdateData()
+        flash('Success: Notifications have been turned on', category='success')
+    elif(setting.lower() == 'off'):
+        # Turn off
+        notifications_setting.value_bool = False
+        notifications_setting.UpdateData()
+        flash('Success: Notifications have been turned off', category='success')
+    else:
+        # Invalid
+        flash('Error: You did not choose a valid notification setting', category='danger')
+
     return render_template('admin.html', title='Administrative Actions')
 
 
