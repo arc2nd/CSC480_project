@@ -92,6 +92,17 @@ def create_tables():
 			description VARCHAR(255) NOT NULL,
 			points INT NOT NULL
 		)
+		""",
+		"""
+		CREATE TABLE systemvalues
+		(
+			id SERIAL PRIMARY KEY,
+			name VARCHAR(255) NOT NULL UNIQUE,
+			value_bool BOOL,
+			value_date date,
+			value_int INT,
+			value_string VARCHAR(255)
+		)
 		"""
 	]
 
@@ -159,6 +170,22 @@ def seed_recurrences():
 
 	return False
 
+def seed_system_values():
+	""" Seed the required system values """
+	commands = [
+		"""
+		INSERT INTO systemvalues
+			(id, name, value_bool, value_date, value_int, value_string)
+			VALUES
+			(1, 'notifications', TRUE, NULL, NULL, NULL)
+		"""
+	]
+
+	if(execute_commands(commands)):
+		return True
+
+	return False
+
 def restart_users_sequence():
 
 	""" Restart the user sequence at 2 since we just created Admin with 1 """
@@ -177,8 +204,8 @@ if __name__ == '__main__':
 	
 	if(create_tables()):
 		print("Tables created. Seeding roles and admin user...")
-		if(seed_roles() and seed_admin_user() and seed_recurrences()):
-			print("Roles, admin user, and recurrences seeded. Updating users id sequence...")
+		if(seed_roles() and seed_admin_user() and seed_recurrences() and seed_system_values()):
+			print("Roles, admin user, recurrences, and system values seeded. Updating users id sequence...")
 			if(restart_users_sequence()):
 				print("Updated users sequence successfully.")
 	else:

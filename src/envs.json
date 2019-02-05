@@ -6,5 +6,6 @@
 	"SQLALCHEMY_DATABASE_URI": "postgresql://cxp:choresarereallyfun@localhost/ChoreExplore",
 	"SQLALCHEMY_TRACK_MODIFICATIONS": false,
 	"STANDARD_ROLE_ID": 2,
+	"SYSTEM_VALUES_NOTIFICATIONS": 1,
 	"WTF_CSRF_SECRET_KEY": "this-needs-to-change-in-production"
 }

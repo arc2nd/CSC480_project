@@ -2,13 +2,24 @@
 
 import Chore
 import User
+import SystemValues
 import smtplib
 import os
+import config
+from Log import Log, LogType
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
+_log = Log()
+
 basedir = os.path.dirname(os.path.realpath(__file__)) 
 
+CONFIG = config.get_creds('envs.json', crypt=False)
+
+def notifications_enabled():
+    system_value_notifications = CONFIG['SYSTEM_VALUES_NOTIFICATIONS']
+    notifications_enabled = (SystemValues.SystemValues.GetById(system_value_notifications)).value_bool
+    return notifications_enabled
 
 def check_due():
     overdue_list = []
@@ -56,8 +67,15 @@ def send_reminder(chore=None):
         s.quit()
             
 if __name__ == '__main__':
-    all_overdue = check_due()
-    for c in all_overdue:
-        send_reminder(chore=c) 
+    notifications_status = False
+    notifications_status = notifications_enabled()
 
+    _log.log('Notifications status: {0}'.format(notifications_status), LogType.INFO)
 
+    if notifications_status:
+        print('Sending notifications')
+        all_overdue = check_due()
+        for c in all_overdue:
+            send_reminder(chore=c) 
+    else:
+        print('Notifications not enabled.')
