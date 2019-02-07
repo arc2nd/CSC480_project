@@ -526,8 +526,26 @@ def user_edit(user_id=None):
             if form.validate():
                 _log.log('form validated', LogType.INFO)
 
-                form.populate_obj(old_user)
+                # Run some uniqueness checks before proceeding
+                currentUsers = User.User.GetAll()
 
+                if(form.email_address.data != old_user.email_address):
+                    _log.log('user attempt to change email address, checking for uniqueness', LogType.INFO)
+                    if(any(u.email_address == form.email_address.data for u in currentUsers)):
+                        _log.log('user did not enter a unique email address', LogType.ERROR)
+                        flash("Error: That email address is already being used by another user", category="danger")
+                        return render_template('user_edit.html', form=form, errors=errors, user=old_user, title='Edit User: {}'.format(old_user.username))
+                    _log.log('user attempt to change email address is allowed', LogType.INFO)
+
+                if(form.username.data != old_user.username):
+                    _log.log('user attempt to change username, checking for uniqueness', LogType.INFO)
+                    if(any(u.email_address == form.email_address.data for u in currentUsers)):
+                        _log.log('user did not enter a unique email address', LogType.ERROR)
+                        flash("Error: That username is already being used by another user", category="danger")
+                        return render_template('user_edit.html', form=form, errors=errors, user=old_user, title='Edit User: {}'.format(old_user.username))
+                    _log.log('user attempt to change username is allowed', LogType.INFO)
+                
+                form.populate_obj(old_user)
                 new_password = form.new_password.data
                 new_password_verify = form.new_password_verify.data
                 
@@ -546,10 +564,8 @@ def user_edit(user_id=None):
                         _log.log('could not verify old password', LogType.WARN)
                         flash("Error: Could not verify your old password", category="danger")
 
-                # Not updating password, just update the other data
-                else:
-                    old_user.UpdateData()
-                    _log.log('edited user: {}'.format(old_user.username), LogType.INFO)
+                old_user.UpdateData()
+                _log.log('edited user: {}'.format(old_user.username), LogType.INFO)
 
                 # Log the user out if they just edited their own account. This is to reset
                 # their session, force them to log in with their new password, etc
