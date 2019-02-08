@@ -89,7 +89,7 @@ class ChoreAddForm(FlaskForm):
     name = TextField('Chore Name:', validators=[validators.required()])
     description = TextField('Description:', validators=[validators.required()])
     due_date = DateField('Due Date:', format='%Y-%m-%d',
-                         validators=[validators.optional()])
+                         validators=[validators.required()])
     points = IntegerField('Points:', validators=[validators.required()])
     assigned_to = SelectField('Assign To:', coerce=int, validators=[validators.optional()])
     recurrence_id = SelectField('Recurrence:', coerce=int, validators=[validators.optional()])
@@ -99,7 +99,7 @@ class ChoreEditForm(FlaskForm):
     name = TextField('Chore Name:', validators=[validators.required()])
     description = TextField('Description:', validators=[validators.required()])
     due_date = DateField('Due Date:', format='%Y-%m-%d',
-                         validators=[validators.optional()])
+                         validators=[validators.required()])
     points = IntegerField('Points:', validators=[validators.required()])
     assigned_to = SelectField('Assign To:', coerce=int, validators=[validators.optional()])
     recurrence_id = SelectField('Recurrence:', coerce=int, validators=[validators.optional()])
