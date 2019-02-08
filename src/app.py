@@ -48,20 +48,20 @@ WTF_CSRF_SECRET_KEY = CREDS['WTF_CSRF_SECRET_KEY']
 def bad_request(error):
     flash('Error: There was a problem with your request', category='danger')
     _log.log('400 error encountered. URL: {0}, IP: {1}'.format(request.url, request.remote_addr), LogType.ERROR)
-    return render_template('error.html', title='Error 400'), 400
+    return render_template('error.html', title='Error 400 - Bad request'), 400
 
 @app.errorhandler(404)
 def page_not_found(error):
     flash('Error: The file you are trying to access does not exist', category='danger')
     _log.log('404 error encountered. {0}, IP: {1}'.format(request.url, request.remote_addr), LogType.ERROR)
-    return render_template('error.html', title='Error 404'), 404
+    return render_template('error.html', title='Error 404 - File not found'), 404
 
 @app.errorhandler(500)
 def internal_error(error):
     db.session.rollback()
     flash('Error: The server encountered an internal error', category='danger')
     _log.log('500 error encountered. {0}, IP: {1}'.format(request.url, request.remote_addr), LogType.ERROR)
-    return render_template('error.html', title='Error 500'), 500
+    return render_template('error.html', title='Error 500 - Internal server error'), 500
 
 def log_path():
     _log.log('Path: {0}'.format(request.path), LogType.INFO)
