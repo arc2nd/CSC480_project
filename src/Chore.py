@@ -53,8 +53,10 @@ class Chore(BaseMixin, db.Model):
 
     # Read operations
     @staticmethod
-    def GetByUser(user, completed):
+    def GetByUser(user, completed=None):
         """ Return all chores assigned to a single user """
+        if(completed == None):
+            return Chore.query.filter_by(assigned_to=user.id).all()	
 
         return Chore.query.filter_by(assigned_to=user.id,complete=completed).all()
     

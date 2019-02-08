@@ -563,6 +563,7 @@ def user_edit(user_id=None):
                     else:
                         _log.log('could not verify old password', LogType.WARN)
                         flash("Error: Could not verify your old password", category="danger")
+                        return render_template('user_edit.html', form=form, errors=errors, user=old_user, title='Edit User: {}'.format(old_user.username))
 
                 old_user.UpdateData()
                 _log.log('edited user: {}'.format(old_user.username), LogType.INFO)

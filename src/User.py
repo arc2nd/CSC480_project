@@ -6,6 +6,7 @@ import bcrypt
 from app import app
 from BaseMixin import BaseMixin
 import Role
+import Chore
 import ErrorHandler
 
 class User(BaseMixin, db.Model):
@@ -109,6 +110,15 @@ class User(BaseMixin, db.Model):
             raise ErrorHandler.ErrorHandler(message="passwords do not match", status_code=400)
 
     # Delete operations
+    @staticmethod
+    def Remove(user):
+        """ Remove a user """
+        user.UnassignAllChores()
+
+        db.session.delete(user)
+        db.session.commit()
+        return True
+
 
     # Utility operations
     @staticmethod
@@ -137,5 +147,15 @@ class User(BaseMixin, db.Model):
     def AddPoints(self, points):
         """ Add a chore's points to the user account """
         self.points += points
+        db.session.commit()
+        return True
+
+    def UnassignAllChores(self):
+        """ Unassigns all chores assigned to a user's account """
+        allChores = Chore.Chore.GetByUser(self)
+
+        for chore in allChores:
+            chore.Unassign()
+
         db.session.commit()
         return True
