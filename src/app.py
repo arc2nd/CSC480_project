@@ -941,6 +941,13 @@ def reward_add():
         form = RewardAddForm(request.form)
 
         if form.validate():
+            currentRewards = Reward.Reward.GetAll()
+
+            if(any(r.name == form.name.data for r in currentRewards)):
+                _log.log('user did not enter a unique reward name', LogType.ERROR)
+                flash("Error: The reward name you entered is not unique", category="danger")
+                return render_template('reward_add.html', form=form, errors=errors, title='Add a reward')
+
             _log.log('form validated', LogType.INFO)
             newReward = Reward.Reward(form.name.data)
             form.populate_obj(newReward)
@@ -1038,6 +1045,15 @@ def reward_edit(reward_id=None):
 
         if form.validate():
             _log.log('form validated', LogType.INFO)
+
+            currentRewards = Reward.Reward.GetAll()
+
+            # If the user is changing the name, check for uniqueness
+            if(form.name.data != old_reward.name):
+                if(any(r.name == form.name.data for r in currentRewards)):
+                    _log.log('user did not enter a unique reward name', LogType.ERROR)
+                    flash("Error: The reward name you entered is not unique", category="danger")
+                    return render_template('reward_edit.html', form=form, errors=errors, reward=old_reward, title='Edit Reward: {}'.format(old_reward.name))
 
             form.populate_obj(old_reward)
             old_reward.UpdateData()
