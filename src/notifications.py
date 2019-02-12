@@ -172,7 +172,3 @@ if __name__ == '__main__':
     else:
         print('Notifications not enabled.')
     
-
-    # this_user = User.User.GetByUsername('jparks')
-    # this_reward = Reward.Reward.GetById(1)
-    # send_reward_claim_notice(this_reward, this_user)
