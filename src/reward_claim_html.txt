@@ -1,0 +1,6 @@
+<html>
+    <head></head>
+        <body>
+            <p>User %THIS_USER% has claimed the reward %REWARD_NAME%.</p>
+        </body>
+</html>
