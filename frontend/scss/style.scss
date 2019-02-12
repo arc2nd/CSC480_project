@@ -161,8 +161,9 @@ h1.splash-header {
 	@include button-variant($brand-accent, darken($brand-accent, 5%), darken($brand-accent, 7%), lighten($brand-accent,2%), lighten($brand-accent, 7%), darken($brand-accent,15%));
 }
 
-.btn-outline-secondary {
-	@include button-outline-variant($brand-accent, #ffffff, lighten($brand-accent,2%), $brand-accent);
+.btn-rainbow {
+	@include button-variant($brand-primary, darken($brand-primary, 5%), darken($brand-primary, 7%), lighten($brand-primary,2%), lighten($brand-primary, 7%), darken($brand-primary,15%));
+	background-image: linear-gradient(90deg, rgba(0, 191, 255, 0.70) 0%, rgba(255, 208, 0, 0.70) 49%, rgba(252, 79, 79, 0.70) 80%, rgba(0, 191, 255, 0.70) 100%);
 }
 
 /* Cards */
@@ -199,4 +200,17 @@ h1.splash-header {
 
 .no-wrap {
 	white-space: nowrap
+}
+
+/* Confetti Effect */
+.confetti-container {
+	text-align: center;
+}
+
+#confetti-canvas {
+	left: 0;
+	pointer-events: none;
+	position: fixed;
+	top: 0;
+	z-index: -1;
 }

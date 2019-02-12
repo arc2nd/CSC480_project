@@ -736,18 +736,22 @@ def chore_complete(chore_id=None):
     log_path()
     user = User.User.GetById(session['user_id'])
     chore = Chore.Chore.GetById(chore_id)
+    completed = False
+    chores = Chore.Chore.GetAll()
+
     _log.log(chore.assigned_to, LogType.INFO)
     if user and chore and chore.assigned_to == user.id:
         if chore.MarkCompleted() and user.AddPoints(chore.points):
                 _log.log('chore completed successfully', LogType.INFO)
                 flash('Success: Chore completed', category='success')
+                completed = True
         else:
             _log.log('error marking chore complete', LogType.ERROR)
             flash('Error: Chore not completed', category='danger')
     else:
         _log.log('user attempt to complete another user\'s chore', LogType.WARN)
         flash('Warning: You cannot complete another user\'s chore', category='warning')
-    return redirect(url_for('chore'))
+    return render_template('chore.html', chores=chores, title='All Chores', completed=completed, now=datetime.now().date())
 
 # chore reassign
 @app.route('/chore/reassign/<int:chore_id>', methods=['GET', 'POST'])
@@ -972,19 +976,23 @@ def reward_claim(reward_id=None):
     log_path()
 
     reward = Reward.Reward.GetById(reward_id)
+    rewards = Reward.Reward.GetAll()
     user = User.User.GetById(session['user_id'])
-
+    claimed = False
+    
     if reward:
         if Reward.Reward.Claim(reward, user):
             _log.log('claimed reward successfully', LogType.INFO)
             flash('Success: Reward \'{}\' claimed for {} points'.format(reward.name, reward.points), category='success')
+            claimed = True
+            
         else:
             _log.log('error claiming reward', LogType.WARN)
             flash('Error: Reward not claimed. Do you have enough points?', category='danger')
     else:
         _log.log('error finding reward', LogType.WARN)
         flash('Warning: Could not find that reward', category='warning')
-    return redirect(url_for('reward'))
+    return render_template('reward.html', rewards=rewards, claimed=claimed, title='All Rewards')
 
 # reward remove 
 @app.route('/reward/remove/<int:reward_id>', methods=['GET'])

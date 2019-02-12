@@ -2,6 +2,14 @@
 
 {% block content %}
 
+{% if completed == True %}
+<div class="confetti-container">
+	<h2>Great Job! Let's celebrate!</h2>
+	<button id="confetti-button" class="btn btn-rainbow" onclick="toggleConfetti();">Release the confetti!</button>
+	<canvas id="confetti-canvas"></canvas>
+</div>
+{% endif %}
+
 <div class="container">
 	<div class="row">
 		{% for chore in chores %}
