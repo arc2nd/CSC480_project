@@ -976,6 +976,7 @@ def reward_claim(reward_id=None):
 
     if reward:
         if Reward.Reward.Claim(reward, user):
+            Reward.Reward.Notify(reward, user)
             _log.log('claimed reward successfully', LogType.INFO)
             flash('Success: Reward \'{}\' claimed for {} points'.format(reward.name, reward.points), category='success')
         else:
