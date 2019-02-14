@@ -14,6 +14,7 @@ $light-bg:				#ffffff;
 $dark-bg:				#343a40;
 $body-color:			#212121;
 $body-color-light:		#efefef;
+$body-color-dark:		
 
 // Examples of overriding bootstrap variables:
 $brand-primary: 		#cc6900;
@@ -91,6 +92,10 @@ body.splash {
 
 h1.splash-header {
 	font-family: $font-family-cursive;
+}
+
+h2.splash-header {
+	color: $brand-accent;
 }
 
 /* Alerts */
