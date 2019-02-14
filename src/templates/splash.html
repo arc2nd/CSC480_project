@@ -19,7 +19,6 @@
 		<div class="container">
 			<div class="row justify-content-center">
 				<div class="col-lg-6 col-md-8 col-sm-10">
-					<h2>Log in to get started.</h2>
 					<br>
 					{% with messages = get_flashed_messages(with_categories=true) %}
 					{% if messages %}
@@ -31,6 +30,8 @@
 					{% endwith %}
 					<div class="card card-gradient">
 						<div class="card-body">
+							<h2 class="splash-header">Log in to get started.</h2>
+							<br>
 							{% if session['logged_in'] %}
 							<p>You're already logged in. Maybe you meant to <a href="{{ url_for('index') }}">go to the
 									home page</a>.</p>
