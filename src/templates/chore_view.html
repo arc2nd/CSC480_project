@@ -4,71 +4,67 @@
 
 {% if chore %}
 <div class="container">
-	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-3">Description:</div>
-		<div class="col-md-9 col-sm-9 font-weight-light">
-			<p>{{chore.description}}</p>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-3">Recurrence:</div>
-		<div class="col-md-9 col-sm-9 font-weight-light">
-			<p>
-				<span class="badge badge-secondary">
-					{% if chore.recurrence_id != 0 %}
-					<i class="fa fa-fw fa-refresh"></i>
-					{% endif %}
-					{{chore_recurrence_name(chore.recurrence_id)}}
-				</span>
-			</p>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-3">Due date:</div>
-		<div class="col-md-9 col-sm-9 font-weight-light">
-			<p>
-				{{ moment(chore.due_date, local=True).format('LL') }}
-				{% if chore.due_date < now %} <span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i> overdue</span>
-					{% endif %}
-			</p>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-3">Assigned to:</div>
-		<div class="col-md-9 col-sm-9 font-weight-light">
-			<p>{{user_full_name(chore.assigned_to)}}</p>
-		</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-3">Points:</div>
-		<div class="col-md-9 col-sm-9 font-weight-light">
-			<p>{{chore.points}}</p>
+	<div class="card">
+		<div class="card-body">
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3">Description:</div>
+				<div class="col-md-9 col-sm-9 font-weight-light">
+					<p>{{chore.description}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3">Recurrence:</div>
+				<div class="col-md-9 col-sm-9 font-weight-light">
+					<p>
+						<span class="badge badge-secondary">
+							{% if chore.recurrence_id != 0 %}
+							<i class="fa fa-fw fa-refresh"></i>
+							{% endif %}
+							{{chore_recurrence_name(chore.recurrence_id)}}
+						</span>
+					</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3">Due date:</div>
+				<div class="col-md-9 col-sm-9 font-weight-light">
+					<p>
+						{{ moment(chore.due_date, local=True).format('LL') }}
+						{% if chore.due_date < now %} <span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i> overdue</span>
+							{% endif %}
+					</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3">Assigned to:</div>
+				<div class="col-md-9 col-sm-9 font-weight-light">
+					<p>{{user_full_name(chore.assigned_to)}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3">Points:</div>
+				<div class="col-md-9 col-sm-9 font-weight-light">
+					<p>{{chore.points}}</p>
+				</div>
+			</div>
+			<div class="text-center">
+				<a class="btn btn-primary my-2" href="{{ url_for('chore_claim', chore_id=chore.id) }}"><i class="fa fa-fw fa-flag"></i> Claim</a>
+				{% if chore.assigned_to == session['user_id'] and not chore.complete %}
+					<a class="btn btn-success my-2" href="{{ url_for('chore_complete', chore_id=chore.id) }}"><i class="fa fa-fw fa-check"></i>Complete</a>
+				{% endif %}
+				<br>
+				{% if is_admin %}
+				<div class="btn-group btn-group-sm my-2" role="group">
+					<a class="btn btn-secondary" href="{{ url_for('chore_edit', chore_id=chore.id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
+					<a class="btn btn-danger" href="{{ url_for('chore_remove', chore_id = chore.id) }}"><i class="fa fa-fw fa-minus-circle"></i> Delete</a>
+					<a class="btn btn-primary" href="{{ url_for('chore_reassign', chore_id = chore.id) }}"><i class="fa fa-fw fa-exchange"></i> Reassign</a>
+				</div>
+				{% endif %}
+			</div>
 		</div>
 	</div>
 </div>
 
-<div class="text-center">
-	<div class="my-2">
-		<a class="btn btn-primary" href="{{ url_for('chore_claim', chore_id=chore.id) }}"><i class="fa fa-fw fa-flag"></i>
-			Claim</a>
-	</div>
-	{% if chore.assigned_to == session['user_id'] and not chore.complete %}
-	<div class="my-2">
-		<a class="btn btn-primary" href="{{ url_for('chore_complete', chore_id=chore.id) }}"><i class="fa fa-fw fa-check"></i>
-			Complete</a>
-	</div>
-	{% endif %}
-	{% if is_admin %}
-	<div class="btn-group btn-group-sm my-2" role="group">
-		<a class="btn btn-secondary" href="{{ url_for('chore_edit', chore_id=chore.id) }}"><i class="fa fa-fw fa-edit"></i>
-			Edit</a>
-		<a class="btn btn-danger" href="{{ url_for('chore_remove', chore_id = chore.id) }}"><i class="fa fa-fw fa-minus-circle"></i>
-			Delete</a>
-		<a class="btn btn-primary" href="{{ url_for('chore_reassign', chore_id = chore.id) }}"><i class="fa fa-fw fa-exchange"></i>
-			Reassign</a>
-	</div>
-	{% endif %}
-</div>
 {% endif %}
 
 {% endblock %}
