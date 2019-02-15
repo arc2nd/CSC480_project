@@ -40,10 +40,11 @@ class Reward(BaseMixin, db.Model):
         
         return False
 
+    @staticmethod
     def Notify(reward, user):
         import notifications
         try:
             notifications.send_reward_claim_notice(reward=reward, user=user)
         except:
-            print('An error has occured in sending a notification about reward {} for user {}'.format(reward.name, user.name))
+            print('An error has occurred in sending a notification about reward {} for user {}'.format(reward.name, user.username))
         return
