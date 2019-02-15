@@ -3,7 +3,9 @@
 from datetime import datetime
 from app import db
 from BaseMixin import BaseMixin
+from Log import Log, LogType
 
+_log = Log()
 
 class Reward(BaseMixin, db.Model):
     __tablename__ = 'rewards'
@@ -46,10 +48,5 @@ class Reward(BaseMixin, db.Model):
         try:
             notifications.send_reward_claim_notice(reward=reward, user=user)
         except:
-<<<<<<< HEAD
-            print('An error has occurred in sending a notification about reward {} for user {}'.format(reward.name, user.username))
-
-=======
-            print('An error has occured in sending a notification about reward {} for user {}'.format(reward.name, user.username))
->>>>>>> 92497885e18762d4ec67b045b8e549774e540921
+            _log.log("An error has occurred in sending a notification about reward {} for user {}".format(reward.name, user.username), LogType.ERROR)
         return
