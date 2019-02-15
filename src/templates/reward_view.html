@@ -4,33 +4,32 @@
 
 {% if reward %}
 <div class="container">
-	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-3">Description:</div>
-		<div class="col-md-9 col-sm-9 font-weight-light">
-			<p>{{reward.description}}</p>
+	<div class="card">
+		<div class="card-body">
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3">Description:</div>
+				<div class="col-md-9 col-sm-9 font-weight-light">
+					<p>{{reward.description}}</p>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-3 col-sm-3">Points:</div>
+				<div class="col-md-9 col-sm-9 font-weight-light">
+					<p>{{reward.points}}</p>
+				</div>
+			</div>
+			<div class="text-center">
+				<a class="btn btn-primary my-2" href="{{ url_for('reward_claim', reward_id=reward.id) }}"><i class="fa fa-fw fa-star"></i> Claim</a>
+				<br>
+				{% if is_admin %}
+				<div class="btn-group btn-group-sm my-2" role="group">
+					<a class="btn btn-secondary" href="{{ url_for('reward_edit', reward_id=reward.id) }}"><i class="fa fa-fw fa-edit"></i> Edit</a>
+					<a class="btn btn-danger" href="{{ url_for('reward_remove', reward_id = reward.id) }}"><i class="fa fa-fw fa-minus-circle"></i> Delete</a>
+				</div>
+				{% endif %}
+			</div>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-3 col-sm-3">Points:</div>
-		<div class="col-md-9 col-sm-9 font-weight-light">
-			<p>{{reward.points}}</p>
-		</div>
-	</div>
-</div>
-
-<div class="text-center">
-	<div class="my-2">
-		<a class="btn btn-primary" href="{{ url_for('reward_claim', reward_id=reward.id) }}"><i class="fa fa-fw fa-star"></i>
-			Claim</a>
-	</div>
-	{% if is_admin %}
-	<div class="btn-group btn-group-sm my-2" role="group">
-		<a class="btn btn-secondary" href="{{ url_for('reward_edit', reward_id=reward.id) }}"><i class="fa fa-fw fa-edit"></i>
-			Edit</a>
-		<a class="btn btn-danger" href="{{ url_for('reward_remove', reward_id = reward.id) }}"><i class="fa fa-fw fa-minus-circle"></i>
-			Delete</a>
-	</div>
-	{% endif %}
 </div>
 {% endif %}
 

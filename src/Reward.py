@@ -47,4 +47,5 @@ class Reward(BaseMixin, db.Model):
             notifications.send_reward_claim_notice(reward=reward, user=user)
         except:
             print('An error has occurred in sending a notification about reward {} for user {}'.format(reward.name, user.username))
+
         return
