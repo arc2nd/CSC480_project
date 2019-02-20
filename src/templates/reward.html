@@ -5,15 +5,16 @@
 {% if claimed == True %}
 <div class="confetti-container">
 	<h2>Great Job! Let's celebrate!</h2>
-	<button id="confetti-button" class="btn btn-rainbow" onclick="toggleConfetti();">Release the confetti!</button>
+	<button id="confetti-button" class="btn btn-rainbow" z="1" onclick="toggleConfetti();">Release the confetti!</button>
 	<canvas id="confetti-canvas"></canvas>
 </div>
 {% endif %}
 
 <div class="container">
 	<div class="row">
+	{% if rewards %}
 		{% for reward in rewards %}
-		<div class="col-lg-5 col-md-12 col-sm-12 m-3 chore-card" z="3">
+		<div class="col-lg-5 col-md-12 col-sm-12 m-3 chore-card" z="1">
 			<h3>{{reward.name}}<br><span class="badge badge-success">{{reward.points}} points</h3>
 			<p>{{reward.description}}</p>
 			<a class="btn btn-block btn-primary my-2" href="{{ url_for('reward_view', reward_id=reward.id) }}">
@@ -36,6 +37,11 @@
 			{% endif %}
 		</div>
 		{% endfor %}
+	{% else %}
+		<div class="col">
+			<div class="alert alert-info">There are currently no rewards available</div>
+		</div>
+	{% endif %}
 	</div>
 </div>
 

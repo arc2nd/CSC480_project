@@ -5,56 +5,46 @@
 <div class="container">
 	<div class="row">
 		<div class="col-lg-5 col-md-12 col-sm-12 m-3">
-			<div class="card" z="3">
+			<div class="card" z="1">
 				<div class="card-header">
 					<h2>Users</h2>
 				</div>
 				<div class="card-body">
-					<a class="btn btn-primary btn-block" href="{{ url_for('user') }}"><i class="fa fa-fw fa-user" aria-hidden></i>
-						Users</a>
-					<a class="btn btn-secondary btn-block" href="{{ url_for('user_add') }}"><i class="fa fa-fw fa-plus" aria-hidden></i>
-						Add a User</a>
+					<a class="btn btn-primary btn-block" href="{{ url_for('user') }}"><i class="fa fa-fw fa-user" aria-hidden></i> Users</a>
+					<a class="btn btn-secondary btn-block" href="{{ url_for('user_add') }}"><i class="fa fa-fw fa-plus" aria-hidden></i> Add a User</a>
 				</div>
 			</div>
 		</div>
 		<div class="col-lg-5 col-md-12 col-sm-12 m-3">
-			<div class="card" z="3">
+			<div class="card" z="1">
 				<div class="card-header">
 					<h2>Chores</h2>
 				</div>
 				<div class="card-body">
-					<a class="btn btn-primary btn-block" href="{{ url_for('chore') }}"><i class="fa fa-fw fa-tasks" aria-hidden></i>
-						Chores</a>
-					<a class="btn btn-secondary btn-block" href="{{ url_for('chore_add') }}"><i class="fa fa-fw fa-plus" aria-hidden></i>
-						Add a Chore</a>
+					<a class="btn btn-primary btn-block" href="{{ url_for('chore') }}"><i class="fa fa-fw fa-tasks" aria-hidden></i> Chores</a>
+					<a class="btn btn-secondary btn-block" href="{{ url_for('chore_add') }}"><i class="fa fa-fw fa-plus" aria-hidden></i> Add a Chore</a>
 				</div>
 			</div>
 		</div>
 		<div class="col-lg-5 col-md-12 col-sm-12 m-3">
-			<div class="card" z="3">
+			<div class="card" z="1">
 				<div class="card-header">
 					<h2>Rewards</h2>
 				</div>
 				<div class="card-body">
-					<a class="btn btn-primary btn-block" href="{{ url_for('reward') }}"><i class="fa fa-fw fa-star" aria-hidden></i>
-						Rewards</a>
-					<a class="btn btn-secondary btn-block" href="{{ url_for('reward_add') }}"><i class="fa fa-fw fa-plus" aria-hidden></i>
-						Add a Reward</a>
+					<a class="btn btn-primary btn-block" href="{{ url_for('reward') }}"><i class="fa fa-fw fa-star" aria-hidden></i> Rewards</a>
+					<a class="btn btn-secondary btn-block" href="{{ url_for('reward_add') }}"><i class="fa fa-fw fa-plus" aria-hidden></i> Add a Reward</a>
 				</div>
 			</div>
 		</div>
 		<div class="col-lg-5 col-md-12 col-sm-12 m-3">
-			<div class="card" z="3">
+			<div class="card" z="1">
 				<div class="card-header">
 					<h2>Notifications</h2>
 				</div>
 				<div class="card-body">
-					<a class="btn btn-success btn-block" href="{{ url_for('admin_notifications_toggle', setting='on') }}"><i class="fa fa-fw fa-toggle-on"
-						 aria-hidden></i>
-						Toggle on</a>
-					<a class="btn btn-danger btn-block" href="{{ url_for('admin_notifications_toggle', setting='off') }}"><i class="fa fa-fw fa-toggle-off"
-						 aria-hidden></i>
-						Toggle off</a>
+					<a class="btn btn-success btn-block" href="{{ url_for('admin_notifications_toggle', setting='on') }}"><i class="fa fa-fw fa-toggle-on" aria-hidden></i> Toggle on</a>
+					<a class="btn btn-danger btn-block" href="{{ url_for('admin_notifications_toggle', setting='off') }}"><i class="fa fa-fw fa-toggle-off" aria-hidden></i> Toggle off</a>
 				</div>
 			</div>
 		</div>

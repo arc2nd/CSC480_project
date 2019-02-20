@@ -56,5 +56,5 @@ Open your terminal, execute the following in the root folder:
 1. `gulp min` (runs min to minify JS/CSS files)
 	- You need to re-run `gulp min` every time you make a change to JS/CSS files for it to re-minify and pick up your changes.
 
-
-
+## Test email server
+1. Command to run the test email server to debug notifications/reminders: `python -m smtpd -n -c DebuggingServer localhost:1025`
