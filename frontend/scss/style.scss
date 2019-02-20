@@ -44,18 +44,30 @@ $blue:					#1565c0;
 
 *[z="1"] {
 	@include shadow-d1;
+	&:hover {
+		@include shadow-d2;
+	}
 }
 
 *[z="2"] {
 	@include shadow-d2;
+	&:hover {
+		@include shadow-d3;
+	}
 }
 
 *[z="3"] {
 	@include shadow-d3;
+	&:hover {
+		@include shadow-d4;
+	}
 }
 
 *[z="4"] {
 	@include shadow-d4;
+	&:hover {
+		@include shadow-d5;
+	}
 }
 
 *[z="5"] {
@@ -91,6 +103,10 @@ body.splash {
 
 h1.splash-header {
 	font-family: $font-family-cursive;
+}
+
+h2.splash-header {
+	color: $brand-accent;
 }
 
 /* Alerts */
@@ -167,6 +183,15 @@ h1.splash-header {
 }
 
 /* Cards */
+.card {
+	border-radius: 0;
+	border: 0;
+}
+
+.card-no-header {
+	border-top: 4px solid $dark-bg;
+}
+
 .card-gradient {
 	background: rgb(234,234,234); /* Old browsers */
 	background: -moz-linear-gradient(top, rgba(234,234,234,1) 8%, rgba(175,175,175,1) 95%); /* FF3.6-15 */

@@ -2,24 +2,27 @@
 
 {% block content %}
 {% if is_admin %}
+{% if chores %}
 <h2>Chores</h2>
+{% endif %}
 <div class="container">
 	<div class="row">
-		{% for chore in chores %}
-		<div class="col-lg-5 col-md-12 col-sm-12 m-3 chore-card" z="3">
-			<h3>{{chore.name}}<br><span class="badge badge-success">{{chore.points}} points</h3>
-			<p class="text-muted">
-				<small>Due <i class="fa fa-fw fa-calendar"></i> {{ moment(chore.due_date, local=True).format('LL') }}
-					<span class="badge badge-secondary">
-						{% if chore.recurrence_id != 0 %}
-						<i class="fa fa-fw fa-refresh"></i>
-						{% endif %}
-						{{chore_recurrence_name(chore.recurrence_id)}}
-					</span>
-				</small>
-			</p>
-			{% if chore.due_date < now %} <p><small><span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i>
-						overdue</span></small></p>
+		{% if chores %}
+			{% for chore in chores %}
+			<div class="col-lg-5 col-md-12 col-sm-12 m-3 chore-card" z="1">
+				<h3>{{chore.name}}<br><span class="badge badge-success">{{chore.points}} points</h3>
+				<p class="text-muted">
+					<small>Due <i class="fa fa-fw fa-calendar"></i> {{ moment(chore.due_date, local=True).format('LL') }}
+						<span class="badge badge-secondary">
+							{% if chore.recurrence_id != 0 %}
+							<i class="fa fa-fw fa-refresh"></i>
+							{% endif %}
+							{{chore_recurrence_name(chore.recurrence_id)}}
+						</span>
+					</small>
+				</p>
+				{% if chore.due_date < now %} 
+					<p><small><span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i> overdue</span></small></p>
 				{% endif %}
 				<p>{{chore.description}}</p>
 				<p><small class="font-weight-light">Assigned to {{ user_full_name(chore.assigned_to) }}</small></p>
@@ -39,29 +42,45 @@
 				</a>
 				{% endif %}
 
-		</div>
-		{% endfor %}
+			</div>
+			{% endfor %}
+		{% else %}
+			<div class="col">
+				<div class="card" z="1">
+					<div class="card-header">
+						<h2>Chores</h2>
+					</div>
+					<div class="card-body">
+						There are currently no chores. Head to the <a href="{url_for("admin")}">admin page</a> to create one.
+					</div>
+				</div>
+			</div>
+		{% endif %}
 	</div>
 </div>
 {% else %}
+{% if chores %}
 <h2>My Chores</h2>
+{% endif %}
 <div class="container">
 	<div class="row">
-		{% for chore in chores %}
-		<div class="col-lg-5 col-md-12 col-sm-12 m-3 chore-card" z="3">
-			<h3>{{chore.name}}<br><span class="badge badge-success">{{chore.points}} points</h3>
-			<p class="text-muted">
-				<small>Due <i class="fa fa-fw fa-calendar"></i> {{ moment(chore.due_date, local=True).format('LL') }}
-					<span class="badge badge-secondary">
-						{% if chore.recurrence_id != 0 %}
-						<i class="fa fa-fw fa-refresh"></i>
-						{% endif %}
-						{{chore_recurrence_name(chore.recurrence_id)}}
-					</span>
-				</small>
-			</p>
-			{% if chore.due_date < now %} <p><small><span class="badge badge-danger"><i class="fa fa-fw fa-exclamation"></i>
-						overdue</span></small></p>
+		{% if chores %}
+			{% for chore in chores %}
+			<div class="col-lg-5 col-md-12 col-sm-12 m-3 chore-card" z="1">
+				<h3>{{chore.name}}<br><span class="badge badge-success">{{chore.points}} points</h3>
+				<p class="text-muted">
+					<small>Due <i class="fa fa-fw fa-calendar"></i> {{ moment(chore.due_date, local=True).format('LL') }}
+						<span class="badge badge-secondary">
+							{% if chore.recurrence_id != 0 %}
+							<i class="fa fa-fw fa-refresh"></i>
+							{% endif %}
+							{{chore_recurrence_name(chore.recurrence_id)}}
+						</span>
+					</small>
+				</p>
+				{% if chore.due_date < now %} <p><small><span class="badge badge-danger"><i
+								class="fa fa-fw fa-exclamation"></i>
+							overdue</span></small></p>
 				{% endif %}
 				<p>{{chore.description}}</p>
 				{% if chore.assigned_to == session['user_id'] and not chore.complete %}
@@ -69,49 +88,72 @@
 					<i class="fa fa-fw fa-check"></i> Complete
 				</a>
 				{% endif %}
-		</div>
-		{% endfor %}
+			</div>
+			{% endfor %}
+		{% else %}
+			<div class="col">
+				<div class="card" z="1">
+					<div class="card-header">
+						<h2>My Chores</h2>
+					</div>
+					<div class="card-body">
+						You do not have any assigned chores. Head to the <a href="{{ url_for('chore') }}">chores page</a> to claim one.
+					</div>
+				</div>
+			</div>
+		{% endif %}
 	</div>
 </div>
 {% endif %}
 <br>
 
-<h2>My Reward Points</h2>
 <div class="container">
 	<div class="row">
 		<div class="col">
-			You currently have <b>{{user.points}} points</b>. You can redeem your points on the <a href="{{ url_for('reward') }}">rewards
-				page</a>.
+			<div class="card" z="1">
+				<div class="card-header">
+					<h2>My Reward Points</h2>
+				</div>
+				<div class="card-body">
+					You currently have <b>{{user.points}} points</b>. You can redeem your points on the <a href="{{ url_for('reward') }}">rewards page</a>.
+				</div>
+			</div>
 		</div>
 	</div>
 </div>
 <br>
 
-<h2>My Account</h2>
 <div class="container">
-	<div class="row">
-		<div class="col-lg-3 col-md-6">Username:</div>
-		<div class="col font-weight-light">{{user.username}}</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-6">Name:</div>
-		<div class="col font-weight-light">{{user_full_name(user.id)}}</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-6">Email Address:</div>
-		<div class="col font-weight-light">{{user.email_address}}</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-6">Role:</div>
-		<div class="col font-weight-light">{{role_name(user.role_id)}}</div>
-	</div>
-	<div class="row">
-		<div class="col-lg-3 col-md-6">Date of Birth:</div>
-		<div class="col font-weight-light">{{ moment(user.date_of_birth, local=True).format('LL') }}</div>
-	</div>
-	<div class="row py-3">
-		<div class="col">
-			<a class="btn btn-primary my-2" href="{{url_for('user_edit', user_id=user.id)}}">Edit my account</a>
+	<div class="card" z="1">
+		<div class="card-header">
+			<h2>My Account</h2>
+		</div>
+		<div class="card-body">
+			<div class="row">
+				<div class="col-lg-3 col-md-6">Username:</div>
+				<div class="col font-weight-light">{{user.username}}</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-6">Name:</div>
+				<div class="col font-weight-light">{{user_full_name(user.id)}}</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-6">Email Address:</div>
+				<div class="col font-weight-light">{{user.email_address}}</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-6">Role:</div>
+				<div class="col font-weight-light">{{role_name(user.role_id)}}</div>
+			</div>
+			<div class="row">
+				<div class="col-lg-3 col-md-6">Date of Birth:</div>
+				<div class="col font-weight-light">{{ moment(user.date_of_birth, local=True).format('LL') }}</div>
+			</div>
+			<div class="row py-3">
+				<div class="col">
+					<a class="btn btn-primary mt-2" href="{{url_for('user_edit', user_id=user.id)}}">Edit my account</a>
+				</div>
+			</div>
 		</div>
 	</div>
 </div>

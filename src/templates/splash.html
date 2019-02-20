@@ -19,7 +19,6 @@
 		<div class="container">
 			<div class="row justify-content-center">
 				<div class="col-lg-6 col-md-8 col-sm-10">
-					<h2>Log in to get started.</h2>
 					<br>
 					{% with messages = get_flashed_messages(with_categories=true) %}
 					{% if messages %}
@@ -31,8 +30,11 @@
 					{% endwith %}
 					<div class="card card-gradient">
 						<div class="card-body">
+							<h2 class="splash-header">Log in to get started.</h2>
+							<br>
 							{% if session['logged_in'] %}
-							<p>You're already logged in. Maybe you meant to <a href="{{ url_for('index') }}">go to the home page</a>.</p>
+							<p>You're already logged in. Maybe you meant to <a href="{{ url_for('index') }}">go to the
+									home page</a>.</p>
 							{% else %}
 							<form action="{{ url_for('user_login')}}" method="post" name="login">
 								{{ form.hidden_tag() }}
@@ -51,7 +53,7 @@
 	</main>
 
 	<footer class="footer splash-footer">
-		<div class="container text-center">&copy; Our Team Name v{{ application_version }}</div>
+		<div class="container text-center">&copy; ChoreExplore v{{application_version}}</div>
 	</footer>
 
 	<script src="{{ url_for('static', filename='js/scripts.min.js') }}"></script>
