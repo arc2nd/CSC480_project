@@ -539,7 +539,7 @@ def user_edit(user_id=None):
 
                 if(form.username.data != old_user.username):
                     _log.log('user attempt to change username, checking for uniqueness', LogType.INFO)
-                    if(any(u.email_address == form.email_address.data for u in currentUsers)):
+                    if(any(u.username == form.username.data for u in currentUsers)):
                         _log.log('user did not enter a unique email address', LogType.ERROR)
                         flash("Error: That username is already being used by another user", category="danger")
                         return render_template('user_edit.html', form=form, errors=errors, user=old_user, title='Edit User: {}'.format(old_user.username))
